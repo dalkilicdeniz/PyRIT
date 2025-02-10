@@ -3,6 +3,7 @@
 
 import enum
 import logging
+import re
 from pathlib import Path
 from typing import Optional, Union
 from uuid import uuid4
@@ -154,9 +155,15 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
         # Custom handling on the first turn for prepended conversation
         score = self._handle_last_prepended_assistant_message()
         custom_prompt = self._handle_last_prepended_user_message()
+        thread_id = ""
 
         while turn <= self._max_turns:
             logger.info(f"Applying the attack strategy for turn {turn}.")
+
+            if turn == 1:
+                print("Starting new chat...")
+            else:
+                print("Continuing chat with thread ID: " + thread_id)
 
             feedback = None
             if self._use_score_as_feedback and score:
@@ -170,6 +177,19 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
                 custom_prompt=custom_prompt,
                 memory_labels=updated_memory_labels,
             )
+            # Extract the thread ID from the response to send follow-up messages
+            if turn == 1:
+                thread_id = response.prompt_metadata.get("thread_id")
+                print("Extracted Thread ID: ", thread_id)
+                if thread_id:
+                    match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
+                    if match:
+                        member_id_str = match.group(1)
+                        self._objective_target.http_request = self._objective_target.http_request.replace(
+                            member_id_str, f"{member_id_str}&threadId={thread_id}"
+                        )
+                    else:
+                        self._objective_target.http_request += f"&threadId={thread_id}"
 
             # Reset custom prompt for future turns
             custom_prompt = None

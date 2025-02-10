@@ -100,10 +100,16 @@ class HTTPTarget(PromptTarget):
                     )
         response_content = response.content
 
+        # Retrieve the thread ID from the response, so we can send follow-up messages
+        thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
+        thread_id_match = re.search(thread_id_key, response_content.decode("utf-8"))
+        thread_id = thread_id_match.group(1) if thread_id_match else None
+
         if self.callback_function:
             response_content = self.callback_function(response=response)
 
-        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)])
+        #Send thread_id in prompt_metadata so that it can be used in follow-up messages
+        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})
 
         return response_entry
 
