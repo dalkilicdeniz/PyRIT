@@ -35,7 +35,8 @@ class PromptRequestResponse:
                 raise ValueError("Conversation ID mismatch.")
 
             if not request_piece.converted_value:
-                raise ValueError("Converted prompt text is None.")
+                request_piece.converted_value = request_piece.original_value
+                #raise ValueError("Converted prompt text is None.")
 
             if not role:
                 role = request_piece.role

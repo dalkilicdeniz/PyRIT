@@ -8,6 +8,7 @@ import re
 from typing import Any, Callable, Optional
 
 import httpx
+from six import print_
 
 from pyrit.models import (
     PromptRequestPiece,
@@ -81,6 +82,7 @@ class HTTPTarget(PromptTarget):
             http2_version = True
 
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
+            #print(http_body)
             match http_body:
                 case dict():
                     response = await client.request(
@@ -107,6 +109,7 @@ class HTTPTarget(PromptTarget):
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
+            #print(response_content)
 
         #Send thread_id in prompt_metadata so that it can be used in follow-up messages
         response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})

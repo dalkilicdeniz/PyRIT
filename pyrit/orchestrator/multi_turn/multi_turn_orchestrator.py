@@ -57,12 +57,12 @@ class MultiTurnAttackResult:
         for message in target_messages:
             for piece in message.request_pieces:
                 if piece.role == "user":
-                    print(f"{Style.BRIGHT}{Fore.BLUE}{piece.role}:")
+                    #print(f"{Style.BRIGHT}{Fore.GREEN}{piece.role}:")
                     if piece.converted_value != piece.original_value:
-                        print(f"Original value: {piece.original_value}")
-                    print(f"Converted value: {piece.converted_value}")
+                        print(f"\nOriginal value: {piece.original_value}")
+                    print(f"\n{Style.BRIGHT}{Fore.GREEN}User: {Style.NORMAL}{piece.converted_value}")
                 else:
-                    print(f"{Style.NORMAL}{Fore.YELLOW}{piece.role}: {piece.converted_value}")
+                    print(f"{Style.BRIGHT}{Fore.BLUE}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
 
                 await display_image_response(piece)
 
