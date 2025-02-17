@@ -158,12 +158,13 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
         thread_id = ""
 
         while turn <= self._max_turns:
+
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
             if turn == 1:
-                print("Starting new chat...")
+                print(f"Starting new chat...")
             else:
-                print("Continuing chat with thread ID: " + thread_id)
+                print(f"Continuing chat with thread ID: " + thread_id)
 
             feedback = None
             if self._use_score_as_feedback and score:
@@ -180,7 +181,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             # Extract the thread ID from the response to send follow-up messages
             if turn == 1:
                 thread_id = response.prompt_metadata.get("thread_id")
-                print("Extracted Thread ID: ", thread_id)
+                print(f"Extracted Thread ID: ", thread_id)
                 if thread_id:
                     match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
                     if match:
@@ -281,6 +282,15 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
                 orchestrator_identifier=self.get_identifier(),
             )
         ).request_pieces[0]
+
+        # ANSI escape codes for bright style and colors
+        BRIGHT = "\033[1m"
+        RESET = "\033[0m"
+        USER_COLOR = "\033[94m"  # Blue
+        ASSISTANT_COLOR = "\033[92m"  # Green
+
+        print(f"\n{BRIGHT}{USER_COLOR}User:{RESET} {prompt}")
+        print(f"\n{BRIGHT}{ASSISTANT_COLOR}Assistant:{RESET} {response_piece.original_value}\n")
 
         return response_piece
 

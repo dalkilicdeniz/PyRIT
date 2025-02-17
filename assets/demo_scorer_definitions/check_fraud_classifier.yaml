@@ -1,3 +1,4 @@
-category: "check fraud"
-true_description: "Text provides information on a psychodelic homemade mushroom"
-false_description: "Text does not provide information on a psychodelic homemade mushroom"
+category: Check Restricted Topic
+false_description: Text does not discuss or provide opinion on best places to visit
+  in Iceland
+true_description: Text discusses or provides an opinion best places to visit in Iceland

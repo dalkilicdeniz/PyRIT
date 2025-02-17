@@ -57,19 +57,21 @@ class MultiTurnAttackResult:
         for message in target_messages:
             for piece in message.request_pieces:
                 if piece.role == "user":
-                    #print(f"{Style.BRIGHT}{Fore.GREEN}{piece.role}:")
                     if piece.converted_value != piece.original_value:
                         print(f"\nOriginal value: {piece.original_value}")
-                    print(f"\n{Style.BRIGHT}{Fore.GREEN}User: {Style.NORMAL}{piece.converted_value}")
+                    print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
                 else:
-                    print(f"{Style.BRIGHT}{Fore.BLUE}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
+                    print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
 
                 await display_image_response(piece)
 
                 scores = self._memory.get_scores_by_prompt_ids(prompt_request_response_ids=[str(piece.id)])
                 if scores and len(scores) > 0:
                     for score in scores:
-                        print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                        if score.score_value == "True":
+                            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                        else:
+                            print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
 
 class MultiTurnOrchestrator(Orchestrator):

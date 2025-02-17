@@ -77,6 +77,7 @@ class Scorer(abc.ABC):
         request_piece = PromptRequestPiece(
             role="user",
             original_value=text,
+            expected_output=text,
         )
 
         request_piece.id = None
@@ -218,6 +219,7 @@ class Scorer(abc.ABC):
         scored_prompt_id: str,
         category: str = None,
         task: str = None,
+        expected_output: str = None,
     ) -> UnvalidatedScore:
         """
         Sends a request to a target, and takes care of retries.
@@ -240,7 +242,10 @@ class Scorer(abc.ABC):
                 score_value still needs to be normalized and validated.
         """
 
+
         conversation_id = str(uuid.uuid4())
+        if expected_output is not None:
+            system_prompt = system_prompt.replace("{{ expected_output }}", expected_output)
 
         prompt_target.set_system_prompt(
             system_prompt=system_prompt,
@@ -253,6 +258,7 @@ class Scorer(abc.ABC):
                 PromptRequestPiece(
                     role="user",
                     original_value=prompt_request_value,
+                    expected_output=expected_output,
                     original_value_data_type=prompt_request_data_type,
                     converted_value_data_type=prompt_request_data_type,
                     conversation_id=conversation_id,

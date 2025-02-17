@@ -89,8 +89,11 @@ class PromptSendingOrchestrator(Orchestrator):
         Sends the normalized prompts to the prompt target.
         """
 
+        expected_output_list = []
         for prompt in prompt_request_list:
             prompt.conversation_id = self._prepare_conversation()
+            if prompt.seed_prompt_group.prompts[0].expected_output:
+                expected_output_list.append(prompt.seed_prompt_group.prompts[0].expected_output)
 
         # Normalizer is responsible for storing the requests in memory
         # The labels parameter may allow me to stash class information for each kind of prompt.
@@ -102,10 +105,15 @@ class PromptSendingOrchestrator(Orchestrator):
             batch_size=self._batch_size,
         )
 
+        response_pieces = []
         if self._scorers and responses:
             response_pieces = PromptRequestResponse.flatten_to_prompt_request_pieces(responses)
 
-            for scorer in self._scorers:
+            for i, piece in enumerate(response_pieces):
+                if i < len(expected_output_list):
+                    piece.expected_output = expected_output_list[i]
+
+        for scorer in self._scorers:
                 await scorer.score_responses_inferring_tasks_batch_async(
                     request_responses=response_pieces, batch_size=self._batch_size
                 )
@@ -116,6 +124,7 @@ class PromptSendingOrchestrator(Orchestrator):
         self,
         *,
         prompt_list: list[str],
+        expected_output_list: list[str] = None,
         prompt_type: PromptDataType = "text",
         memory_labels: Optional[dict[str, str]] = None,
         metadata: Optional[dict[str, str]] = None,
@@ -141,17 +150,20 @@ class PromptSendingOrchestrator(Orchestrator):
             prompt_list = [prompt_list]
 
         requests: list[NormalizerRequest] = []
-        for prompt in prompt_list:
 
+        i= 0
+        for prompt in prompt_list:
             requests.append(
                 self._create_normalizer_request(
                     prompt_text=prompt,
+                    expected_output=expected_output_list[i] if expected_output_list else None,
                     prompt_type=prompt_type,
                     converters=self._prompt_converters,
                     metadata=metadata,
                     conversation_id=str(uuid.uuid4()),
                 )
             )
+            i+=1
 
         return await self.send_normalizer_requests_async(
             prompt_request_list=requests,
@@ -170,13 +182,16 @@ class PromptSendingOrchestrator(Orchestrator):
                 last_conversation_id = message.conversation_id
 
             if message.role == "user" or message.role == "system":
-                print(f"{Style.BRIGHT}{Fore.BLUE}{message.role}: {message.converted_value}")
+                print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
             else:
-                print(f"{Style.NORMAL}{Fore.YELLOW}{message.role}: {message.converted_value}")
+                print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
                 await display_image_response(message)
 
             for score in message.scores:
-                print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                if score.score_value == "True":
+                    print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                else:
+                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
     def _prepare_conversation(self):
         """

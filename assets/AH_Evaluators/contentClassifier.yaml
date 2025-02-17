@@ -1,0 +1,3 @@
+category: "AH Similarity Evaluator"
+true_description: "Text is very similar or equal to {{ expected_output }}"
+false_description: "Text is not equal or similar to {{ expected_output }}"
