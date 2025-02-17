@@ -31,7 +31,7 @@ class PromptSendingOrchestrator(Orchestrator):
         objective_target: PromptTarget,
         prompt_converters: Optional[list[PromptConverter]] = None,
         scorers: Optional[list[Scorer]] = None,
-        batch_size: int = 10,
+        batch_size: int = 1,
         verbose: bool = False,
     ) -> None:
         """
@@ -115,7 +115,7 @@ class PromptSendingOrchestrator(Orchestrator):
 
         for scorer in self._scorers:
                 await scorer.score_responses_inferring_tasks_batch_async(
-                    request_responses=response_pieces, batch_size=self._batch_size
+                    request_responses=response_pieces, batch_size=10
                 )
 
         return responses

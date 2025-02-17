@@ -5,6 +5,7 @@
 import json
 import logging
 import re
+import time
 from typing import Any, Callable, Optional
 
 import httpx
@@ -100,16 +101,29 @@ class HTTPTarget(PromptTarget):
                         content=http_body,
                         follow_redirects=True,
                     )
-        response_content = response.content
+
+        response_content = ""
 
         # Retrieve the thread ID from the response, so we can send follow-up messages
         thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
-        thread_id_match = re.search(thread_id_key, response_content.decode("utf-8"))
+        thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
         thread_id = thread_id_match.group(1) if thread_id_match else None
 
         if self.callback_function:
-            response_content = self.callback_function(response=response)
-            #print(response_content)
+            text_message = self.callback_function(response=response)
+            if text_message:
+                response_content = "Text Message: " + text_message
+
+            # Append data message if it exists
+            data_message_key = r"event:DATA_MESSAGE\s+data:(\{.*?\})"
+            data_message_match = re.search(data_message_key, response.content.decode("utf-8"))
+            data_message = data_message_match.group(1) if data_message_match else None
+
+            if data_message:
+                response_content = response_content + ", Data Message: " + data_message
+
+        #print(response_content)
+        time.sleep(10)
 
         #Send thread_id in prompt_metadata so that it can be used in follow-up messages
         response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})

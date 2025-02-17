@@ -1,3 +1,3 @@
 category: "AH Similarity Evaluator"
-true_description: "Text is very similar or equal to {{ expected_output }}"
-false_description: "Text is not equal or similar to {{ expected_output }}"
+true_description: "Text is relevant in content or equal to {{ expected_output }}. Assess 'Text Message:' and 'Data Message' fields seperately. Both should succeed."
+false_description: "Text is not equal or relevant in content to {{ expected_output }}. Assess 'Text Message:' and 'Data Message' fields seperately. At least one should fail."
