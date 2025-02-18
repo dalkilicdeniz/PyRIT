@@ -1,3 +1,3 @@
 category: "AH Similarity Evaluator"
-true_description: "Text is relevant in content or equal to {{ expected_output }}. Assess 'Text Message:' and 'Data Message' fields seperately. Both should succeed."
-false_description: "Text is not equal or relevant in content to {{ expected_output }}. Assess 'Text Message:' and 'Data Message' fields seperately. At least one should fail."
+true_description: "'Text Message' is relevant to {{ question }} in terms of food information, recipes, or product domains, or it is similar to the 'Text Message' in the expected output. Additionally, 'Data Message' matches the format of the 'Data Message' in the expected output. Expected output: {{ expected_output }}"
+false_description: "'Text Message' is not relevant to {{ question }} in terms of food information, recipes, or product domains, or it is not similar to the 'Text Message' in the expected output. Additionally, 'Data Message' does not match the format of the 'Data Message' in the expected output. Expected output: {{ expected_output }}"

@@ -244,6 +244,10 @@ class Scorer(abc.ABC):
 
 
         conversation_id = str(uuid.uuid4())
+
+        if prompt_request_value is not None:
+            system_prompt = system_prompt.replace("{{ question }}", prompt_request_value)
+
         if expected_output is not None:
             system_prompt = system_prompt.replace("{{ expected_output }}", expected_output)
 
