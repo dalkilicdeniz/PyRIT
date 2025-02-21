@@ -220,6 +220,7 @@ class Scorer(abc.ABC):
         category: str = None,
         task: str = None,
         expected_output: str = None,
+        request_prompt: Optional[str] = None,
     ) -> UnvalidatedScore:
         """
         Sends a request to a target, and takes care of retries.
@@ -245,8 +246,8 @@ class Scorer(abc.ABC):
 
         conversation_id = str(uuid.uuid4())
 
-        if prompt_request_value is not None:
-            system_prompt = system_prompt.replace("{{ question }}", prompt_request_value)
+        if request_prompt is not None:
+            system_prompt = system_prompt.replace("{{ question }}", request_prompt)
 
         if expected_output is not None:
             system_prompt = system_prompt.replace("{{ expected_output }}", expected_output)

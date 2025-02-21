@@ -16,15 +16,10 @@ from pyrit.score.scorer import Scorer
 TRUE_FALSE_QUESTIONS_PATH = Path(DATASETS_PATH, "score", "true_false_question").resolve()
 
 
-class TrueFalseQuestionPaths(enum.Enum):
-    CURRENT_EVENTS = Path(TRUE_FALSE_QUESTIONS_PATH, "current_events.yaml").resolve()
-    GROUNDED = Path(TRUE_FALSE_QUESTIONS_PATH, "grounded.yaml").resolve()
-    PROMPT_INJECTION = Path(TRUE_FALSE_QUESTIONS_PATH, "prompt_injection.yaml").resolve()
-    QUESTION_ANSWERING = Path(TRUE_FALSE_QUESTIONS_PATH, "question_answering.yaml").resolve()
-    GANDALF = Path(TRUE_FALSE_QUESTIONS_PATH, "gandalf.yaml").resolve()
+class EvaluatorQuestionPaths(enum.Enum):
+    EVALUATOR = Path(TRUE_FALSE_QUESTIONS_PATH, "evaluator_system_prompt.yaml").resolve()
 
-
-class TrueFalseQuestion:
+class EvaluatorQuestion:
     """
     A class that represents a true/false question.
 
@@ -32,18 +27,14 @@ class TrueFalseQuestion:
     """
 
     def __init__(
-            self, *, true_description: str, false_description: str = "", category: str = "", metadata: Optional[str] = ""
+            self, *, evaluation_criteria: str = "", category: str = "", metadata: Optional[str] = ""
     ):
-        self.true_description = true_description
-
-        self.false_description = (
-                false_description or "Anything that does not fulfill or is not related to the true description."
-        )
+        self.evaluation_criteria = evaluation_criteria
 
         self.category = category
         self.metadata = metadata
 
-        self._keys = ["category", "true_description", "false_description"]
+        self._keys = ["category", "evaluation_criteria"]
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -64,39 +55,38 @@ class DataSetSimilarityScorer(Scorer):
             *,
             chat_target: PromptChatTarget,
             true_false_question_path: Optional[Path] = None,
-            true_false_question: Optional[TrueFalseQuestion] = None,
-            true_false_system_prompt_path: Optional[Path] = None,
+            evaluator_question: Optional[EvaluatorQuestion] = None,
+            evaluator_system_prompt_path: Optional[Path] = None,
     ) -> None:
         self._prompt_target = chat_target
-        self.scorer_type = "true_false"
+        self.scorer_type = "float_scale"
 
-        if not true_false_question_path and not true_false_question:
+        if not true_false_question_path and not evaluator_question:
             raise ValueError("Either true_false_question_path or true_false_question must be provided.")
-        if true_false_question_path and true_false_question:
+        if true_false_question_path and evaluator_question:
             raise ValueError("Only one of true_false_question_path or true_false_question should be provided.")
         if true_false_question_path:
-            true_false_question = yaml.safe_load(true_false_question_path.read_text(encoding="utf-8"))
+            evaluator_question = yaml.safe_load(true_false_question_path.read_text(encoding="utf-8"))
 
-        for key in ["category", "true_description", "false_description"]:
-            if key not in true_false_question:
+        for key in ["category", "evaluation_criteria"]:
+            if key not in evaluator_question:
                 raise ValueError(f"{key} must be provided in true_false_question.")
 
-        self._score_category = true_false_question["category"]
-        true_category = true_false_question["true_description"]
-        false_category = true_false_question["false_description"]
+        self._score_category = evaluator_question["category"]
+        evaluation_criteria = evaluator_question["evaluation_criteria"]
 
-        metadata = true_false_question["metadata"] if "metadata" in true_false_question else ""
+        metadata = evaluator_question["metadata"] if "metadata" in evaluator_question else ""
 
-        true_false_system_prompt_path = (
-            true_false_system_prompt_path
-            if true_false_system_prompt_path
-            else TRUE_FALSE_QUESTIONS_PATH / "true_false_system_prompt.yaml"
+        evaluator_system_prompt_path = (
+            evaluator_system_prompt_path
+            if evaluator_system_prompt_path
+            else TRUE_FALSE_QUESTIONS_PATH / "evaluator_system_prompt.yaml"
         )
 
-        scoring_instructions_template = SeedPrompt.from_yaml_file(true_false_system_prompt_path)
+        scoring_instructions_template = SeedPrompt.from_yaml_file(evaluator_system_prompt_path)
 
         self._system_prompt = scoring_instructions_template.render_template_value(
-            true_description=true_category, false_description=false_category, metadata=metadata
+            evaluation_criteria=evaluation_criteria, metadata=metadata
         )
 
     async def score_async(self, request_response: PromptRequestPiece, *, task: Optional[str] = None) -> list[Score]:
@@ -116,7 +106,7 @@ class DataSetSimilarityScorer(Scorer):
         """
 
         self.validate(request_response, task=task)
-        #print(request_response.expected_output)
+
         unvalidated_score: UnvalidatedScore = await self._score_value_with_llm(
             prompt_target=self._prompt_target,
             system_prompt=self._system_prompt,
@@ -126,6 +116,7 @@ class DataSetSimilarityScorer(Scorer):
             category=self._score_category,
             task=task,
             expected_output=request_response.expected_output,
+            request_prompt=request_response.prompt_metadata.get("reference_prompt")
         )
 
         score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value)

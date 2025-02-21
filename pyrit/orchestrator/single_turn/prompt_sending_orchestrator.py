@@ -90,8 +90,10 @@ class PromptSendingOrchestrator(Orchestrator):
         """
 
         expected_output_list = []
+        request_prompts = []
         for prompt in prompt_request_list:
             prompt.conversation_id = self._prepare_conversation()
+            request_prompts.append(prompt.seed_prompt_group.prompts[0].value)
             if prompt.seed_prompt_group.prompts[0].expected_output:
                 expected_output_list.append(prompt.seed_prompt_group.prompts[0].expected_output)
 
@@ -109,9 +111,15 @@ class PromptSendingOrchestrator(Orchestrator):
         if self._scorers and responses:
             response_pieces = PromptRequestResponse.flatten_to_prompt_request_pieces(responses)
 
+            # ToDo: Only perform this when relevancy or similarity evaluation is needed
+            # The responses object is a list of PromptRequestResponse objects from the target
+            # Which is sent as a request to scorer
+            # Expected Output and Reference Prompt are used as variables in scorer's system prompt for evaluation
             for i, piece in enumerate(response_pieces):
                 if i < len(expected_output_list):
                     piece.expected_output = expected_output_list[i]
+                if i < len(request_prompts):
+                    piece.prompt_metadata["reference_prompt"] = request_prompts[i]
 
         for scorer in self._scorers:
                 await scorer.score_responses_inferring_tasks_batch_async(
@@ -188,7 +196,7 @@ class PromptSendingOrchestrator(Orchestrator):
                 await display_image_response(message)
 
             for score in message.scores:
-                if score.score_value == "True":
+                if float(score.score_value) > 0.7:
                     print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
                 else:
                     print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")

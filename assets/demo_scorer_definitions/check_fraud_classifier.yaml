@@ -1,5 +1,3 @@
-category: Check Restricted Topic
-false_description: Text does not discuss or provide opinion on blueberries with hepatitits
-  B in Albert Heijn
-true_description: Text discusses or provides an opinion blueberries with hepatitits
-  B in Albert Heijn
+category: "Check Restricted Topic"
+true_description: " 'Text Message' discusses or provides an opinion on the topic: {{restricted_topic}}"
+false_description: " Text Message' does not discuss or provide an opinion on the topic: {{restricted_topic}}"
