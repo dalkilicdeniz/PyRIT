@@ -51,6 +51,20 @@ class Scorer(abc.ABC):
         """
         raise NotImplementedError("score_async method not implemented")
 
+    async def score_chat_async(self, chat_json: str, *, task: Optional[str] = None) -> list[Score]:
+        """
+        Score the chat JSON string, add the results to the database
+        and return a list of Score objects.
+
+        Args:
+            chat_json (str): The JSON string representing the chat to be scored.
+            task (str): The task based on which the chat should be scored (the original attacker model's objective).
+
+        Returns:
+            list[Score]: A list of Score objects representing the results.
+        """
+        raise NotImplementedError("score_chat_async method not implemented")
+
     @abstractmethod
     def validate(self, request_response: PromptRequestPiece, *, task: Optional[str] = None):
         """
@@ -215,8 +229,8 @@ class Scorer(abc.ABC):
         prompt_target: PromptChatTarget,
         system_prompt: str,
         prompt_request_value: str,
-        prompt_request_data_type: PromptDataType,
-        scored_prompt_id: str,
+        prompt_request_data_type: PromptDataType = "text",
+        scored_prompt_id: str = None,
         category: str = None,
         task: str = None,
         expected_output: str = None,

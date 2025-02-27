@@ -47,26 +47,26 @@ class EvaluatorQuestion:
         return iter(self._keys)
 
 
-class DataSetSimilarityScorer(Scorer):
+class Evaluator(Scorer):
     """A class that represents a self-ask true/false for scoring."""
 
     def __init__(
             self,
             *,
             chat_target: PromptChatTarget,
-            true_false_question_path: Optional[Path] = None,
+            evaluator_yaml_path: Optional[Path] = None,
             evaluator_question: Optional[EvaluatorQuestion] = None,
             evaluator_system_prompt_path: Optional[Path] = None,
     ) -> None:
         self._prompt_target = chat_target
         self.scorer_type = "float_scale"
 
-        if not true_false_question_path and not evaluator_question:
+        if not evaluator_yaml_path and not evaluator_question:
             raise ValueError("Either true_false_question_path or true_false_question must be provided.")
-        if true_false_question_path and evaluator_question:
+        if evaluator_yaml_path and evaluator_question:
             raise ValueError("Only one of true_false_question_path or true_false_question should be provided.")
-        if true_false_question_path:
-            evaluator_question = yaml.safe_load(true_false_question_path.read_text(encoding="utf-8"))
+        if evaluator_yaml_path:
+            evaluator_question = yaml.safe_load(evaluator_yaml_path.read_text(encoding="utf-8"))
 
         for key in ["category", "evaluation_criteria"]:
             if key not in evaluator_question:
@@ -123,6 +123,22 @@ class DataSetSimilarityScorer(Scorer):
 
         self._memory.add_scores_to_memory(scores=[score])
         return [score]
+
+    async def score_chat_async(self, chat_json: str, *, task: Optional[str] = None) -> list[Score]:
+
+        unvalidated_score: UnvalidatedScore = await self._score_value_with_llm(
+            prompt_target=self._prompt_target,
+            system_prompt=self._system_prompt,
+            prompt_request_value=chat_json,
+            category=self._score_category,
+            task=task,
+        )
+
+        score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value)
+
+        self._memory.add_scores_to_memory(scores=[score])
+        return [score]
+
 
     def validate(self, request_response: PromptRequestPiece, *, task: Optional[str] = None):
         pass

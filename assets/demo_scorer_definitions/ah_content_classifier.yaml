@@ -1,3 +1,3 @@
 category: Check Restricted Topic
-false_description: Text focuses on recipe or product recommendations or general cooking related information or empty text.
-true_description: Text focuses on topics different from recipe and product recommendations or general cooking related information.
+false_description: Text focuses on recipe or product recommendations or general cooking-related information or empty text.
+true_description: Text focuses on topics different from recipe and product recommendations or general cooking-related information.

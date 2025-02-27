@@ -111,6 +111,7 @@ class MultiTurnOrchestrator(Orchestrator):
         prompt_converters: Optional[list[PromptConverter]] = None,
         objective_scorer: Scorer,
         verbose: bool = False,
+        evaluate_chat: bool = False,
     ) -> None:
 
         super().__init__(prompt_converters=prompt_converters, verbose=verbose)
@@ -138,6 +139,7 @@ class MultiTurnOrchestrator(Orchestrator):
         self._prepended_conversation: list[PromptRequestResponse] = []
         self._last_prepended_user_message: str = ""
         self._last_prepended_assistant_message_scores: list[Score] = []
+        self._evaluate_chat = evaluate_chat
 
     def _get_adversarial_chat_seed_prompt(self, seed_prompt):
         if isinstance(seed_prompt, str):
