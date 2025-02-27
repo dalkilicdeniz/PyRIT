@@ -233,6 +233,7 @@ class Scorer(abc.ABC):
         scored_prompt_id: str = None,
         category: str = None,
         task: str = None,
+        orchestrator_identifier: dict[str, str] = None,
         expected_output: str = None,
         request_prompt: Optional[str] = None,
     ) -> UnvalidatedScore:
@@ -260,6 +261,9 @@ class Scorer(abc.ABC):
 
         conversation_id = str(uuid.uuid4())
 
+        if orchestrator_identifier:
+            orchestrator_identifier["scored_prompt_id"] = str(scored_prompt_id)
+
         if request_prompt is not None:
             system_prompt = system_prompt.replace("{{ question }}", request_prompt)
 
@@ -269,9 +273,9 @@ class Scorer(abc.ABC):
         prompt_target.set_system_prompt(
             system_prompt=system_prompt,
             conversation_id=conversation_id,
-            orchestrator_identifier=None,
+            orchestrator_identifier=orchestrator_identifier,
         )
-        prompt_metadata = {"response_format": "json"}
+        prompt_metadata: dict[str, str | int] = {"response_format": "json"}
         scorer_llm_request = PromptRequestResponse(
             [
                 PromptRequestPiece(
