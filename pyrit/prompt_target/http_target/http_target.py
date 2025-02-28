@@ -5,9 +5,11 @@
 import json
 import logging
 import re
+import time
 from typing import Any, Callable, Optional
 
 import httpx
+from six import print_
 
 from pyrit.models import (
     PromptRequestPiece,
@@ -81,6 +83,7 @@ class HTTPTarget(PromptTarget):
             http2_version = True
 
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
+            #print(http_body)
             match http_body:
                 case dict():
                     response = await client.request(
@@ -98,12 +101,51 @@ class HTTPTarget(PromptTarget):
                         content=http_body,
                         follow_redirects=True,
                     )
-        response_content = response.content
+
+        response_content = ""
+        # Retrieve the thread ID from the response, so we can send follow-up messages
+        thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
+        thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
+        thread_id = thread_id_match.group(1) if thread_id_match else None
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
+        elif self.callback_function is None: # Default parsing for AI Assistant
 
-        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)])
+            # Todo fix this
+            # Parse stream of messages from the response to form Text Message
+            # Regular expression to find all TEXT_MESSAGE events
+            text_message_key = r"event:TEXT_MESSAGE\s+data:(.*?)\n"
+
+            # Find all matches in the response content
+            text_message_matches = re.findall(text_message_key, response.content.decode("utf-8"), re.DOTALL)
+
+            # Concatenate all the text message parts into one variable
+            full_text_message = ''.join(text_message_matches)
+
+            if full_text_message:
+                response_content = "Text Message: " + full_text_message
+
+            # Append data message if it exists
+            data_message_key = r"event:DATA_MESSAGE\s+data:(\{.*?\})"
+            data_message_match = re.search(data_message_key, response.content.decode("utf-8"))
+            data_message = data_message_match.group(1) if data_message_match else None
+
+            if data_message:
+                response_content = response_content + ", Data Message: " + data_message
+
+            suggestion_pills_key = r"event:SUGGESTION_CHIPS\s+data:(\{.*?\})"
+            suggestion_pills_match = re.search(suggestion_pills_key, response.content.decode("utf-8"))
+            suggestion_pills = suggestion_pills_match.group(1) if suggestion_pills_match else None
+
+            if suggestion_pills:
+                response_content = response_content + ", Suggestion Chips: " + suggestion_pills
+
+        #print(response_content)
+        time.sleep(10)
+
+        #Send thread_id in prompt_metadata so that it can be used in follow-up messages
+        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})
 
         return response_entry
 

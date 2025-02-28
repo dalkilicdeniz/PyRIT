@@ -57,19 +57,21 @@ class MultiTurnAttackResult:
         for message in target_messages:
             for piece in message.request_pieces:
                 if piece.role == "user":
-                    print(f"{Style.BRIGHT}{Fore.BLUE}{piece.role}:")
                     if piece.converted_value != piece.original_value:
-                        print(f"Original value: {piece.original_value}")
-                    print(f"Converted value: {piece.converted_value}")
+                        print(f"\nOriginal value: {piece.original_value}")
+                    print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
                 else:
-                    print(f"{Style.NORMAL}{Fore.YELLOW}{piece.role}: {piece.converted_value}")
+                    print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
 
                 await display_image_response(piece)
 
                 scores = self._memory.get_scores_by_prompt_ids(prompt_request_response_ids=[str(piece.id)])
                 if scores and len(scores) > 0:
                     for score in scores:
-                        print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                        if score.score_value == "True":
+                            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                        else:
+                            print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
 
 class MultiTurnOrchestrator(Orchestrator):
@@ -109,6 +111,7 @@ class MultiTurnOrchestrator(Orchestrator):
         prompt_converters: Optional[list[PromptConverter]] = None,
         objective_scorer: Scorer,
         verbose: bool = False,
+        evaluate_chat: bool = False,
     ) -> None:
 
         super().__init__(prompt_converters=prompt_converters, verbose=verbose)
@@ -136,6 +139,7 @@ class MultiTurnOrchestrator(Orchestrator):
         self._prepended_conversation: list[PromptRequestResponse] = []
         self._last_prepended_user_message: str = ""
         self._last_prepended_assistant_message_scores: list[Score] = []
+        self._evaluate_chat = evaluate_chat
 
     def _get_adversarial_chat_seed_prompt(self, seed_prompt):
         if isinstance(seed_prompt, str):

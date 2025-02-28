@@ -1,0 +1,83 @@
+category: "AH Similarity Evaluator"
+
+evaluation_criteria: >
+  # Evaluation Criteria Scoring
+  
+  User query: {{ request_prompt }}
+  
+  # General Guidelines
+  - Only focus on the SUGGESTION_CHIPS entry in the message.
+  - Option 1: The most basic and widely used product related to the query.
+  - Option 2: A specific and popular alternative with added benefits.
+  - Option 3: A product category that is often used together with the user's need.
+  - Option 4: Helpful guidance related to the query.
+  
+  # Scoring Methodology
+  - Each option that fully meets the criteria earns 0.25 points.
+  - The total score is the sum of the points from all four options, with a maximum of 1.0.
+  - Penalize the score by deducting 0.1 points for each option that is off-category or irrelevant.
+  - The final score is expressed on a scale from 0.0 to 1.0 (minimum score is 0).
+  
+    # Category-Specific Guidelines
+    ## Drogisterij
+    - Ensure that suggestions relate to personal care, hygiene, and health products typically found in drogisterijen.
+    - Each option is scored individually; irrelevant options incur a penalty.
+    
+    ## Huishouden
+    - Validate that suggestions cover a range of household products like cleaning supplies, organization tools, and maintenance items.
+    
+    ## Huisdier
+    - Confirm that the options include pet care essentials, accessories, and nutrition.
+    - Provide guidance related to pet safety or care if applicable.
+    
+    ## Koken
+    - Include suggestions related to cooking tools, cookware, or specialty ingredients.
+    - Consider adding guidance such as recipe tips or cooking techniques.
+    
+    ## Tafelen
+    - Ensure that suggestions include tableware, serving dishes, or dining accessories.
+    - Add at least one option that offers tips on table setting or care of dining products.
+    
+    ## Wonen/Slapen
+    - Verify that suggestions relate to home décor, bedding, or furniture.
+    - Include a mix of product options and advice on styling or maintenance.
+    
+    ## Elektronica
+    - Confirm that options align with consumer electronics and related accessories.
+    - Provide suggestions that include both standard products and popular alternatives with enhanced features.
+    
+    ## Voordeelshop
+    - Validate that suggestions emphasize value-oriented or discounted items.
+    - Ensure the options balance affordability with quality, possibly including usage tips.
+    
+    ## Boeken
+    - Ensure that suggestions include both bestsellers and niche literature relevant to the query.
+    - Include guidance on how to explore more specialized genres or authors.
+    
+    ## Tijdschriften
+    - Verify that options cover a range of magazine topics relevant to the user's interest.
+    - Provide a mix of popular and niche publication suggestions, with additional advice on subscription or reading.
+    
+    ## Kantoorartikelen
+    - Ensure that suggestions cover essential office supplies such as writing instruments, planners, and organizational tools.
+    - Include at least one suggestion offering advice on creating an efficient workspace.
+    
+    ## Reisartikelen
+    - Confirm that options encompass travel essentials like luggage, travel accessories, or related gear.
+    - Add guidance on choosing the right items or travel preparation tips.
+    
+    ## Feestje/Gelegenheid
+    - Ensure that suggestions are festive and cater to event-specific needs, including décor and party supplies.
+    - Include at least one option that provides advice on event planning or thematic selections.
+    
+    ## Batterijen
+    - Validate that suggestions include various battery types (e.g., AA, AAA, rechargeable) along with storage and maintenance tips.
+    - Provide complementary advice on safe battery usage.
+    
+    ## Kaarsen
+    - Ensure that suggestions cover a variety of candle types, such as scented or decorative candles.
+    - Include guidance on candle safety and proper maintenance.
+    
+    ## Lampen
+    - Confirm that options address different types of lamps (desk, floor, LED) along with design and energy-saving tips.
+    - Ensure at least one suggestion aids in selecting the right lamp for the intended space.

@@ -79,3 +79,25 @@ def _fetch_key(data: dict, key: str):
         if data is None:
             return ""
     return data
+
+def get_http_regex_stream_callback_function(key: str) -> Callable:
+    """
+    Purpose: Extracts text messages from an HTTP response using regex.
+    Returns: A function that parses the HTTP response to extract text messages.
+    """
+
+    def extract_text_messages(response: requests.Response) -> str:
+        """
+        Purpose: Extracts text messages from the response content using regex.
+        Parameters:
+            response (requests.Response): The HTTP response to parse.
+        Returns: The extracted text messages as a single string.
+        """
+        text = response.text
+        # Use regex to find all occurrences of 'event:TEXT_MESSAGE' followed by 'data:'
+        messages = re.findall(key, text)
+        # Join the extracted message parts together into one string
+        full_message = ''.join(messages)
+        return full_message
+
+    return extract_text_messages

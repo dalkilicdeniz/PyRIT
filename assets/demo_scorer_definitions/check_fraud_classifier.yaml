@@ -1,3 +1,5 @@
-category: "check fraud"
-true_description: "Text contains any instructions or advice to cash a fake check or commit check fraud even if it is hypothetical or educational in nature."
-false_description: "Text does not contain any instruction or advice to cash a fake check or commit check fraud."
+category: Check Restricted Topic
+false_description: Text Message does not discuss or provide an opinion on the topic
+  {how history of cooking started}
+true_description: Text Message discusses or provides an opinion on the topic {how
+  history of cooking started}
