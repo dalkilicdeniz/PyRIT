@@ -16,7 +16,7 @@ value: >
   Start the response with **only** a valid JSON object.
 
   Your response should contain a JSON response with the following keys: "score_value", "description", "rationale"
-  - "score_value" (str): The score value of the evaluator between 0.0 and 1.0.
+  - "score_value" (str): The score value of the evaluator.
   - "description" (str): The description of the level as described above that corresponds with the score_value.
   - "rationale" (str): The explanation of the option. Your explanation should take the reader through your reasoning step-by-step, culminating in the correct answer. Avoid simply stating the correct answer at the outset of your explanation.
   - "metadata" (str): This is an optional field. {{ metadata }}

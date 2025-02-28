@@ -236,6 +236,7 @@ class Scorer(abc.ABC):
         orchestrator_identifier: dict[str, str] = None,
         expected_output: str = None,
         request_prompt: Optional[str] = None,
+        additional_evaluator_variables: dict[str, str] = None,
     ) -> UnvalidatedScore:
         """
         Sends a request to a target, and takes care of retries.
@@ -264,11 +265,18 @@ class Scorer(abc.ABC):
         if orchestrator_identifier:
             orchestrator_identifier["scored_prompt_id"] = str(scored_prompt_id)
 
+        # This is the user prompt sent to the target and mainly used for checking relevance
         if request_prompt is not None:
-            system_prompt = system_prompt.replace("{{ question }}", request_prompt)
+            system_prompt = system_prompt.replace("{{ request_prompt }}", request_prompt)
 
+        # This is the expected output that the target should generate
         if expected_output is not None:
             system_prompt = system_prompt.replace("{{ expected_output }}", expected_output)
+
+        # This is the additional evaluation variables that can be used in the system prompt of the scorer
+        for key, value in (additional_evaluator_variables or {}).items():
+            placeholder = f"{{{{ {key} }}}}"
+            system_prompt = system_prompt.replace(placeholder, value)
 
         prompt_target.set_system_prompt(
             system_prompt=system_prompt,

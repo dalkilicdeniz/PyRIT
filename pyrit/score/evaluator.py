@@ -3,7 +3,7 @@
 
 import enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Literal
 
 import yaml
 
@@ -30,7 +30,6 @@ class EvaluatorQuestion:
             self, *, evaluation_criteria: str = "", category: str = "", metadata: Optional[str] = ""
     ):
         self.evaluation_criteria = evaluation_criteria
-
         self.category = category
         self.metadata = metadata
 
@@ -57,9 +56,12 @@ class Evaluator(Scorer):
             evaluator_yaml_path: Optional[Path] = None,
             evaluator_question: Optional[EvaluatorQuestion] = None,
             evaluator_system_prompt_path: Optional[Path] = None,
+            additional_evaluator_variables: Optional[dict] = None,
+            scorer_type: Literal["true_false", "float_scale"] = "true_false",
     ) -> None:
         self._prompt_target = chat_target
-        self.scorer_type = "float_scale"
+        self.scorer_type = scorer_type
+        self._additional_evaluator_variables = additional_evaluator_variables or {}
 
         if not evaluator_yaml_path and not evaluator_question:
             raise ValueError("Either true_false_question_path or true_false_question must be provided.")
@@ -115,8 +117,9 @@ class Evaluator(Scorer):
             scored_prompt_id=request_response.id,
             category=self._score_category,
             task=task,
+            request_prompt=request_response.prompt_metadata.get("reference_prompt"),
             expected_output=request_response.expected_output,
-            request_prompt=request_response.prompt_metadata.get("reference_prompt")
+            additional_evaluator_variables=self._additional_evaluator_variables,
         )
 
         score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value)
@@ -132,6 +135,7 @@ class Evaluator(Scorer):
             prompt_request_value=chat_json,
             category=self._score_category,
             task=task,
+            additional_evaluator_variables=self._additional_evaluator_variables,
         )
 
         score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value)

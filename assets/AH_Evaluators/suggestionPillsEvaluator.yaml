@@ -3,7 +3,7 @@ category: "AH Similarity Evaluator"
 evaluation_criteria: >
   # Evaluation Criteria Scoring
   
-  User query: {{ question }}
+  User query: {{ request_prompt }}
   
   # General Guidelines
   - Only focus on the SUGGESTION_CHIPS entry in the message.

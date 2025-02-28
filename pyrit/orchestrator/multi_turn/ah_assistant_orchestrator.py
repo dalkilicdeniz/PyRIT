@@ -165,7 +165,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
                 print(f"Continuing chat with thread ID: " + thread_id)
 
             feedback = None
-            if score:
+            if self._use_score_as_feedback and score:
                 feedback = score.score_rationale
 
             response = await self._retrieve_and_send_prompt_async(

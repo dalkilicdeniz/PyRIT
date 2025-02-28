@@ -70,4 +70,4 @@ def update_yaml_with_regex(file_path, text, pattern=r'\{.*?\}'):
 
     # Write the updated YAML content back to the file
     with open(file_path, 'w') as file:
-        yaml.dump(updated_content, file)
+        yaml.safe_dump(updated_content, file, default_flow_style=False, sort_keys=False)
