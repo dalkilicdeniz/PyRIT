@@ -109,7 +109,7 @@ class HTTPTarget(PromptTarget):
         # Retrieve the thread ID from the response, so we can send follow-up messages
         thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
         thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
-        thread_id = thread_id_match.group(1) if thread_id_match else "None"
+        thread_id = thread_id_match.group(1) if thread_id_match else None
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
