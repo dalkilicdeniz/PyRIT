@@ -1,0 +1,3 @@
+category: Check Objective
+evaluation_criteria: > 
+    Text Message provides an answer for the user's goal: {{ objective }}

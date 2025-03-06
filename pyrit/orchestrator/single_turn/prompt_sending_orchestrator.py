@@ -31,7 +31,7 @@ class PromptSendingOrchestrator(Orchestrator):
         objective_target: PromptTarget,
         prompt_converters: Optional[list[PromptConverter]] = None,
         scorers: Optional[list[Scorer]] = None,
-        batch_size: int = 10,
+        batch_size: int = 1,
         verbose: bool = False,
     ) -> None:
         """
@@ -89,8 +89,13 @@ class PromptSendingOrchestrator(Orchestrator):
         Sends the normalized prompts to the prompt target.
         """
 
+        expected_output_list = []
+        request_prompts = []
         for prompt in prompt_request_list:
             prompt.conversation_id = self._prepare_conversation()
+            request_prompts.append(prompt.seed_prompt_group.prompts[0].value)
+            if prompt.seed_prompt_group.prompts[0].expected_output:
+                expected_output_list.append(prompt.seed_prompt_group.prompts[0].expected_output)
 
         # Normalizer is responsible for storing the requests in memory
         # The labels parameter may allow me to stash class information for each kind of prompt.
@@ -102,12 +107,23 @@ class PromptSendingOrchestrator(Orchestrator):
             batch_size=self._batch_size,
         )
 
+        response_pieces = []
         if self._scorers and responses:
             response_pieces = PromptRequestResponse.flatten_to_prompt_request_pieces(responses)
 
-            for scorer in self._scorers:
+            # ToDo: Only perform this when relevancy or similarity evaluation is needed
+            # The responses object is a list of PromptRequestResponse objects from the target
+            # Which is sent as a request to scorer
+            # Expected Output and Reference Prompt are used as variables in scorer's system prompt for evaluation
+            for i, piece in enumerate(response_pieces):
+                if i < len(expected_output_list):
+                    piece.expected_output = expected_output_list[i]
+                if i < len(request_prompts):
+                    piece.prompt_metadata["reference_prompt"] = request_prompts[i]
+
+        for scorer in self._scorers:
                 await scorer.score_responses_inferring_tasks_batch_async(
-                    request_responses=response_pieces, batch_size=self._batch_size
+                    request_responses=response_pieces, batch_size=10
                 )
 
         return responses
@@ -116,6 +132,7 @@ class PromptSendingOrchestrator(Orchestrator):
         self,
         *,
         prompt_list: list[str],
+        expected_output_list: list[str] = None,
         prompt_type: PromptDataType = "text",
         memory_labels: Optional[dict[str, str]] = None,
         metadata: Optional[dict[str, Union[str, int]]] = None,
@@ -141,17 +158,20 @@ class PromptSendingOrchestrator(Orchestrator):
             prompt_list = [prompt_list]
 
         requests: list[NormalizerRequest] = []
-        for prompt in prompt_list:
 
+        i= 0
+        for prompt in prompt_list:
             requests.append(
                 self._create_normalizer_request(
                     prompt_text=prompt,
+                    expected_output=expected_output_list[i] if expected_output_list else None,
                     prompt_type=prompt_type,
                     converters=self._prompt_converters,
                     metadata=metadata,
                     conversation_id=str(uuid.uuid4()),
                 )
             )
+            i+=1
 
         return await self.send_normalizer_requests_async(
             prompt_request_list=requests,
@@ -170,13 +190,16 @@ class PromptSendingOrchestrator(Orchestrator):
                 last_conversation_id = message.conversation_id
 
             if message.role == "user" or message.role == "system":
-                print(f"{Style.BRIGHT}{Fore.BLUE}{message.role}: {message.converted_value}")
+                print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
             else:
-                print(f"{Style.NORMAL}{Fore.YELLOW}{message.role}: {message.converted_value}")
+                print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
                 await display_image_response(message)
 
             for score in message.scores:
-                print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                if float(score.score_value) > 0.7:
+                    print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                else:
+                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
     def _prepare_conversation(self):
         """
@@ -195,3 +218,63 @@ class PromptSendingOrchestrator(Orchestrator):
 
                 self._memory.add_request_response_to_memory(request=request)
         return conversation_id
+
+    def get_chat_results(self) -> list[dict]:
+        """
+        Retrieves single-turn results from the orchestrator's memory, pairing each user
+        message with the next assistant message in the same conversation. Each result
+        entry includes:
+          {
+            "conversation_id": str,
+            "prompt": str,
+            "assistant_response": str,
+            "scores": [
+                {
+                    "score_value": float,
+                    "score_rationale": str
+                },
+                ...
+            ]
+          }
+
+        Returns:
+            list[dict]: A list of single-turn results, ready to be used in a single-turn HTML report.
+        """
+        messages = self.get_memory()
+        results = []
+
+        user_prompt = None
+        conversation_id = None
+
+        # Iterate through all messages in memory
+        for msg in messages:
+            if msg.role == "user":
+                # Record user prompt and conversation ID
+                user_prompt = msg.converted_value
+                conversation_id = msg.conversation_id
+
+            elif msg.role == "assistant" and user_prompt is not None:
+                # We have found an assistant response that pairs with the last user prompt
+                assistant_response = msg.converted_value
+
+                # Convert the message scores to a list of dicts
+                single_turn_scores = []
+                for s in msg.scores:
+                    single_turn_scores.append({
+                        "score_value": s.score_value,
+                        "score_rationale": s.score_rationale
+                    })
+
+                # Build the single-turn result
+                results.append({
+                    "conversation_id": conversation_id,
+                    "prompt": user_prompt,
+                    "assistant_response": assistant_response,
+                    "scores": single_turn_scores
+                })
+
+                # Reset for the next user->assistant pair
+                user_prompt = None
+                conversation_id = None
+
+        return results

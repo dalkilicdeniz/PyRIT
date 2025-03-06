@@ -3,6 +3,8 @@
 
 
 from typing import List, Union
+import re
+import yaml
 
 
 def combine_dict(existing_dict: dict = None, new_dict: dict = None) -> dict:
@@ -42,3 +44,30 @@ def combine_list(list1: Union[str, List[str]], list2: Union[str, List[str]]) -> 
     # Merge and keep only unique values
     combined = list(set(list1 + list2))
     return combined
+
+def update_yaml_with_regex(file_path, text, pattern=r'\{.*?\}'):
+    with open(file_path, 'r') as file:
+        yaml_content = yaml.safe_load(file)
+
+    # Function to replace content inside curly braces with the topic, while keeping the braces
+    def replace_with_topic(value):
+        # Only apply the replacement if the value is a string
+        if isinstance(value, str):
+            return re.sub(pattern, f'{{{text}}}', value)
+        return value
+
+    # Recursively update all string fields in the YAML content
+    def update_fields(data):
+        if isinstance(data, dict):
+            return {k: update_fields(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [update_fields(item) for item in data]
+        else:
+            return replace_with_topic(data)
+
+    # Update all fields in the YAML content
+    updated_content = update_fields(yaml_content)
+
+    # Write the updated YAML content back to the file
+    with open(file_path, 'w') as file:
+        yaml.safe_dump(updated_content, file, default_flow_style=False, sort_keys=False)

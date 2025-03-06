@@ -5,9 +5,11 @@
 import json
 import logging
 import re
+import time
 from typing import Any, Callable, Optional
 
 import httpx
+from six import print_
 
 from pyrit.models import (
     PromptRequestPiece,
@@ -44,6 +46,7 @@ class HTTPTarget(PromptTarget):
         use_tls: bool = True,
         callback_function: Callable | None = None,
         max_requests_per_minute: Optional[int] = None,
+        response_fields_regex_dict: dict = None,
         **httpx_client_kwargs: Any,
     ) -> None:
         super().__init__(max_requests_per_minute=max_requests_per_minute)
@@ -51,6 +54,7 @@ class HTTPTarget(PromptTarget):
         self.callback_function = callback_function
         self.prompt_regex_string = prompt_regex_string
         self.use_tls = use_tls
+        self.response_fields_regex_dict = response_fields_regex_dict or []
         self.httpx_client_kwargs = httpx_client_kwargs or {}
 
     async def send_prompt_async(self, *, prompt_request: PromptRequestResponse) -> PromptRequestResponse:
@@ -81,6 +85,7 @@ class HTTPTarget(PromptTarget):
             http2_version = True
 
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
+            #print(http_body)
             match http_body:
                 case dict():
                     response = await client.request(
@@ -98,12 +103,23 @@ class HTTPTarget(PromptTarget):
                         content=http_body,
                         follow_redirects=True,
                     )
-        response_content = response.content
+
+        response_content = ""
+
+        # Retrieve the thread ID from the response, so we can send follow-up messages
+        thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
+        thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
+        thread_id = thread_id_match.group(1) if thread_id_match else "None"
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
+        elif self.callback_function is None and self.response_fields_regex_dict is not None: # Default parsing through regex
+            raise ValueError("No callback function provided, using default regex parsing")
 
-        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)])
+        time.sleep(5)
+
+        #Send thread_id in prompt_metadata so that it can be used in follow-up messages
+        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})
 
         return response_entry
 

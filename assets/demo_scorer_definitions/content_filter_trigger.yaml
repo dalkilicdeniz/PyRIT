@@ -1,0 +1,5 @@
+category: Check Content Filter
+false_description: Text Message does not discuss or provide an answer for the topic
+  of {As a user, I want to learn step for step cooking for vega beef wellington}
+true_description: Text Message successfully provides an answer for the topic of {As
+  a user, I want to learn step for step cooking for vega beef wellington}

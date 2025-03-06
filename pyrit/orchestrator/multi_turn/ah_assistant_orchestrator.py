@@ -2,13 +2,13 @@
 # Licensed under the MIT license.
 
 import enum
+import json
 import logging
 import re
 from pathlib import Path
 from typing import Optional, Union
 from uuid import uuid4
-
-from pyrit.common.path import RED_TEAM_ORCHESTRATOR_PATH, AH_PERSONAS
+from pyrit.common.path import AH_PERSONAS
 from pyrit.common.utils import combine_dict
 from pyrit.models import PromptRequestPiece, Score, SeedPrompt, SeedPromptGroup
 from pyrit.orchestrator import MultiTurnAttackResult, MultiTurnOrchestrator
@@ -25,19 +25,13 @@ logger = logging.getLogger(__name__)
 
 
 class RTOSystemPromptPaths(enum.Enum):
-    TEXT_GENERATION = Path(RED_TEAM_ORCHESTRATOR_PATH, "text_generation.yaml").resolve()
     AH_ASSISTANT_CUSTOMER = Path(AH_PERSONAS, "customer.yaml").resolve()
-    IMAGE_GENERATION = Path(RED_TEAM_ORCHESTRATOR_PATH, "image_generation.yaml").resolve()
-    NAIVE_CRESCENDO = Path(RED_TEAM_ORCHESTRATOR_PATH, "naive_crescendo.yaml").resolve()
-    VIOLENT_DURIAN = Path(RED_TEAM_ORCHESTRATOR_PATH, "violent_durian.yaml").resolve()
-    CRUCIBLE = Path(RED_TEAM_ORCHESTRATOR_PATH, "crucible.yaml").resolve()
 
-
-class RedTeamingOrchestrator(MultiTurnOrchestrator):
+class AHAssistantOrchestrator(MultiTurnOrchestrator):
     """
-    The `RedTeamingOrchestrator` class orchestrates a multi-turn red teaming attack on a target system.
+    The `AHAssistantOrchestrator` class orchestrates a multi-turn chat on a target system.
 
-    It is extemely simple. It sends a prompt to the target system, and then sends the response to the red teaming chat.
+    It is extemely simple. It sends a prompt to the target system, and then sends the response to the customer chat.
 
     Args:
         objective_target (PromptTarget): Target for created prompts.
@@ -61,19 +55,21 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
         *,
         objective_target: PromptTarget,
         adversarial_chat: PromptChatTarget,
-        adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.TEXT_GENERATION.value,
+        adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.AH_ASSISTANT_CUSTOMER.value,
         adversarial_chat_seed_prompt: Optional[str] = "How can I help you?",
         prompt_converters: Optional[list[PromptConverter]] = None,
         max_turns: int = 5,
         objective_scorer: Scorer,
         use_score_as_feedback: bool = True,
         verbose: bool = False,
+        evaluate_chat: bool = False,
+        score_threshold: float = 0.9,
     ) -> None:
 
-        if objective_scorer.scorer_type != "true_false":
-            raise ValueError(
-                f"The scorer must be a true/false scorer. The scorer type is {objective_scorer.scorer_type}."
-            )
+        # if objective_scorer.scorer_type != "true_false":
+        #     raise ValueError(
+        #         f"The scorer must be a true/false scorer. The scorer type is {objective_scorer.scorer_type}."
+        #     )
 
         super().__init__(
             objective_target=objective_target,
@@ -84,10 +80,12 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             prompt_converters=prompt_converters,
             objective_scorer=objective_scorer,
             verbose=verbose,
+            evaluate_chat=evaluate_chat
         )
 
         self._prompt_normalizer = PromptNormalizer()
         self._use_score_as_feedback = use_score_as_feedback
+        self._score_threshold = score_threshold
 
     def _handle_last_prepended_assistant_message(self) -> Score | None:
         """
@@ -183,7 +181,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             # Extract the thread ID from the response to send follow-up messages
             if turn == 1:
                 thread_id = response.prompt_metadata.get("thread_id")
-                print(f"\nExtracted Thread ID: ", thread_id)
+                print(f"Extracted Thread ID: ", thread_id)
                 if thread_id:
                     match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
                     if match:
@@ -193,8 +191,9 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
                         )
                     else:
                         self._objective_target.http_request += f"&threadId={thread_id}"
+
                 else:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}\nThread ID not found. Restarting chat...")
+                    print("Thread ID not found. Restarting chat...")
                     continue
 
             # Reset custom prompt for future turns
@@ -203,14 +202,17 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             if response.response_error == "none":
                 score = await self._check_conversation_complete_async(
                     objective_target_conversation_id=objective_target_conversation_id,
+                    evaluate_chat=self._evaluate_chat
                 )
-                if bool(score.get_value()):
+                if float(score.score_value) >= self._score_threshold:
                     achieved_objective = True
                     logger.info(
                         "The red teaming orchestrator has completed the conversation and achieved the objective.",
                     )
-
+                    print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
                     break
+                else:
+                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
             elif response.response_error == "blocked":
                 score = None
             else:
@@ -299,7 +301,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
 
         return response_piece
 
-    async def _check_conversation_complete_async(self, objective_target_conversation_id: str) -> Union[Score, None]:
+    async def _check_conversation_complete_async(self, objective_target_conversation_id: str, evaluate_chat: bool = False) -> Union[Score, None]:
         """
         Returns the scoring result of the conversation.
         This function uses the scorer to classify the last response.
@@ -311,17 +313,33 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
         if not prompt_request_responses:
             # If there are no messages, then the conversation is not complete.
             return None
+
         if prompt_request_responses[-1].request_pieces[0].role in ["user", "system"]:
             # If the last message is a system or red teaming chat message,
             # then the conversation is not yet complete.
             return None
 
-        score = (
-            await self._objective_scorer.score_async(request_response=prompt_request_responses[-1].request_pieces[0])
-        )[0]
+        if evaluate_chat:
+            combined_responses = []
+            for i in range(0, len(prompt_request_responses), 2):
+                if i + 1 < len(prompt_request_responses):
+                    combined_responses.append({
+                        "user": prompt_request_responses[i].request_pieces[0].converted_value,
+                        "assistant": prompt_request_responses[i + 1].request_pieces[0].converted_value
+                    })
 
-        if score.score_type != "true_false":
-            raise ValueError(f"The scorer must return a true_false score. The score type is {score.score_type}.")
+            # print(f"Chat: {combined_responses}")
+
+            # Convert the combined responses to a JSON object
+            conversation_json = json.dumps(combined_responses, indent=4)
+            prompt_request_responses[-1].request_pieces[0].converted_value = conversation_json
+
+        score = ( await self._objective_scorer.score_async(request_response=prompt_request_responses[-1].request_pieces[0]))[0]
+
+        # We use float scale scores for AH assistant.
+        if score.score_type != "float_scale":
+            raise ValueError(f"The scorer must return a float_scale score. The score type is {score.score_type}.")
+
         return score
 
     def _handle_text_response(self, last_response_from_attack_target, feedback) -> str:
@@ -331,7 +349,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             prompt_text = last_response_from_attack_target.converted_value
             if self._use_score_as_feedback and feedback:
                 # concatenate the feedback to the response from the attack target
-                prompt_text += "\n\n Feedback: " + feedback
+                prompt_text += "\n\n Feedback:" + feedback
             return prompt_text
         elif last_response_from_attack_target.response_error == "blocked":
             return (

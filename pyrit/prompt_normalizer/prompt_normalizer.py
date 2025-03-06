@@ -136,7 +136,7 @@ class PromptNormalizer(abc.ABC):
         target: PromptTarget,
         labels: Optional[dict[str, str]] = None,
         orchestrator_identifier: Optional[dict[str, str]] = None,
-        batch_size: int = 10,
+        batch_size: int = 1,
     ) -> list[PromptRequestResponse]:
         """
         Sends a batch of prompts to the target asynchronously.

@@ -21,7 +21,6 @@ from pyrit.score import Scorer
 
 logger = logging.getLogger(__name__)
 
-
 class MultiTurnAttackResult:
     """The result of a multi-turn attack."""
 
@@ -57,19 +56,153 @@ class MultiTurnAttackResult:
         for message in target_messages:
             for piece in message.request_pieces:
                 if piece.role == "user":
-                    print(f"{Style.BRIGHT}{Fore.BLUE}{piece.role}:")
                     if piece.converted_value != piece.original_value:
-                        print(f"Original value: {piece.original_value}")
-                    print(f"Converted value: {piece.converted_value}")
+                        print(f"\nOriginal value: {piece.original_value}")
+                    print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
                 else:
-                    print(f"{Style.NORMAL}{Fore.YELLOW}{piece.role}: {piece.converted_value}")
+                    print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{piece.role.capitalize()}: {Style.NORMAL}{piece.converted_value}")
 
                 await display_image_response(piece)
 
                 scores = self._memory.get_scores_by_prompt_ids(prompt_request_response_ids=[str(piece.id)])
                 if scores and len(scores) > 0:
                     for score in scores:
-                        print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                        if score.score_value == "True":
+                            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                        else:
+                            print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+
+    async def get_conversation_report_async(self) -> dict:
+        """
+        Returns a structured conversation report for HTML reporting.
+
+        Groups user and assistant messages into turns:
+          - Each turn contains up to two messages: one user message, one assistant message.
+          - Each piece stores both original_value and converted_value.
+          - Assistant pieces may have scores if found in memory.
+          - The final score is taken from the last assistant piece with a score in the transcript.
+        """
+        report = {}
+        transcript = []
+        scores_by_turn = []
+
+        # Retrieve conversation messages from memory using the conversation ID.
+        target_messages = self._memory.get_conversation(conversation_id=self.conversation_id)
+        if not target_messages:
+            report["error"] = "No conversation with the target"
+            return report
+
+        # Set basic conversation info.
+        report["objective"] = self.objective
+        report["achieved_objective"] = self.achieved_objective
+
+        turn_index = 1
+        i = 0
+        n = len(target_messages)
+
+        # Process messages in pairs: (user, assistant).
+        while i < n:
+            turn_data = {"turn_index": turn_index, "pieces": []}
+
+            # 1) Process user message (if exists)
+            if i < n:
+                turn_data["pieces"].extend(
+                    self._build_piece_data(
+                        target_messages[i],
+                        turn_index=turn_index,
+                        scores_by_turn=scores_by_turn,
+                        is_assistant=False
+                    )
+                )
+                i += 1
+
+            # 2) Process assistant message (if exists)
+            if i < n:
+                turn_data["pieces"].extend(
+                    self._build_piece_data(
+                        target_messages[i],
+                        turn_index=turn_index,
+                        scores_by_turn=scores_by_turn,
+                        is_assistant=True
+                    )
+                )
+                i += 1
+
+            transcript.append(turn_data)
+            turn_index += 1
+
+        # Determine the final score from the last assistant piece that has scores.
+        final_score = None
+        for turn in reversed(transcript):
+            for piece in reversed(turn["pieces"]):
+                if piece["role"].lower() == "assistant" and piece["scores"]:
+                    final_score = piece["scores"][0]["score"]
+                    break
+            if final_score is not None:
+                break
+
+        report["transcript"] = transcript
+        report["aggregated_metrics"] = {
+            "total_turns": len(transcript),
+            "final_score": final_score,
+            "scores_by_turn": scores_by_turn
+        }
+        report["additional_metadata"] = {
+            "conversation_id": self.conversation_id
+        }
+
+        return report
+
+    def _build_piece_data(
+            self,
+            message,
+            turn_index: int,
+            scores_by_turn: list,
+            is_assistant: bool
+    ) -> list:
+        """
+        Helper function to convert each piece in a message into a dict with:
+          - role
+          - original_value
+          - converted_value
+          - scores (assistant only)
+
+        If 'is_assistant' is True, we retrieve scores from memory.
+        If any scores are found, they are added to both the piece data
+        and 'scores_by_turn' for step-by-step breakdown.
+        """
+        pieces_data = []
+        for piece in message.request_pieces:
+            piece_data = {
+                "role": piece.role,
+                "original_value": piece.original_value or "",
+                "converted_value": piece.converted_value or "",
+                "scores": []
+            }
+
+            # Only retrieve scores if this piece is truly from the assistant
+            if is_assistant and piece.role.lower() == "assistant":
+                scores = self._memory.get_scores_by_prompt_ids(
+                    prompt_request_response_ids=[str(piece.id)]
+                )
+                if scores:
+                    piece_scores = []
+                    for s in scores:
+                        piece_scores.append({
+                            "score": s.score_value,
+                            "rationale": s.score_rationale
+                        })
+                    piece_data["scores"] = piece_scores
+
+                    # Record for step-by-step breakdown
+                    if piece_scores:
+                        scores_by_turn.append({
+                            "turn_index": turn_index,
+                            "score_details": piece_scores
+                        })
+
+            pieces_data.append(piece_data)
+        return pieces_data
 
 
 class MultiTurnOrchestrator(Orchestrator):
@@ -109,6 +242,7 @@ class MultiTurnOrchestrator(Orchestrator):
         prompt_converters: Optional[list[PromptConverter]] = None,
         objective_scorer: Scorer,
         verbose: bool = False,
+        evaluate_chat: bool = False,
     ) -> None:
 
         super().__init__(prompt_converters=prompt_converters, verbose=verbose)
@@ -136,6 +270,7 @@ class MultiTurnOrchestrator(Orchestrator):
         self._prepended_conversation: list[PromptRequestResponse] = []
         self._last_prepended_user_message: str = ""
         self._last_prepended_assistant_message_scores: list[Score] = []
+        self._evaluate_chat = evaluate_chat
 
     def _get_adversarial_chat_seed_prompt(self, seed_prompt):
         if isinstance(seed_prompt, str):

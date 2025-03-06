@@ -77,6 +77,7 @@ class Scorer(abc.ABC):
         request_piece = PromptRequestPiece(
             role="user",
             original_value=text,
+            expected_output=text,
         )
 
         request_piece.id = None
@@ -214,11 +215,14 @@ class Scorer(abc.ABC):
         prompt_target: PromptChatTarget,
         system_prompt: str,
         prompt_request_value: str,
-        prompt_request_data_type: PromptDataType,
-        scored_prompt_id: str,
+        prompt_request_data_type: PromptDataType = "text",
+        scored_prompt_id: str = None,
         category: str = None,
         task: str = None,
         orchestrator_identifier: dict[str, str] = None,
+        expected_output: str = None,
+        request_prompt: Optional[str] = None,
+        additional_evaluator_variables: dict[str, str] = None,
     ) -> UnvalidatedScore:
         """
         Sends a request to a target, and takes care of retries.
@@ -241,10 +245,24 @@ class Scorer(abc.ABC):
                 score_value still needs to be normalized and validated.
         """
 
+
         conversation_id = str(uuid.uuid4())
 
         if orchestrator_identifier:
             orchestrator_identifier["scored_prompt_id"] = str(scored_prompt_id)
+
+        # This is the user prompt sent to the target and mainly used for checking relevance
+        if request_prompt is not None:
+            system_prompt = system_prompt.replace("{{ request_prompt }}", request_prompt)
+
+        # This is the expected output that the target should generate
+        if expected_output is not None:
+            system_prompt = system_prompt.replace("{{ expected_output }}", expected_output)
+
+        # This is the additional evaluation variables that can be used in the system prompt of the scorer
+        for key, value in (additional_evaluator_variables or {}).items():
+            placeholder = f"{{{{ {key} }}}}"
+            system_prompt = system_prompt.replace(placeholder, value)
 
         prompt_target.set_system_prompt(
             system_prompt=system_prompt,
@@ -257,6 +275,7 @@ class Scorer(abc.ABC):
                 PromptRequestPiece(
                     role="user",
                     original_value=prompt_request_value,
+                    expected_output=expected_output,
                     original_value_data_type=prompt_request_data_type,
                     converted_value_data_type=prompt_request_data_type,
                     conversation_id=conversation_id,

@@ -53,6 +53,7 @@ class Orchestrator(abc.ABC, Identifier):
     def _create_normalizer_request(
         self,
         prompt_text: str,
+        expected_output: str = None,
         prompt_type: PromptDataType = "text",
         conversation_id: str = None,
         converters=None,
@@ -66,6 +67,7 @@ class Orchestrator(abc.ABC, Identifier):
             prompts=[
                 SeedPrompt(
                     value=prompt_text,
+                    expected_output=expected_output,
                     data_type=prompt_type,
                     metadata=metadata,
                 )
