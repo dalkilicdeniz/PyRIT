@@ -159,7 +159,9 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
         custom_prompt = self._handle_last_prepended_user_message()
         thread_id = ""
 
-        while turn <= self._max_turns:
+        max_retries = 3
+        retry_count = 0
+        while turn <= self._max_turns and retry_count < max_retries:
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
@@ -195,6 +197,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
                         self._objective_target.http_request += f"&threadId={thread_id}"
                 else:
                     print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}\nThread ID not found. Restarting chat...")
+                    retry_count += 1
                     continue
 
             # Reset custom prompt for future turns

@@ -265,17 +265,18 @@ def generate_multi_turn_html_report(
     html += "</div></body></html>"
     return html
 
-def generate_single_turn_html_report(results: list) -> str:
+def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> str:
     """
     Generates an HTML report for single-turn dataset evaluations.
 
-    Each entry in `reports` is expected to represent a single user prompt,
+    Each entry in `results` is expected to represent a single user prompt,
     a single assistant response, and any associated scoring metadata.
 
     Features:
     - Light color scheme for better readability
-    - Cleaner, minimalist approach without search/export features
+    - Pass/fail highlighting based on a configurable threshold
     - Summaries expand to show the user prompt, assistant response, and scoring details
+    - Safely parses score_value from text to float (defaults to 0.0 if parsing fails)
 
     Args:
         results (list): A list of dictionaries, each representing a single dataset item
@@ -286,12 +287,13 @@ def generate_single_turn_html_report(results: list) -> str:
                             "assistant_response": str,
                             "scores": [
                                 {
-                                  "score_value": float,
+                                  "score_value": str or float,
                                   "score_rationale": str
                                 },
                                 ...
                             ]
                           }
+        threshold (float): A numeric value used to determine pass/fail. Defaults to 0.7.
 
     Returns:
         str: A complete HTML string containing the report.
@@ -301,7 +303,7 @@ def generate_single_turn_html_report(results: list) -> str:
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Single-Turn Dataset Report</title>
+  <title>Single-Turn Dataset Evaluation Report</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -400,6 +402,23 @@ def generate_single_turn_html_report(results: list) -> str:
     .score-list li {
       margin-bottom: 4px;
     }
+    /* Styling for pass/fail highlights */
+    .score-pass {
+      color: #1b5e20;         /* Dark green */
+      background-color: #c8e6c9; /* Light green background */
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-left: 6px;
+    }
+    .score-fail {
+      color: #b71c1c;         /* Dark red */
+      background-color: #ffcdd2; /* Light red background */
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-left: 6px;
+    }
     .explanation-block {
       display: inline-block;
       border: none;
@@ -428,22 +447,37 @@ def generate_single_turn_html_report(results: list) -> str:
     <h1>Single-Turn Dataset Evaluation Report</h1>
 """
 
-    # Loop through each single-turn report
     for index, report in enumerate(results, start=1):
         conversation_id = report.get("conversation_id", f"SingleTurn-{index}")
         prompt = report.get("prompt", "N/A")
         assistant_response = report.get("assistant_response", "N/A")
         scores = report.get("scores", [])
 
-        # Build a short summary text
-        # e.g., "Test Case 1: Conversation ID: SingleTurn-1 | Score: 0.9"
-        # If multiple scores, you might pick the first or combine them as needed
-        if scores:
-            # Example: take the average or highest
-            main_score = max(float(s["score_value"]) for s in scores)
-            summary_text = f"Test Case {index}: Conversation ID <span class='conversation-id'>{conversation_id}</span> | Score: {main_score}"
+        # Parse each score_value as float, defaulting to 0.0 on error
+        numeric_scores = []
+        for s in scores:
+            raw_val = s.get("score_value", "0.0")
+            try:
+                numeric_scores.append(float(raw_val))
+            except ValueError:
+                numeric_scores.append(0.0)
+
+        # Compute main_score as max of numeric scores if any exist
+        main_score = max(numeric_scores) if numeric_scores else None
+
+        # Build pass/fail summary text
+        if main_score is not None:
+            pass_fail_label = "Passed" if main_score >= threshold else "Failed"
+            pass_fail_class = "score-pass" if main_score >= threshold else "score-fail"
+            summary_text = (
+                f"Test Case {index}: "
+                f"Conversation ID <span class='conversation-id'>{conversation_id}</span> | "
+                f"Score: {main_score} <span class='{pass_fail_class}'>{pass_fail_label}</span>"
+            )
         else:
-            summary_text = f"Test Case {index}: Conversation ID <span class='conversation-id'>{conversation_id}</span>"
+            summary_text = (
+                f"Test Case {index}: Conversation ID <span class='conversation-id'>{conversation_id}</span>"
+            )
 
         # Start the <details> block for this test case
         html += f"""
@@ -453,6 +487,7 @@ def generate_single_turn_html_report(results: list) -> str:
       </summary>
       <div class="metrics">
         <p><strong>Conversation ID:</strong> <span class="conversation-id">{conversation_id}</span></p>
+        <p><strong>Threshold:</strong> {threshold}</p>
       </div>
       <h3>Transcript</h3>
       <table>
@@ -470,17 +505,32 @@ def generate_single_turn_html_report(results: list) -> str:
             <td>
 """
 
-        # If there are scores, display them in a bullet list
+        # Render each score in bullet points
         if scores:
             bullet_points = []
             for s in scores:
-                score_val = s.get("score_value", "N/A")
+                # Parse the score value
+                raw_val = s.get("score_value", "0.0")
+                try:
+                    score_val = float(raw_val)
+                except ValueError:
+                    score_val = 0.0
+
+                # Mark pass/fail
+                pass_fail_span_class = "score-pass" if score_val >= threshold else "score-fail"
+                pass_fail_text = "Pass" if score_val >= threshold else "Fail"
+
                 rationale = s.get("score_rationale", "No rationale provided")
+
                 bullet_points.append(
-                    f"<li><strong>{score_val}</strong> "
+                    f"<li>"
+                    f"<strong>{score_val}</strong> "
+                    f"<span class='{pass_fail_span_class}'>{pass_fail_text}</span>"
                     f"<details class='explanation-block'><summary>View Explanation</summary>"
-                    f"<div>{rationale}</div></details></li>"
+                    f"<div>{rationale}</div></details>"
+                    f"</li>"
                 )
+
             html += f"<ul class='score-list'>{''.join(bullet_points)}</ul>"
         else:
             html += "N/A"
@@ -497,12 +547,12 @@ def generate_single_turn_html_report(results: list) -> str:
     html += "</div></body></html>"
     return html
 
-
 def save_html_report(
         results: list,
         directory: str = ".",
         report_generator=None,
-        is_chat_evaluation: bool = True
+        is_chat_evaluation: bool = True,
+        threshold: float = 0.7
 ) -> str:
     """
     Saves an HTML report generated by the specified report generator function.
@@ -510,11 +560,12 @@ def save_html_report(
     Args:
         results (list): A list of result dictionaries.
         directory (str): Directory where the report file will be saved.
-        report_generator (callable): A function that takes `results` (and possibly
-            `is_chat_evaluation`) and returns an HTML string. Defaults to None,
-            in which case `generate_multi_turn_html_report` is used.
-        is_chat_evaluation (bool): If True, scores reflect the entire conversation
-            (cumulative score). Only used by the multi-turn generator.
+        report_generator (callable): A function that takes either:
+            - (results, is_chat_evaluation) for multi-turn
+            - (results, threshold) for single-turn
+          If None, defaults to multi-turn.
+        is_chat_evaluation (bool): Used only if the multi-turn generator is called.
+        threshold (float): Used only if the single-turn generator is called.
 
     Returns:
         str: The full file path where the HTML report was saved.
@@ -523,14 +574,13 @@ def save_html_report(
     if report_generator is None:
         html_content = generate_multi_turn_html_report(results, is_chat_evaluation)
     else:
-        # For single-turn or any custom generator, call it directly
-        # (Some generators might not need `is_chat_evaluation`.)
-        try:
-            # If the generator expects two arguments
+        # Detect if the user passed the single-turn generator by function name
+        if report_generator.__name__ == "generate_single_turn_html_report":
+            # Pass the threshold, ignoring is_chat_evaluation
+            html_content = report_generator(results, threshold=threshold)
+        else:
+            # Assume multi-turn or other generator expecting two arguments
             html_content = report_generator(results, is_chat_evaluation)
-        except TypeError:
-            # If it only expects one argument (e.g., single-turn)
-            html_content = report_generator(results)
 
     # Create a timestamp string for the file name (format: YYYYMMDD_HHMMSS)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -542,5 +592,8 @@ def save_html_report(
     # Write the HTML content to the file
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(html_content)
+
+    # Print the location of the saved file
+    print(f"Report saved at: {file_path}")
 
     return str(file_path)
