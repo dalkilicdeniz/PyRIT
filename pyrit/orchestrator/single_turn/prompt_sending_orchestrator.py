@@ -69,6 +69,19 @@ class PromptSendingOrchestrator(Orchestrator):
 
         self._prepended_conversation = prepended_conversation
 
+    async def get_prepended_conversation_async(
+        self, *, normalizer_request: NormalizerRequest
+    ) -> Optional[list[PromptRequestResponse]]:
+        """
+        Returns the prepended conversation for the normalizer request.
+
+        Can be overwritten by subclasses to provide a different conversation.
+        """
+        if self._prepended_conversation:
+            return self._prepended_conversation
+
+        return None
+
     def set_skip_criteria(
         self, *, skip_criteria: PromptFilterCriteria, skip_value_type: PromptConverterState = "original"
     ):
@@ -91,8 +104,10 @@ class PromptSendingOrchestrator(Orchestrator):
 
         expected_output_list = []
         request_prompts = []
+        self.validate_normalizer_requests(prompt_request_list=prompt_request_list)
+
         for prompt in prompt_request_list:
-            prompt.conversation_id = self._prepare_conversation()
+            prompt.conversation_id = await self._prepare_conversation_async(normalizer_request=prompt)
             request_prompts.append(prompt.seed_prompt_group.prompts[0].value)
             if prompt.seed_prompt_group.prompts[0].expected_output:
                 expected_output_list.append(prompt.seed_prompt_group.prompts[0].expected_output)
@@ -175,7 +190,7 @@ class PromptSendingOrchestrator(Orchestrator):
 
         return await self.send_normalizer_requests_async(
             prompt_request_list=requests,
-            memory_labels=combine_dict(existing_dict=self._global_memory_labels, new_dict=memory_labels),
+            memory_labels=memory_labels,
         )
 
     async def print_conversations_async(self):
@@ -201,13 +216,23 @@ class PromptSendingOrchestrator(Orchestrator):
                 else:
                     print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
-    def _prepare_conversation(self):
+    def validate_normalizer_requests(self, *, prompt_request_list: list[NormalizerRequest]):
+        """
+        Validates the normalizer request.
+
+        This is a no-op for this orchestrator, but subclasses may want to implement this.
+        """
+        pass
+
+    async def _prepare_conversation_async(self, normalizer_request: NormalizerRequest) -> str:
         """
         Adds the conversation to memory if there is a prepended conversation, and return the conversation ID.
         """
-        conversation_id = uuid.uuid4()
-        if self._prepended_conversation:
-            for request in self._prepended_conversation:
+        conversation_id = str(uuid.uuid4())
+
+        prepended_conversation = await self.get_prepended_conversation_async(normalizer_request=normalizer_request)
+        if prepended_conversation:
+            for request in prepended_conversation:
                 for piece in request.request_pieces:
                     piece.conversation_id = conversation_id
                     piece.orchestrator_identifier = self.get_identifier()
