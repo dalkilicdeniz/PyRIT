@@ -334,7 +334,7 @@ class RedTeamingOrchestrator(MultiTurnOrchestrator):
             prompt_text = last_response_from_attack_target.converted_value
             if self._use_score_as_feedback and feedback:
                 # concatenate the feedback to the response from the attack target
-                prompt_text += "\n\n Feedback: " + feedback
+                prompt_text += "\n\n Feedback by the evaluator:" + feedback
             return prompt_text
         elif last_response_from_attack_target.response_error == "blocked":
             return (

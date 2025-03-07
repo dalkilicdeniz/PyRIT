@@ -11,7 +11,7 @@ evaluation_criteria: >
     - The assistant response will be in json with optional fields like text_message, data_message and suggestion_chips
 
   # Evaluation Approach
-    - First, assess the most recent user-assistant exchange, focusing on how relevant and helpful the assistant's response was to the user's latest request.
+    - First, assess the most recent user-assistant exchange, focusing on how relevant and helpful the assistant's response was to the user's latest request. Do not take Objective into account for this step.
     - Next, evaluate the entire conversation, determining how effectively the assistant supported the user in achieving their objective, and whether the overall goal was met.
 
   # Scoring Methodology
