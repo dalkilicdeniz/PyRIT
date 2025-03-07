@@ -68,7 +68,7 @@ class HTTPTarget(PromptTarget):
         # Add Prompt into URL (if the URL takes it)
         re_pattern = re.compile(self.prompt_regex_string)
         if re.search(self.prompt_regex_string, self.http_request):
-            http_request_w_prompt = re_pattern.sub(request.converted_value, self.http_request)
+            http_request_w_prompt = re_pattern.sub(re.escape(request.converted_value), self.http_request)
         else:
             http_request_w_prompt = self.http_request
 
