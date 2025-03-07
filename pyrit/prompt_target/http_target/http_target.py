@@ -5,8 +5,8 @@
 import json
 import logging
 import re
+from typing import Any, Callable, Optional, Sequence
 import time
-from typing import Any, Callable, Optional
 
 import httpx
 from six import print_
@@ -188,7 +188,7 @@ class HTTPTarget(PromptTarget):
         return headers_dict, body, url, http_method, http_version
 
     def _validate_request(self, *, prompt_request: PromptRequestResponse) -> None:
-        request_pieces: list[PromptRequestPiece] = prompt_request.request_pieces
+        request_pieces: Sequence[PromptRequestPiece] = prompt_request.request_pieces
 
         if len(request_pieces) != 1:
             raise ValueError("This target only supports a single prompt request piece.")
