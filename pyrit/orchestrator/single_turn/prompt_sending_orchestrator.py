@@ -6,6 +6,7 @@ import uuid
 from typing import Optional, Union
 
 from colorama import Fore, Style
+from langsmith import expect
 
 from pyrit.common.display_response import display_image_response
 from pyrit.common.utils import combine_dict
@@ -176,16 +177,17 @@ class PromptSendingOrchestrator(Orchestrator):
 
         i= 0
         for prompt in prompt_list:
+            expected_output = expected_output_list[i] if expected_output_list else None
             requests.append(
-                self._create_normalizer_request(
-                    prompt_text=prompt,
-                    expected_output=expected_output_list[i] if expected_output_list else None,
-                    prompt_type=prompt_type,
-                    converters=self._prompt_converters,
-                    metadata=metadata,
-                    conversation_id=str(uuid.uuid4()),
+                    self._create_normalizer_request(
+                        prompt_text=prompt,
+                        expected_output=expected_output,
+                        prompt_type=prompt_type,
+                        converters=self._prompt_converters,
+                        metadata=metadata,
+                        conversation_id=str(uuid.uuid4()),
+                    )
                 )
-            )
             i+=1
 
         return await self.send_normalizer_requests_async(
@@ -273,6 +275,7 @@ class PromptSendingOrchestrator(Orchestrator):
 
         # Iterate through all messages in memory
         for msg in messages:
+
             if msg.role == "user":
                 # Record user prompt and conversation ID
                 user_prompt = msg.converted_value
@@ -287,7 +290,8 @@ class PromptSendingOrchestrator(Orchestrator):
                 for s in msg.scores:
                     single_turn_scores.append({
                         "score_value": s.score_value,
-                        "score_rationale": s.score_rationale
+                        "score_rationale": s.score_rationale,
+                        "expected_output": s.expected_output
                     })
 
                 # Build the single-turn result

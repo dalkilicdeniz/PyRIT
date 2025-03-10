@@ -267,20 +267,11 @@ def generate_multi_turn_html_report(
 
 def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> str:
     """
-    Generates an HTML report for single-turn dataset evaluations.
-
-    Each entry in `results` is expected to represent a single user prompt,
-    a single assistant response, and any associated scoring metadata.
-
-    Features:
-    - Light color scheme for better readability
-    - Pass/fail highlighting based on a configurable threshold
-    - Summaries expand to show the user prompt, assistant response, and scoring details
-    - Safely parses score_value from text to float (defaults to 0.0 if parsing fails)
+    Generates an HTML report for single-turn dataset evaluations where expected_output is inside each score entry.
 
     Args:
-        results (list): A list of dictionaries, each representing a single dataset item
-                        or single-turn conversation. Expected structure:
+        results (list): A list of dictionaries, each representing a single dataset item.
+                        Expected structure:
                           {
                             "conversation_id": str,
                             "prompt": str,
@@ -288,7 +279,8 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
                             "scores": [
                                 {
                                   "score_value": str or float,
-                                  "score_rationale": str
+                                  "score_rationale": str,
+                                  "expected_output": str
                                 },
                                 ...
                             ]
@@ -306,12 +298,10 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
   <title>Single-Turn Dataset Evaluation Report</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
-      background: #f8f9fa; /* Light gray background */
+      background: #f8f9fa;
       margin: 0;
       padding: 20px;
       color: #333;
@@ -343,7 +333,7 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
     summary {
       padding: 12px 18px;
       cursor: pointer;
-      background: #e3f2fd; /* Light blue */
+      background: #e3f2fd;
       color: #01579b;
       font-size: 1rem;
       font-weight: 500;
@@ -352,22 +342,15 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       transition: background 0.3s ease;
       border: none;
     }
-    summary:hover {
-      background: #bbdefb;
-    }
-    summary::-webkit-details-marker {
-      display: none;
-    }
+    summary:hover { background: #bbdefb; }
+    summary::-webkit-details-marker { display: none; }
     .metrics {
-      background-color: #f1f8e9; /* Light green */
+      background-color: #f1f8e9;
       padding: 12px 18px;
       margin: 0;
       border-bottom: 1px solid #ddd;
     }
-    .conversation-id {
-      color: #0277bd;
-      font-weight: bold;
-    }
+    .conversation-id { color: #0277bd; font-weight: bold; }
     h3 {
       padding: 10px 18px;
       margin: 0;
@@ -385,35 +368,31 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       padding: 10px 12px;
       text-align: left;
       border-bottom: 1px solid #eee;
+      vertical-align: top;
     }
     th {
       background-color: #0277bd;
       color: #fff;
       font-size: 0.9rem;
     }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
+    tr:nth-child(even) { background-color: #f9f9f9; }
     .score-list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
-    .score-list li {
-      margin-bottom: 4px;
-    }
-    /* Styling for pass/fail highlights */
+    .score-list li { margin-bottom: 8px; }
     .score-pass {
-      color: #1b5e20;         /* Dark green */
-      background-color: #c8e6c9; /* Light green background */
+      color: #1b5e20;
+      background-color: #c8e6c9;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: bold;
       margin-left: 6px;
     }
     .score-fail {
-      color: #b71c1c;         /* Dark red */
-      background-color: #ffcdd2; /* Light red background */
+      color: #b71c1c;
+      background-color: #ffcdd2;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: bold;
@@ -437,9 +416,7 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       display: inline-block;
       margin-bottom: 4px;
     }
-    .explanation-block summary:hover {
-      background: #9ccc65;
-    }
+    .explanation-block summary:hover { background: #9ccc65; }
   </style>
 </head>
 <body>
@@ -453,7 +430,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
         assistant_response = report.get("assistant_response", "N/A")
         scores = report.get("scores", [])
 
-        # Parse each score_value as float, defaulting to 0.0 on error
         numeric_scores = []
         for s in scores:
             raw_val = s.get("score_value", "0.0")
@@ -462,10 +438,8 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
             except ValueError:
                 numeric_scores.append(0.0)
 
-        # Compute main_score as max of numeric scores if any exist
         main_score = max(numeric_scores) if numeric_scores else None
 
-        # Build pass/fail summary text
         if main_score is not None:
             pass_fail_label = "Passed" if main_score >= threshold else "Failed"
             pass_fail_class = "score-pass" if main_score >= threshold else "score-fail"
@@ -479,12 +453,9 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
                 f"Test Case {index}: Conversation ID <span class='conversation-id'>{conversation_id}</span>"
             )
 
-        # Start the <details> block for this test case
         html += f"""
     <details>
-      <summary>
-        {summary_text}
-      </summary>
+      <summary>{summary_text}</summary>
       <div class="metrics">
         <p><strong>Conversation ID:</strong> <span class="conversation-id">{conversation_id}</span></p>
         <p><strong>Threshold:</strong> {threshold}</p>
@@ -495,50 +466,57 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
           <tr>
             <th>User Prompt</th>
             <th>Assistant Response</th>
+            <th>Expected Output</th>
             <th>Score(s)</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>{prompt}</td>
-            <td>{assistant_response}</td>
-            <td>
 """
 
-        # Render each score in bullet points
         if scores:
-            bullet_points = []
             for s in scores:
-                # Parse the score value
                 raw_val = s.get("score_value", "0.0")
+                expected_output = s.get("expected_output", "N/A")
                 try:
                     score_val = float(raw_val)
                 except ValueError:
                     score_val = 0.0
 
-                # Mark pass/fail
                 pass_fail_span_class = "score-pass" if score_val >= threshold else "score-fail"
                 pass_fail_text = "Pass" if score_val >= threshold else "Fail"
 
                 rationale = s.get("score_rationale", "No rationale provided")
 
-                bullet_points.append(
-                    f"<li>"
-                    f"<strong>{score_val}</strong> "
-                    f"<span class='{pass_fail_span_class}'>{pass_fail_text}</span>"
-                    f"<details class='explanation-block'><summary>View Explanation</summary>"
-                    f"<div>{rationale}</div></details>"
-                    f"</li>"
-                )
-
-            html += f"<ul class='score-list'>{''.join(bullet_points)}</ul>"
-        else:
-            html += "N/A"
-
-        # Close out the row, table, and details
-        html += """
+                html += f"""
+          <tr>
+            <td>{prompt}</td>
+            <td>{assistant_response}</td>
+            <td>{expected_output}</td>
+            <td>
+              <ul class='score-list'>
+                <li>
+                  <strong>{score_val}</strong>
+                  <span class='{pass_fail_span_class}'>{pass_fail_text}</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>{rationale}</div>
+                  </details>
+                </li>
+              </ul>
             </td>
           </tr>
+"""
+
+        else:
+            html += f"""
+          <tr>
+            <td>{prompt}</td>
+            <td>{assistant_response}</td>
+            <td>N/A</td>
+            <td>N/A</td>
+          </tr>
+"""
+
+        html += """
         </tbody>
       </table>
     </details>

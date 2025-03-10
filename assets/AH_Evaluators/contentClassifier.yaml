@@ -1,3 +1,0 @@
-category: "AH Similarity Evaluator"
-true_description: "'Text Message' is relevant to user prompt '{{ question }}' in terms of food information, recipes, or product domains, or it is similar to the 'Text Message' in the sample output. Additionally, 'Data Message' is relevant to the 'Data Message' in the expected output regardless of the content of data provided. Sample Reference output: {{ expected_output }}"
-false_description: "'Text Message' is not relevant to user prompt '{{ question }}' in terms of food information, recipes, or product domains, and it is not similar to the 'Text Message' in the sample output. Or, 'Data Message' is not relevant to the 'Data Message' in the sample output regardless of the data provided. Sample Reference output: {{ expected_output }}"

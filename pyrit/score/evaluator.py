@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional, Literal
 
 import yaml
+from langsmith import expect
 
 from pyrit.common.path import DATASETS_PATH
 from pyrit.models import PromptRequestPiece, SeedPrompt
@@ -122,7 +123,7 @@ class Evaluator(Scorer):
             additional_evaluator_variables=self._additional_evaluator_variables,
         )
 
-        score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value)
+        score = unvalidated_score.to_score(score_value=unvalidated_score.raw_score_value, expected_output=request_response.expected_output)
 
         self._memory.add_scores_to_memory(scores=[score])
         return [score]

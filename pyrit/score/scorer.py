@@ -311,6 +311,7 @@ class Scorer(abc.ABC):
                 scorer_class_identifier=self.get_identifier(),
                 score_metadata=parsed_response.get("metadata"),
                 prompt_request_response_id=scored_prompt_id,
+                expected_output=expected_output,
                 task=task,
             )
 
