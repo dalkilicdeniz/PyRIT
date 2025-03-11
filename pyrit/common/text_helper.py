@@ -298,7 +298,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
   <title>Single-Turn Dataset Evaluation Report</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
       background: #f8f9fa;
@@ -319,16 +318,18 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       font-size: 1.8rem;
       color: #2c3e50;
     }
+    .description {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      color: #666;
+    }
     details {
       margin-bottom: 15px;
       border: 1px solid #ddd;
       border-radius: 6px;
       background-color: #fcfcfc;
-      transition: all 0.3s ease;
       overflow: hidden;
-    }
-    details[open] {
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     summary {
       padding: 12px 18px;
@@ -339,7 +340,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       font-weight: 500;
       border-radius: 6px;
       outline: none;
-      transition: background 0.3s ease;
       border: none;
     }
     summary:hover { background: #bbdefb; }
@@ -349,15 +349,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       padding: 12px 18px;
       margin: 0;
       border-bottom: 1px solid #ddd;
-    }
-    .conversation-id { color: #0277bd; font-weight: bold; }
-    h3 {
-      padding: 10px 18px;
-      margin: 0;
-      background: #e3f2fd;
-      border-top: 1px solid #ddd;
-      font-size: 1rem;
-      font-weight: 500;
     }
     table {
       width: 100%;
@@ -376,19 +367,12 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       font-size: 0.9rem;
     }
     tr:nth-child(even) { background-color: #f9f9f9; }
-    .score-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    .score-list li { margin-bottom: 8px; }
     .score-pass {
       color: #1b5e20;
       background-color: #c8e6c9;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: bold;
-      margin-left: 6px;
     }
     .score-fail {
       color: #b71c1c;
@@ -396,13 +380,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: bold;
-      margin-left: 6px;
-    }
-    .explanation-block {
-      display: inline-block;
-      border: none;
-      border-radius: 4px;
-      background: transparent;
     }
     .explanation-block summary {
       background: #aed581;
@@ -412,9 +389,7 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
       cursor: pointer;
       border-radius: 4px;
       outline: none;
-      border: none;
       display: inline-block;
-      margin-bottom: 4px;
     }
     .explanation-block summary:hover { background: #9ccc65; }
   </style>
@@ -425,7 +400,6 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
 """
 
     for index, report in enumerate(results, start=1):
-        conversation_id = report.get("conversation_id", f"SingleTurn-{index}")
         prompt = report.get("prompt", "N/A")
         assistant_response = report.get("assistant_response", "N/A")
         scores = report.get("scores", [])
@@ -445,19 +419,19 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
             pass_fail_class = "score-pass" if main_score >= threshold else "score-fail"
             summary_text = (
                 f"Test Case {index}: "
-                f"Conversation ID <span class='conversation-id'>{conversation_id}</span> | "
+                f"<strong>User Prompt:</strong> \"{prompt[:100]}...\" | "
                 f"Score: {main_score} <span class='{pass_fail_class}'>{pass_fail_label}</span>"
             )
         else:
             summary_text = (
-                f"Test Case {index}: Conversation ID <span class='conversation-id'>{conversation_id}</span>"
+                f"Test Case {index}: <strong>User Prompt:</strong> \"{prompt[:100]}...\""
             )
 
         html += f"""
     <details>
       <summary>{summary_text}</summary>
       <div class="metrics">
-        <p><strong>Conversation ID:</strong> <span class="conversation-id">{conversation_id}</span></p>
+        <p><strong>User Prompt:</strong> {prompt}</p>
         <p><strong>Threshold:</strong> {threshold}</p>
       </div>
       <h3>Transcript</h3>
@@ -493,7 +467,7 @@ def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> s
             <td>{assistant_response}</td>
             <td>{expected_output}</td>
             <td>
-              <ul class='score-list'>
+              <ul>
                 <li>
                   <strong>{score_val}</strong>
                   <span class='{pass_fail_span_class}'>{pass_fail_text}</span>
@@ -530,7 +504,8 @@ def save_html_report(
         directory: str = ".",
         report_generator=None,
         is_chat_evaluation: bool = True,
-        threshold: float = 0.7
+        threshold: float = 0.7,
+        description: str = ""
 ) -> str:
     """
     Saves an HTML report generated by the specified report generator function.
@@ -544,6 +519,7 @@ def save_html_report(
           If None, defaults to multi-turn.
         is_chat_evaluation (bool): Used only if the multi-turn generator is called.
         threshold (float): Used only if the single-turn generator is called.
+        description (str): Optional description text to include under the title in the report.
 
     Returns:
         str: The full file path where the HTML report was saved.
@@ -559,6 +535,16 @@ def save_html_report(
         else:
             # Assume multi-turn or other generator expecting two arguments
             html_content = report_generator(results, is_chat_evaluation)
+
+    # Insert description under title if provided.
+    # We assume the title is <h1>Single-Turn Dataset Evaluation Report</h1>
+    # and we insert the description right after it.
+    if description:
+        # Insert the description paragraph after the <h1> tag.
+        html_content = html_content.replace(
+            "<h1>Single-Turn Dataset Evaluation Report</h1>",
+            f"<h1>Single-Turn Dataset Evaluation Report</h1>\n<p class='description'>{description}</p>"
+        )
 
     # Create a timestamp string for the file name (format: YYYYMMDD_HHMMSS)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

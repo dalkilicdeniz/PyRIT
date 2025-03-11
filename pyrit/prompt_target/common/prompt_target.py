@@ -24,6 +24,7 @@ class PromptTarget(abc.ABC, Identifier):
         self._memory = CentralMemory.get_memory_instance()
         self._verbose = verbose
         self._max_requests_per_minute = max_requests_per_minute
+        self.http_request = None
 
         if self._verbose:
             logging.basicConfig(level=logging.INFO)
