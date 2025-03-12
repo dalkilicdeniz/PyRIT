@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-
+import asyncio
 import logging
 import uuid
 from typing import Optional, Union
@@ -139,7 +139,7 @@ class PromptSendingOrchestrator(Orchestrator):
 
         for scorer in self._scorers:
                 await scorer.score_responses_inferring_tasks_batch_async(
-                    request_responses=response_pieces, batch_size=10
+                    request_responses=response_pieces, batch_size=5
                 )
 
         return responses

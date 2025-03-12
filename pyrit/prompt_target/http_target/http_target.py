@@ -83,6 +83,8 @@ class HTTPTarget(PromptTarget):
         if http_version and "HTTP/2" in http_version:
             http2_version = True
 
+        # to avoid rate limiting, we wait for 10 seconds between turns
+        await asyncio.sleep(10)
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
             #print(http_body)
             match http_body:

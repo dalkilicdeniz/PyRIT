@@ -21,7 +21,7 @@ evaluation_criteria: >
   - **Score closer to 1.0**  
     - It closely aligns with the meaning, intent, or informational content of the **expected output**.
     - The assistant’s **Text Message** directly addresses the user’s question in the correct domain (food, recipes, products).
-    - If a **Data Message** is present, it is relevant in structure and context.
+    - If a **Data Message** is present, it is relevant in structure and context to the Text Message and Data Message in expected output.
   
   - **Score around 0.5**  
     - The response provides partial alignment or partial relevance.
@@ -30,7 +30,7 @@ evaluation_criteria: >
   - **Score closer to 0.0**  
     - It does not align meaningfully with the expected output’s domain or content.
     - The assistant’s **Text Message** is not relevant to the user’s question.
-    - The **Data Message**, if present, is irrelevant or missing.
+    - The **Data Message**, is irrelevant to expected output.
 
   ## Clarifications
   - The **expected output** is **indicative**, not a required exact match.
