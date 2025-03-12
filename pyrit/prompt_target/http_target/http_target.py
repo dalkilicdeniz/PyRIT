@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-
-
+import asyncio
 import json
 import logging
 import re
@@ -115,8 +114,6 @@ class HTTPTarget(PromptTarget):
             response_content = self.callback_function(response=response)
         elif self.callback_function is None and self.response_fields_regex_dict is not None: # Default parsing through regex
             raise ValueError("No callback function provided, using default regex parsing")
-
-        time.sleep(5)
 
         #Send thread_id in prompt_metadata so that it can be used in follow-up messages
         response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})

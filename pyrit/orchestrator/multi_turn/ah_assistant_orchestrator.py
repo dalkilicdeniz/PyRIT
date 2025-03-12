@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-
+import asyncio
 import enum
 import json
 import logging
 import re
+import time
 from pathlib import Path
 from typing import Optional, Union
 from uuid import uuid4
@@ -158,6 +159,8 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         thread_id = ""
 
         while turn <= self._max_turns:
+            # to avoid rate limiting, we wait for 10 seconds between turns
+            await asyncio.sleep(10)
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
@@ -262,7 +265,6 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         """
         if not custom_prompt:
             # The prompt for the red teaming LLM needs to include the latest message from the prompt target.
-            logger.info("Generating a prompt for the prompt target using the red teaming LLM.")
             prompt = await self._get_prompt_from_adversarial_chat(
                 objective=objective,
                 objective_target_conversation_id=objective_target_conversation_id,
@@ -349,7 +351,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
             prompt_text = last_response_from_attack_target.converted_value
             if self._use_score_as_feedback and feedback:
                 # concatenate the feedback to the response from the attack target
-                prompt_text += "\n\n Feedback by the evaluator:" + feedback
+                prompt_text += "\n\n Feedback: " + feedback
             return prompt_text
         elif last_response_from_attack_target.response_error == "blocked":
             return (
@@ -441,6 +443,9 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
             memory_labels (dict[str, str], Optional): A free-form dictionary of labels to apply to the
                 prompts throughout the attack. These should already be combined with GLOBAL_MEMORY_LABELS.
         """
+
+        # This is the response from the attack target combined with feedback (if exists),
+        # used to generate the next prompt for the red teaming chat.
         prompt_text = self._get_prompt_for_adversarial_chat(
             objective_target_conversation_id=objective_target_conversation_id, feedback=feedback
         )
@@ -459,6 +464,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
             prompts=[SeedPrompt(value=prompt_text, data_type="text")],
         )
 
+        # This is the response from the red teaming chat, which is the next prompt for the attack target.
         response_text = (
             (
                 await self._prompt_normalizer.send_prompt_async(
