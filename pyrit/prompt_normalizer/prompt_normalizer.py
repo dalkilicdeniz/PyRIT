@@ -90,35 +90,43 @@ class PromptNormalizer(abc.ABC):
 
         response = None
 
-        try:
-            response = await target.send_prompt_async(prompt_request=request)
-            self._memory.add_request_response_to_memory(request=request)
-        except EmptyResponseException:
-            # Empty responses are retried, but we don't want them to stop execution
-            self._memory.add_request_response_to_memory(request=request)
+        max_retries = 2
+        retry_delay = 5  # seconds
 
-            response = construct_response_from_request(
-                request=request.request_pieces[0],
-                response_text_pieces=[""],
-                response_type="text",
-                error="empty",
-            )
+        for attempt in range(max_retries + 1):
+            try:
+                response = await target.send_prompt_async(prompt_request=request)
+                self._memory.add_request_response_to_memory(request=request)
+                break  # Exit the loop if the operation is successful
+            except EmptyResponseException:
+                # Empty responses are retried, but we don't want them to stop execution
+                self._memory.add_request_response_to_memory(request=request)
 
-        except Exception as ex:
-            # Ensure request to memory before processing exception
-            self._memory.add_request_response_to_memory(request=request)
+                response = construct_response_from_request(
+                    request=request.request_pieces[0],
+                    response_text_pieces=[""],
+                    response_type="text",
+                    error="empty",
+                )
+                break  # Exit the loop if the operation is successful
+            except Exception as ex:
+                # Ensure request to memory before processing exception
+                self._memory.add_request_response_to_memory(request=request)
 
-            error_response = construct_response_from_request(
-                request=request.request_pieces[0],
-                response_text_pieces=[str(ex)],
-                response_type="error",
-                error="processing",
-            )
+                if attempt < max_retries:
+                    await asyncio.sleep(retry_delay)  # Wait before retrying
+                else:
+                    error_response = construct_response_from_request(
+                        request=request.request_pieces[0],
+                        response_text_pieces=[str(ex)],
+                        response_type="error",
+                        error="processing",
+                    )
 
-            await self._calc_hash(request=error_response)
-            self._memory.add_request_response_to_memory(request=error_response)
-            cid = request.request_pieces[0].conversation_id if request and request.request_pieces else None
-            raise Exception(f"Error sending prompt with conversation ID: {cid}") from ex
+                    await self._calc_hash(request=error_response)
+                    self._memory.add_request_response_to_memory(request=error_response)
+                    cid = request.request_pieces[0].conversation_id if request and request.request_pieces else None
+                    raise Exception(f"Error sending prompt with conversation ID: {cid}") from ex
 
         if response is None:
             return None
