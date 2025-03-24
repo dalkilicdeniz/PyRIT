@@ -15,7 +15,7 @@ from pyrit.models import (
     PromptRequestResponse,
     construct_response_from_request,
 )
-from pyrit.prompt_target import PromptTarget
+from pyrit.prompt_target import PromptTarget, limit_requests_per_minute
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,7 @@ class HTTPTarget(PromptTarget):
         self.response_fields_regex_dict = response_fields_regex_dict or []
         self.httpx_client_kwargs = httpx_client_kwargs or {}
 
+    @limit_requests_per_minute
     async def send_prompt_async(self, *, prompt_request: PromptRequestResponse) -> PromptRequestResponse:
         """
         Sends prompt to HTTP endpoint and returns the response
