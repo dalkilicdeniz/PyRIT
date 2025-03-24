@@ -109,9 +109,9 @@ class HTTPTarget(PromptTarget):
         response_content = ""
 
         # Retrieve the thread ID from the response, so we can send follow-up messages
-        thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
-        thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
-        thread_id = thread_id_match.group(1) if thread_id_match else None
+        response_json = response.json()
+        print(response_json)
+        thread_id = response_json.get("chatId")
 
         if self.callback_function:
             response_content = self.callback_function(response=response)

@@ -181,23 +181,41 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
                 custom_prompt=custom_prompt,
                 memory_labels=updated_memory_labels,
             )
+
             # Extract the thread ID from the response to send follow-up messages
             if turn == 1:
-                thread_id = response.prompt_metadata.get("thread_id")
-                print(f"Extracted Thread ID: ", thread_id)
-                if thread_id:
-                    match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
-                    if match:
-                        member_id_str = match.group(1)
-                        self._objective_target.http_request = self._objective_target.http_request.replace(
-                            member_id_str, f"{member_id_str}&threadId={thread_id}"
-                        )
-                    else:
-                        self._objective_target.http_request += f"&threadId={thread_id}"
-
-                else:
-                    print("Thread ID not found. Restarting chat...")
+                # Extract chatId from the response
+                chat_id = response.prompt_metadata.get("thread_id")
+                if not chat_id:
+                    print("Chat ID not found. Restarting chat...")
                     continue
+
+                # Update the URL with chatId
+                url = f"https://ahgpt-service.kaas.nonprd.k8s.ah.technology/v1/chats/{chat_id}/messages/stream"
+
+                # Replace the request body for follow-up messages
+                follow_up_request_body = {
+                    "message": {
+                        "content": "{PROMPT}",
+                        "role": "USER",
+                        "base64ImagesAsStrings": []
+                    }
+                }
+
+                # Update the HTTP request with the new body
+                self._objective_target.http_request = re.sub(
+                    r'POST\s+.*?\s+HTTP',
+                    f'POST {url} HTTP',
+                    self._objective_target.http_request
+                )
+
+                self._objective_target.http_request = re.sub(
+                    r'\{.*?\}',
+                    json.dumps(follow_up_request_body),
+                    self._objective_target.http_request
+                )
+
+                print(self._objective_target.http_request)
 
             # Reset custom prompt for future turns
             custom_prompt = None

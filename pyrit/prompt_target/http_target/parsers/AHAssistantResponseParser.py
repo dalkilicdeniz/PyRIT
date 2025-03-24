@@ -1,36 +1,27 @@
-import re
 import json
 
 class AHAssistantResponseParser:
-    response_fields_regex_dict = [
-        {"name": "text_message", "pattern": r"event:TEXT_MESSAGE\s+data:(.*?)(?:\n|$)"},
-        {"name": "data_message", "pattern": r"event:DATA_MESSAGE\s+data:(\{.*?\})"},
-        {"name": "suggestion_pills", "pattern": r"event:SUGGESTION_CHIPS\s+data:(\{.*?\})"}
-    ]
-
     @staticmethod
     def parse_response(response):
         """Parses the assistant's response content and extracts structured data."""
-        response_data = {}
+        response_data = {"ai_message": ""}
         response_text = response.content.decode("utf-8")
 
-        for field in AHAssistantResponseParser.response_fields_regex_dict:
-            matches = re.findall(field["pattern"], response_text, re.DOTALL)
+        # Split the response text by newlines to process each line
+        lines = response_text.splitlines()
+        tokens = []
 
-            if matches:
-                if field["name"] == "text_message":
-                    # Combine all text messages, clean up whitespace
-                    content = "".join(matches)
-                else:
-                    content = matches[-1].strip()  # Get the latest non-empty match
+        for line in lines:
+            if line.startswith("event:AI_MESSAGE"):
+                # Extract the JSON part of the line
+                json_part = line.split("data:", 1)[1]
+                try:
+                    data = json.loads(json_part)
+                    tokens.append(data.get("token", ""))
+                except json.JSONDecodeError:
+                    continue
 
-                    # Try to parse JSON if applicable
-                    if "{" in content and "}" in content:
-                        try:
-                            content = json.loads(content)
-                        except json.JSONDecodeError:
-                            pass  # Keep as a string if JSON parsing fails
-
-                response_data[field["name"]] = content
+        # Combine all AI message tokens
+        response_data["ai_message"] = "".join(tokens)
 
         return response_data
