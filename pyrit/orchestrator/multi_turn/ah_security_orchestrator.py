@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-
+import asyncio
 import enum
 import json
 import logging
@@ -140,6 +140,45 @@ class AHSecurityOrchestrator(MultiTurnOrchestrator):
             RuntimeError: If the response from the target system contains an unexpected error.
             ValueError: If the scoring feedback is not of the required type (true/false) for binary completion.
         """
+
+        # AH-GPT do not take the initial user message into account when we start the chat. It only uses it for generating a title. Therefore, we have to initialize chat separately.
+        # Send request to new chat endpoint and get the thread ID to use in actual chat
+        empty_seed = SeedPromptGroup(
+            prompts=[SeedPrompt(value="", data_type="text")],
+        )
+
+        response_piece = (
+            await self._prompt_normalizer.send_prompt_async(
+                target=self._objective_target,
+                seed_prompt_group=empty_seed,
+            )
+        ).request_pieces[0]
+
+        thread_id = response_piece.prompt_metadata.get("thread_id")
+        print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nCreated new chat with thread_id: " + thread_id + f"{Style.NORMAL}")
+
+        # prepare chat request template
+        url = f"https://ahgpt-service.kaas.nonprd.k8s.ah.technology/v1/chats/{thread_id}/messages/stream"
+
+        # Replace the request body for follow-up messages
+        follow_up_request_body = """{
+              "message": "{{PROMPT}}"
+            }"""
+
+        # Update the HTTP request with the new body
+        self._objective_target.http_request = re.sub(
+            r'POST\s+https://ahgpt-service\.kaas\.nonprd\.k8s\.ah\.technology/v1/chats',
+            f'POST {url}',
+            self._objective_target.http_request
+        )
+
+        self._objective_target.http_request = re.sub(
+            r'\n\n.*',  # Match from the double newline to the end
+            f'\n\n{follow_up_request_body}',
+            self._objective_target.http_request,
+            flags=re.DOTALL
+        )
+
         # Set conversation IDs for objective target and adversarial chat at the beginning of the conversation.
         objective_target_conversation_id = str(uuid4())
         adversarial_chat_conversation_id = str(uuid4())
@@ -150,23 +189,20 @@ class AHSecurityOrchestrator(MultiTurnOrchestrator):
         # If there is no prepended conversation, the turn count is 1.
         turn = self._prepare_conversation(new_conversation_id=objective_target_conversation_id)
 
-        achieved_objective = False
-
         # Custom handling on the first turn for prepended conversation
         score = self._handle_last_prepended_assistant_message()
         custom_prompt = self._handle_last_prepended_user_message()
-        thread_id = ""
 
         max_retries = 3
         retry_count = 0
+        achieved_objective = False
         while turn <= self._max_turns and retry_count < max_retries:
+            # to avoid rate limiting, we wait for 10 seconds between turns
+            await asyncio.sleep(10)
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
-            if turn == 1:
-                print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nStarting new chat...")
-            else:
-                print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nContinuing chat with thread ID: " + thread_id)
+            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nThread: " + thread_id + " Turn " + str(turn) + f"{Style.NORMAL}")
 
             feedback = None
             if self._use_score_as_feedback and score:
@@ -180,23 +216,6 @@ class AHSecurityOrchestrator(MultiTurnOrchestrator):
                 custom_prompt=custom_prompt,
                 memory_labels=updated_memory_labels,
             )
-            # Extract the thread ID from the response to send follow-up messages
-            if turn == 1:
-                thread_id = response.prompt_metadata.get("thread_id")
-                print(f"\nExtracted Thread ID: ", thread_id)
-                if thread_id:
-                    match = re.search(r"(https?://[^\s/$.?#].[^\s]*)", self._objective_target.http_request)
-                    if match:
-                        url = match.group(1)
-                        self._objective_target.http_request = self._objective_target.http_request.replace(
-                            url, f"{url}?threadId={thread_id}"
-                        )
-                    else:
-                        self._objective_target.http_request += f"threadId={thread_id}"
-                else:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}\nThread ID not found. Restarting chat...")
-                    retry_count += 1
-                    continue
 
             # Reset custom prompt for future turns
             custom_prompt = None

@@ -3,25 +3,29 @@ import json
 class AHAssistantResponseParser:
     @staticmethod
     def parse_response(response):
-        """Parses the assistant's response content and extracts structured data."""
-        response_data = {"ai_message": ""}
-        response_text = response.content.decode("utf-8")
+        try:
+            lines = response.text.splitlines()
+            tokens = []
 
-        # Split the response text by newlines to process each line
-        lines = response_text.splitlines()
-        tokens = []
+            for line in lines:
+                # We only care about lines starting with `data:` — `event:` lines can be skipped
+                if line.startswith("data:"):
+                    data_part = line.split("data:", 1)[1].strip()
+                    if not data_part:
+                        continue  # skip empty lines
 
-        for line in lines:
-            if line.startswith("event:AI_MESSAGE"):
-                # Extract the JSON part of the line
-                json_part = line.split("data:", 1)[1]
-                try:
-                    data = json.loads(json_part)
-                    tokens.append(data.get("token", ""))
-                except json.JSONDecodeError:
-                    continue
+                    try:
+                        data = json.loads(data_part)
+                        token = data.get("token", "")
+                        if token:
+                            tokens.append(token)
+                    except json.JSONDecodeError as e:
+                        print("JSON parse error:", e)
+                        continue
 
-        # Combine all AI message tokens
-        response_data["ai_message"] = "".join(tokens)
+            message = "".join(tokens).strip()
+            return {"text_message": message}
 
-        return response_data
+        except Exception as e:
+            print("Failed to parse AI message response:", e)
+            return {"text": ""}

@@ -68,7 +68,7 @@ class HTTPTarget(PromptTarget):
         # Add Prompt into URL (if the URL takes it)
         re_pattern = re.compile(self.prompt_regex_string)
         if re.search(self.prompt_regex_string, self.http_request):
-            http_request_w_prompt = re_pattern.sub(re.escape(request.converted_value), self.http_request)
+            http_request_w_prompt = re_pattern.sub(request.converted_value, self.http_request)
         else:
             http_request_w_prompt = self.http_request
 
@@ -87,7 +87,6 @@ class HTTPTarget(PromptTarget):
         # to avoid rate limiting, we wait for 10 seconds between turns
         await asyncio.sleep(10)
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
-            #print(http_body)
             match http_body:
                 case dict():
                     response = await client.request(
@@ -105,13 +104,13 @@ class HTTPTarget(PromptTarget):
                         content=http_body,
                         follow_redirects=True,
                     )
-
-        response_content = ""
-
-        # Retrieve the thread ID from the response, so we can send follow-up messages
-        response_json = response.json()
-        print(response_json)
-        thread_id = response_json.get("chatId")
+                
+        try:
+            response_content = response.json()
+            thread_id = response_content.get("chatId")
+        except json.JSONDecodeError:
+            response_content = response.content.decode("utf-8")
+            thread_id = None
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
