@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Report</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa; /* Light gray background */
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+    details {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    details[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    summary {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #e3f2fd; /* Light blue */
+      color: #01579b;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      outline: none;
+      transition: background 0.3s ease;
+      border: none;
+    }
+    summary:hover {
+      background: #bbdefb;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    .metrics {
+      background-color: #f1f8e9; /* Light green */
+      padding: 12px 18px;
+      margin: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .objective-text {
+      color: #0277bd;
+      font-weight: bold;
+    }
+    .achieved-yes {
+      color: #1b5e20;
+      background-color: #c8e6c9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .achieved-no {
+      color: #b71c1c;
+      background-color: #ffcdd2;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    h3 {
+      padding: 10px 18px;
+      margin: 0;
+      background: #e3f2fd;
+      border-top: 1px solid #ddd;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #0277bd;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .metadata {
+      font-size: 0.85rem;
+      color: #666;
+      padding: 10px 18px;
+      border-top: 1px solid #ddd;
+    }
+    .score-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-list li {
+      margin-bottom: 4px;
+    }
+    .explanation-block {
+      display: inline-block;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .explanation-block summary {
+      background: #aed581;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+      outline: none;
+      border: none;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .explanation-block summary:hover {
+      background: #9ccc65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Multi-turn Chat Report</h1>
+<p class='overview'>Total Test Cases: 1 | Passed: 1 | Failed: 0</p>
+<p class='execution-time'>Test Execution Time: 37 seconds</p>
+<p class='description'>This report provides an overview of multi-turn customer simulations, highlighting how the assistant engages in realistic, task-focused conversations. Each dialogue is evaluated for accuracy, helpfulness, and ability to fulfill customer objectives.</p>
+
+    <details>
+      <summary>
+        Test Case 1: Objective: <span class='objective-text'>As a home cook, I want a quick and easy pasta recipe for a busy weeknight. I live gluten free and I have a nut allergy. I like meat</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 1 | Final Score: 0.9
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">As a home cook, I want a quick and easy pasta recipe for a busy weeknight. I live gluten free and I have a nut allergy. I like meat</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 1</p>
+        <p><strong>Final Score:</strong> 0.9</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Ik ben op zoek naar een makkelijk en snel pastarecept voor een drukke doordeweekse avond. Ik eet glutenvrij en heb een notenallergie. Ik hou van vlees. Heb jij een recept daarvoor?</td>
+            <td>{'text_message': 'Hier is een eenvoudig en snel glutenvrij pastarecept met vlees:\n\n**Glutenvrije Pasta met Kip en Groenten**\n\n**Ingrediënten:**\n- 250 g glutenvrije pasta (bijv. rijst- of maïspasta)\n- 300 g kipfilet, in blokjes\n- 1 courgette, in blokjes\n- 1 rode paprika, in blokjes\n- 2 teentjes knoflook, fijngehakt\n- 2 eetlepels olijfolie\n- Zout en peper naar smaak\n- Italiaanse kruiden (bijv. oregano, basilicum)\n\n**Instructies:**\n1. Kook de glutenvrije pasta volgens de instructies op de verpakking. Giet af en zet apart.\n2. Verhit de olijfolie in een grote pan op middelhoog vuur. Voeg de kipblokjes toe en bak ze goudbruin en gaar.\n3. Voeg de knoflook, courgette en paprika toe aan de pan. Bak dit 5-7 minuten tot de groenten zacht zijn.\n4. Meng de gekookte pasta door het kip- en groentemengsel. Breng op smaak met zout, peper en Italiaanse kruiden.\n5. Serveer direct en geniet!\n\nDit recept is snel te maken en perfect voor een drukke doordeweekse avond!'}</td>
+            <td><ul class='score-list'><li><strong>0.9</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant's last response provided a clear, relevant, and detailed recipe that fits the user's dietary restrictions (gluten-free and nut-free) and includes meat, as requested. The recipe is straightforward and quick, matching the user's need for a busy weeknight meal.
+
+Full Chat Score:
+Throughout the conversation, the assistant has successfully met the user's objective by offering relevant and helpful information promptly. The instructions are clear and detailed, ensuring that the user can easily follow and prepare the meal. The recipe provided is complete and adheres to all of the user's dietary restrictions and preferences. Therefore, the assistant's performance is excellent in fulfilling the user's request.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details></div></body></html>
