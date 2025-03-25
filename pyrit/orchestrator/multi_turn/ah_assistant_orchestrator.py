@@ -155,7 +155,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
             )
         ).request_pieces[0]
 
-        thread_id = response_piece.prompt_metadata.get("thread_id")
+        thread_id = response_piece.prompt_metadata.get("chatId")
         print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nCreated new chat with thread_id: " + thread_id + f"{Style.NORMAL}")
 
         # prepare chat request template
@@ -201,7 +201,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
-            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nThread: " + thread_id + " Turn " + str(turn) + f"{Style.NORMAL}")
+            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nTurn " + str(turn) + f"{Style.NORMAL}")
 
             feedback = None
             if self._use_score_as_feedback and score:

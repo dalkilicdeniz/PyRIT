@@ -152,6 +152,7 @@ class PromptSendingOrchestrator(Orchestrator):
         prompt_type: PromptDataType = "text",
         memory_labels: Optional[dict[str, str]] = None,
         metadata: Optional[dict[str, Union[str, int]]] = None,
+        thread_ids: Optional[list[str]] = None,
     ) -> list[PromptRequestResponse]:
         """
         Sends the prompts to the prompt target.
@@ -169,7 +170,6 @@ class PromptSendingOrchestrator(Orchestrator):
         Returns:
             list[PromptRequestResponse]: The responses from sending the prompts.
         """
-
         if isinstance(prompt_list, str):
             prompt_list = [prompt_list]
 
@@ -178,6 +178,7 @@ class PromptSendingOrchestrator(Orchestrator):
         i= 0
         for prompt in prompt_list:
             expected_output = expected_output_list[i] if expected_output_list else None
+            metadata = {"chatId": thread_ids[i]} if thread_ids else metadata
             requests.append(
                     self._create_normalizer_request(
                         prompt_text=prompt,
