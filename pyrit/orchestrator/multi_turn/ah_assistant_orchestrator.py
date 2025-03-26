@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 class RTOSystemPromptPaths(enum.Enum):
     AH_ASSISTANT_CUSTOMER = Path(AH_PERSONAS, "customer.yaml").resolve()
-    AH_GPT_USER = Path(AH_PERSONAS, "ah_gpt_user.yaml").resolve()
 
 class AHAssistantOrchestrator(MultiTurnOrchestrator):
     """
@@ -53,19 +52,19 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
     """
 
     def __init__(
-        self,
-        *,
-        objective_target: PromptTarget,
-        adversarial_chat: PromptChatTarget,
-        adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.AH_ASSISTANT_CUSTOMER.value,
-        adversarial_chat_seed_prompt: Optional[str] = "How can I help you?",
-        prompt_converters: Optional[list[PromptConverter]] = None,
-        max_turns: int = 5,
-        objective_scorer: Scorer,
-        use_score_as_feedback: bool = True,
-        verbose: bool = False,
-        evaluate_chat: bool = False,
-        score_threshold: float = 0.9,
+            self,
+            *,
+            objective_target: PromptTarget,
+            adversarial_chat: PromptChatTarget,
+            adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.AH_ASSISTANT_CUSTOMER.value,
+            adversarial_chat_seed_prompt: Optional[str] = "How can I help you?",
+            prompt_converters: Optional[list[PromptConverter]] = None,
+            max_turns: int = 5,
+            objective_scorer: Scorer,
+            use_score_as_feedback: bool = True,
+            verbose: bool = False,
+            evaluate_chat: bool = False,
+            score_threshold: float = 0.9,
     ) -> None:
 
         # if objective_scorer.scorer_type != "true_false":
@@ -115,7 +114,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         return custom_prompt
 
     async def run_attack_async(
-        self, *, objective: str, memory_labels: Optional[dict[str, str]] = None
+            self, *, objective: str, memory_labels: Optional[dict[str, str]] = None
     ) -> MultiTurnAttackResult:
         """
         Executes a multi-turn red teaming attack asynchronously.
@@ -142,45 +141,6 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
             RuntimeError: If the response from the target system contains an unexpected error.
             ValueError: If the scoring feedback is not of the required type (true/false) for binary completion.
         """
-
-        # AH-GPT do not take the initial user message into account when we start the chat. It only uses it for generating a title. Therefore, we have to initialize chat separately.
-        # Send request to new chat endpoint and get the thread ID to use in actual chat
-        empty_seed = SeedPromptGroup(
-            prompts=[SeedPrompt(value="", data_type="text")],
-        )
-
-        response_piece = (
-            await self._prompt_normalizer.send_prompt_async(
-                target=self._objective_target,
-                seed_prompt_group=empty_seed,
-            )
-        ).request_pieces[0]
-
-        thread_id = response_piece.prompt_metadata.get("chatId")
-        print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nCreated new chat with thread_id: " + thread_id + f"{Style.NORMAL}")
-
-        # prepare chat request template
-        url = f"https://ahgpt-service.kaas.nonprd.k8s.ah.technology/v1/chats/{thread_id}/messages/stream"
-
-        # Replace the request body for follow-up messages
-        follow_up_request_body = """{
-              "message": "{{PROMPT}}"
-            }"""
-
-        # Update the HTTP request with the new body
-        self._objective_target.http_request = re.sub(
-            r'POST\s+https://ahgpt-service\.kaas\.nonprd\.k8s\.ah\.technology/v1/chats',
-            f'POST {url}',
-            self._objective_target.http_request
-        )
-
-        self._objective_target.http_request = re.sub(
-            r'\n\n.*',  # Match from the double newline to the end
-            f'\n\n{follow_up_request_body}',
-            self._objective_target.http_request,
-            flags=re.DOTALL
-        )
-
         # Set conversation IDs for objective target and adversarial chat at the beginning of the conversation.
         objective_target_conversation_id = str(uuid4())
         adversarial_chat_conversation_id = str(uuid4())
@@ -191,18 +151,23 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         # If there is no prepended conversation, the turn count is 1.
         turn = self._prepare_conversation(new_conversation_id=objective_target_conversation_id)
 
+        achieved_objective = False
+
         # Custom handling on the first turn for prepended conversation
         score = self._handle_last_prepended_assistant_message()
         custom_prompt = self._handle_last_prepended_user_message()
+        thread_id = ""
 
-        achieved_objective = False
         while turn <= self._max_turns:
             # to avoid rate limiting, we wait for 10 seconds between turns
             await asyncio.sleep(10)
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
-            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nTurn " + str(turn) + f"{Style.NORMAL}")
+            if turn == 1:
+                print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nStarting new chat...")
+            else:
+                print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nContinuing chat with thread ID: " + thread_id)
 
             feedback = None
             if self._use_score_as_feedback and score:
@@ -216,6 +181,23 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
                 custom_prompt=custom_prompt,
                 memory_labels=updated_memory_labels,
             )
+            # Extract the thread ID from the response to send follow-up messages
+            if turn == 1:
+                thread_id = response.prompt_metadata.get("thread_id")
+                print(f"Extracted Thread ID: ", thread_id)
+                if thread_id:
+                    match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
+                    if match:
+                        member_id_str = match.group(1)
+                        self._objective_target.http_request = self._objective_target.http_request.replace(
+                            member_id_str, f"{member_id_str}&threadId={thread_id}"
+                        )
+                    else:
+                        self._objective_target.http_request += f"&threadId={thread_id}"
+
+                else:
+                    print("Thread ID not found. Restarting chat...")
+                    continue
 
             # Reset custom prompt for future turns
             custom_prompt = None
@@ -228,7 +210,7 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
                 if float(score.score_value) >= self._score_threshold:
                     achieved_objective = True
                     logger.info(
-                        "The AH-GPT orchestrator has completed the conversation and achieved the objective.",
+                        "The red teaming orchestrator has completed the conversation and achieved the objective.",
                     )
                     print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
                     break
@@ -254,14 +236,14 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         )
 
     async def _retrieve_and_send_prompt_async(
-        self,
-        *,
-        objective: str,
-        objective_target_conversation_id: str,
-        adversarial_chat_conversation_id: str,
-        feedback: Optional[str] = None,
-        custom_prompt: str = "",
-        memory_labels: Optional[dict[str, str]] = None,
+            self,
+            *,
+            objective: str,
+            objective_target_conversation_id: str,
+            adversarial_chat_conversation_id: str,
+            feedback: Optional[str] = None,
+            custom_prompt: str = "",
+            memory_labels: Optional[dict[str, str]] = None,
     ) -> PromptRequestPiece:
         """
         Generates and sends a prompt to the prompt target.
@@ -436,13 +418,13 @@ class AHAssistantOrchestrator(MultiTurnOrchestrator):
         return self._handle_file_response(last_response_from_objective_target, feedback)
 
     async def _get_prompt_from_adversarial_chat(
-        self,
-        *,
-        objective: str,
-        objective_target_conversation_id: str,
-        adversarial_chat_conversation_id: str,
-        feedback: Optional[str] = None,
-        memory_labels: Optional[dict[str, str]] = None,
+            self,
+            *,
+            objective: str,
+            objective_target_conversation_id: str,
+            adversarial_chat_conversation_id: str,
+            feedback: Optional[str] = None,
+            memory_labels: Optional[dict[str, str]] = None,
     ) -> str:
         """
         Send a prompt to the adversarial chat to generate a new prompt for the objective target.

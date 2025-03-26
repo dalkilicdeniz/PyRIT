@@ -28,12 +28,12 @@ class PromptSendingOrchestrator(Orchestrator):
     """
 
     def __init__(
-        self,
-        objective_target: PromptTarget,
-        prompt_converters: Optional[list[PromptConverter]] = None,
-        scorers: Optional[list[Scorer]] = None,
-        batch_size: int = 1,
-        verbose: bool = False,
+            self,
+            objective_target: PromptTarget,
+            prompt_converters: Optional[list[PromptConverter]] = None,
+            scorers: Optional[list[Scorer]] = None,
+            batch_size: int = 1,
+            verbose: bool = False,
     ) -> None:
         """
         Args:
@@ -71,7 +71,7 @@ class PromptSendingOrchestrator(Orchestrator):
         self._prepended_conversation = prepended_conversation
 
     async def get_prepended_conversation_async(
-        self, *, normalizer_request: NormalizerRequest
+            self, *, normalizer_request: NormalizerRequest
     ) -> Optional[list[PromptRequestResponse]]:
         """
         Returns the prepended conversation for the normalizer request.
@@ -84,7 +84,7 @@ class PromptSendingOrchestrator(Orchestrator):
         return None
 
     def set_skip_criteria(
-        self, *, skip_criteria: PromptFilterCriteria, skip_value_type: PromptConverterState = "original"
+            self, *, skip_criteria: PromptFilterCriteria, skip_value_type: PromptConverterState = "original"
     ):
         """
         Sets the skip criteria for the orchestrator.
@@ -94,10 +94,10 @@ class PromptSendingOrchestrator(Orchestrator):
         self._prompt_normalizer.set_skip_criteria(skip_criteria=skip_criteria, skip_value_type=skip_value_type)
 
     async def send_normalizer_requests_async(
-        self,
-        *,
-        prompt_request_list: list[NormalizerRequest],
-        memory_labels: Optional[dict[str, str]] = None,
+            self,
+            *,
+            prompt_request_list: list[NormalizerRequest],
+            memory_labels: Optional[dict[str, str]] = None,
     ) -> list[PromptRequestResponse]:
         """
         Sends the normalized prompts to the prompt target.
@@ -138,21 +138,20 @@ class PromptSendingOrchestrator(Orchestrator):
                     piece.prompt_metadata["reference_prompt"] = request_prompts[i]
 
         for scorer in self._scorers:
-                await scorer.score_responses_inferring_tasks_batch_async(
-                    request_responses=response_pieces, batch_size=5
-                )
+            await scorer.score_responses_inferring_tasks_batch_async(
+                request_responses=response_pieces, batch_size=5
+            )
 
         return responses
 
     async def send_prompts_async(
-        self,
-        *,
-        prompt_list: list[str],
-        expected_output_list: list[str] = None,
-        prompt_type: PromptDataType = "text",
-        memory_labels: Optional[dict[str, str]] = None,
-        metadata: Optional[dict[str, Union[str, int]]] = None,
-        thread_ids: Optional[list[str]] = None,
+            self,
+            *,
+            prompt_list: list[str],
+            expected_output_list: list[str] = None,
+            prompt_type: PromptDataType = "text",
+            memory_labels: Optional[dict[str, str]] = None,
+            metadata: Optional[dict[str, Union[str, int]]] = None,
     ) -> list[PromptRequestResponse]:
         """
         Sends the prompts to the prompt target.
@@ -170,6 +169,7 @@ class PromptSendingOrchestrator(Orchestrator):
         Returns:
             list[PromptRequestResponse]: The responses from sending the prompts.
         """
+
         if isinstance(prompt_list, str):
             prompt_list = [prompt_list]
 
@@ -178,17 +178,16 @@ class PromptSendingOrchestrator(Orchestrator):
         i= 0
         for prompt in prompt_list:
             expected_output = expected_output_list[i] if expected_output_list else None
-            metadata = {"chatId": thread_ids[i]} if thread_ids else metadata
             requests.append(
-                    self._create_normalizer_request(
-                        prompt_text=prompt,
-                        expected_output=expected_output,
-                        prompt_type=prompt_type,
-                        converters=self._prompt_converters,
-                        metadata=metadata,
-                        conversation_id=str(uuid.uuid4()),
-                    )
+                self._create_normalizer_request(
+                    prompt_text=prompt,
+                    expected_output=expected_output,
+                    prompt_type=prompt_type,
+                    converters=self._prompt_converters,
+                    metadata=metadata,
+                    conversation_id=str(uuid.uuid4()),
                 )
+            )
             i+=1
 
         return await self.send_normalizer_requests_async(

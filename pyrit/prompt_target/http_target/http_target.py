@@ -39,14 +39,14 @@ class HTTPTarget(PromptTarget):
     """
 
     def __init__(
-        self,
-        http_request: str,
-        prompt_regex_string: str = "{PROMPT}",
-        use_tls: bool = True,
-        callback_function: Callable | None = None,
-        max_requests_per_minute: Optional[int] = None,
-        response_fields_regex_dict: dict = None,
-        **httpx_client_kwargs: Any,
+            self,
+            http_request: str,
+            prompt_regex_string: str = "{PROMPT}",
+            use_tls: bool = True,
+            callback_function: Callable | None = None,
+            max_requests_per_minute: Optional[int] = None,
+            response_fields_regex_dict: dict = None,
+            **httpx_client_kwargs: Any,
     ) -> None:
         super().__init__(max_requests_per_minute=max_requests_per_minute)
         self.http_request = http_request
@@ -61,16 +61,11 @@ class HTTPTarget(PromptTarget):
         """
         Sends prompt to HTTP endpoint and returns the response
         """
+
         self._validate_request(prompt_request=prompt_request)
         request = prompt_request.request_pieces[0]
 
-        # Todo: This is only for AH gpt single turn, we will remove it when api is improved
-        # Add thread id into URL (if the URL takes it)
-        if "chatId" in request.prompt_metadata:
-            id = request.prompt_metadata["chatId"]
-            self.http_request = self.http_request.replace("{CHAT_ID}", id)
-
-        # Add Prompt into request (if the request takes it)
+        # Add Prompt into URL (if the URL takes it)
         re_pattern = re.compile(self.prompt_regex_string)
         if re.search(self.prompt_regex_string, self.http_request):
             http_request_w_prompt = re_pattern.sub(request.converted_value, self.http_request)
@@ -110,13 +105,12 @@ class HTTPTarget(PromptTarget):
                         follow_redirects=True,
                     )
 
-        # Get the chatId from the response to use in follow-up messages
-        try:
-            response_content = response.json()
-            thread_id = response_content.get("chatId")
-        except json.JSONDecodeError:
-            response_content = response.content.decode("utf-8")
-            thread_id = None
+        response_content = ""
+
+        # Retrieve the thread ID from the response, so we can send follow-up messages
+        thread_id_key = r"event:THREAD_CREATED\ndata:(.*?)\n"
+        thread_id_match = re.search(thread_id_key, response.content.decode("utf-8"))
+        thread_id = thread_id_match.group(1) if thread_id_match else None
 
         if self.callback_function:
             response_content = self.callback_function(response=response)
@@ -124,7 +118,7 @@ class HTTPTarget(PromptTarget):
             raise ValueError("No callback function provided, using default regex parsing")
 
         #Send thread_id in prompt_metadata so that it can be used in follow-up messages
-        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"chatId": thread_id})
+        response_entry = construct_response_from_request(request=request, response_text_pieces=[str(response_content)], prompt_metadata={"thread_id": thread_id})
 
         return response_entry
 
