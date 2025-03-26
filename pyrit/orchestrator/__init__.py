@@ -15,6 +15,9 @@ from pyrit.orchestrator.fuzzer_orchestrator import FuzzerOrchestrator
 from pyrit.orchestrator.multi_turn.crescendo_orchestrator import CrescendoOrchestrator
 from pyrit.orchestrator.multi_turn.pair_orchestrator import PAIROrchestrator
 from pyrit.orchestrator.multi_turn.red_teaming_orchestrator import RedTeamingOrchestrator
+from pyrit.orchestrator.multi_turn.ah_gpt.ah_gpt_orchestrator import AHGPTOrchestrator
+from pyrit.orchestrator.multi_turn.ah_gpt.ah_gpt_redteaming_orchestrator import AHGPTRedTeamingOrchestrator
+from pyrit.orchestrator.single_turn.ah_gpt.ah_gpt_dataset_orchestrator import AHGPTPromptSendingOrchestrator
 from pyrit.orchestrator.multi_turn.ah_assistant_orchestrator import AHAssistantOrchestrator
 from pyrit.orchestrator.single_turn.flip_attack_orchestrator import FlipAttackOrchestrator
 from pyrit.orchestrator.skeleton_key_orchestrator import SkeletonKeyOrchestrator
@@ -38,6 +41,9 @@ __all__ = [
     "PromptSendingOrchestrator",
     "RedTeamingOrchestrator",
     "AHAssistantOrchestrator",
+    "AHGPTOrchestrator",
+    "AHGPTRedTeamingOrchestrator",
+    "AHGPTPromptSendingOrchestrator",
     "RolePlayOrchestrator",
     "RolePlayPaths",
     "ScoringOrchestrator",

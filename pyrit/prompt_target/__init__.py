@@ -6,7 +6,8 @@ from pyrit.prompt_target.common.prompt_chat_target import PromptChatTarget
 from pyrit.prompt_target.common.utils import limit_requests_per_minute
 from pyrit.prompt_target.openai.openai_target import OpenAITarget
 from pyrit.prompt_target.openai.openai_chat_target import OpenAIChatTarget
-
+from pyrit.prompt_target.http_target.ah_gpt.http_target import AHGPTHttpTarget
+from pyrit.prompt_target.http_target.ah_gpt.ah_gpt_response_parser import AHGPTResponseParser
 
 from pyrit.prompt_target.azure_blob_storage_target import AzureBlobStorageTarget
 from pyrit.prompt_target.azure_ml_chat_target import AzureMLChatTarget
@@ -38,6 +39,8 @@ __all__ = [
     "get_http_target_regex_matching_callback_function",
     "get_http_regex_stream_callback_function",
     "HTTPTarget",
+    "AHGPTHttpTarget",
+    "AHGPTResponseParser",
     "HuggingFaceChatTarget",
     "HuggingFaceEndpointTarget",
     "limit_requests_per_minute",
