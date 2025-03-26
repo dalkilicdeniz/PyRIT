@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class RTOSystemPromptPaths(enum.Enum):
     TEXT_GENERATION = Path(RED_TEAM_ORCHESTRATOR_PATH, "text_generation.yaml").resolve()
+    AH_GPT_RED_TEAMING = Path(RED_TEAM_ORCHESTRATOR_PATH, "ah_gpt_red_teaming.yaml").resolve()
     AH_ASSISTANT_CUSTOMER = Path(AH_PERSONAS, "customer.yaml").resolve()
 
 class AHSecurityOrchestrator(MultiTurnOrchestrator):

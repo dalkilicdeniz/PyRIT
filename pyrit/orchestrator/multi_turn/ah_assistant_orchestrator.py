@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class RTOSystemPromptPaths(enum.Enum):
     AH_ASSISTANT_CUSTOMER = Path(AH_PERSONAS, "customer.yaml").resolve()
+    AH_GPT_USER = Path(AH_PERSONAS, "ah_gpt_user.yaml").resolve()
 
 class AHAssistantOrchestrator(MultiTurnOrchestrator):
     """
