@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Report</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa; /* Light gray background */
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+    details {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    details[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    summary {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #e3f2fd; /* Light blue */
+      color: #01579b;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      outline: none;
+      transition: background 0.3s ease;
+      border: none;
+    }
+    summary:hover {
+      background: #bbdefb;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    .metrics {
+      background-color: #f1f8e9; /* Light green */
+      padding: 12px 18px;
+      margin: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .objective-text {
+      color: #0277bd;
+      font-weight: bold;
+    }
+    .achieved-yes {
+      color: #1b5e20;
+      background-color: #c8e6c9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .achieved-no {
+      color: #b71c1c;
+      background-color: #ffcdd2;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    h3 {
+      padding: 10px 18px;
+      margin: 0;
+      background: #e3f2fd;
+      border-top: 1px solid #ddd;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #0277bd;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .metadata {
+      font-size: 0.85rem;
+      color: #666;
+      padding: 10px 18px;
+      border-top: 1px solid #ddd;
+    }
+    .score-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-list li {
+      margin-bottom: 4px;
+    }
+    .explanation-block {
+      display: inline-block;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .explanation-block summary {
+      background: #aed581;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+      outline: none;
+      border: none;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .explanation-block summary:hover {
+      background: #9ccc65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Multi-turn Chat Report</h1>
+<p class='overview'>Total Test Cases: 3 | Passed: 3 | Failed: 0</p>
+<p class='execution-time'>Test Execution Time: 1 minutes, 22 seconds</p>
+<p class='description'>This report provides an overview of multi-turn customer simulations, highlighting how the assistant engages in realistic, task-focused conversations. Each dialogue is evaluated for accuracy, helpfulness, and ability to fulfill customer objectives.</p>
+
+    <details>
+      <summary>
+        Test Case 1: Objective: <span class='objective-text'>Find out how to register working hours correctly in the internal system.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 2 | Final Score: 0.9
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Find out how to register working hours correctly in the internal system.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 2</p>
+        <p><strong>Final Score:</strong> 0.9</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>I just started working here and I need some guidance. Do you have any tips for new employees?</td>
+            <td>{'text_message': 'Here are some tips for new employees at Albert Heijn:\n\n1. **Familiarize Yourself with the Store Layout**: Take time to learn where products are located and how the store is organized.\n\n2. **Understand Company Policies**: Review the employee handbook and familiarize yourself with company policies and procedures.\n\n3. **Ask Questions**: Don’t hesitate to ask your colleagues or supervisors if you need help or clarification on tasks.\n\n4. **Customer Service**: Focus on providing excellent customer service. Be friendly, approachable, and willing to assist customers.\n\n5. **Teamwork**: Collaborate with your team members. Building good relationships with colleagues can enhance your work experience.\n\n6. **Stay Organized**: Keep your workspace tidy and manage your time effectively to handle tasks efficiently.\n\n7. **Continuous Learning**: Take advantage of training opportunities and seek feedback to improve your skills.\n\n8. **Be Adaptable**: Be open to changes and willing to learn new processes or systems as they arise.\n\nGood luck in your new role!'}</td>
+            <td><ul class='score-list'><li><strong>0.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided general tips for new employees, which are indeed helpful but did not address the specific issue raised by the user about how to register working hours correctly in the internal system.
+
+
+Full Chat Score:
+The overall conversation does not fulfill the user's objective of finding out how to register working hours correctly. The assistant focuses on general tips for new employees without any mention of the internal system or working hours registration. Therefore, the assistant's response is not relevant to the user's goal.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Thanks for the tips! Can you also guide me on how to register my working hours properly in the internal system?</td>
+            <td>{'text_message': 'To register your working hours in the internal system, follow these steps:\n\n1. **Log In**: Access the internal system using your employee credentials.\n\n2. **Navigate to Time Registration**: Find the section for time registration or clocking in/out.\n\n3. **Select Date and Hours**: Choose the date for which you want to register your hours and enter the start and end times of your shift.\n\n4. **Breaks**: If applicable, make sure to account for any breaks taken during your shift.\n\n5. **Submit**: Review the entered information for accuracy and submit your hours.\n\n6. **Confirmation**: Check for a confirmation message or email to ensure your hours have been recorded successfully.\n\nIf you encounter any issues, reach out to your supervisor or HR for assistance.'}</td>
+            <td><ul class='score-list'><li><strong>0.9</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant's response to the request for help on registering working hours in the internal system is well-organized, clear, and complete. It covers every step of the process, from logging in to submitting the hours and checking for confirmation. This response is highly relevant to the user's query.
+
+Full Chat Score:
+The entire conversation is relevant to the user’s inquiries and objective. The assistant started by giving general tips for new employees, which is a good initial response to the user’s broader question. Then the assistant provided detailed guidance on registering working hours in the internal system when specifically asked. The instructions are clear, comprehensive, and appear to meet the user's objective completely.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details>
+    <details>
+      <summary>
+        Test Case 2: Objective: <span class='objective-text'>Explore internal training opportunities for career development within AH.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 1 | Final Score: 1.0
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Explore internal training opportunities for career development within AH.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 1</p>
+        <p><strong>Final Score:</strong> 1.0</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>I want to explore career development opportunities within AH. Where should I start?</td>
+            <td>{'text_message': 'To explore career development opportunities within Albert Heijn, you can start by visiting the internal career portal or HR section on the company intranet. Look for resources related to training programs, mentorship opportunities, and job openings. Additionally, consider discussing your career goals with your manager or HR representative for personalized guidance.'}</td>
+            <td><ul class='score-list'><li><strong>1.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided a comprehensive and relevant response to the user's request for exploring career development opportunities within AH. The suggestion to visit the internal career portal or HR section on the company intranet is both appropriate and useful. Additionally, the advice to discuss career goals with a manager or HR representative adds a personalized touch.
+
+Full Chat Score:
+The entire conversation (the single exchange) clearly addresses the user's objective with useful steps and resources for career development within AH. The information is complete, relevant, and offers practical next steps. Hence, the score value is fully earned.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details>
+    <details>
+      <summary>
+        Test Case 3: Objective: <span class='objective-text'>Understand the process for requesting and tracking vacation days.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 3 | Final Score: 1.0
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Understand the process for requesting and tracking vacation days.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 3</p>
+        <p><strong>Final Score:</strong> 1.0</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Hi there! Can you tell me how to request time off?</td>
+            <td>{'text_message': "To request time off at Albert Heijn, you typically need to follow these steps:\n\n1. **Check Company Policy**: Review the employee handbook or intranet for specific guidelines on time off requests.\n2. **Use the HR System**: Log into the HR management system used by Albert Heijn to submit your request.\n3. **Fill Out the Request Form**: Provide the necessary details, including the dates you wish to take off and the reason for your request.\n4. **Submit for Approval**: Send your request to your supervisor or manager for approval.\n5. **Follow Up**: If you don't receive a response within a reasonable time, follow up with your manager.\n\nMake sure to submit your request well in advance to allow for proper scheduling."}</td>
+            <td><ul class='score-list'><li><strong>0.85</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant's response to the user's query about requesting time off is detailed and relevant. It provides a clear and concise step-by-step process, making it easy for the user to understand and follow.
+
+Full Chat Score:
+The conversation effectively addresses the user's objective of understanding the process for requesting vacation days. The assistant offers thorough instructions which are both clear and complete, covering all necessary steps for the user to follow and ensuring they have the information needed to submit their request successfully.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Thanks! How do I access the HR management system?</td>
+            <td>{'text_message': 'To access the HR management system at Albert Heijn, follow these steps:\n\n1. **Visit the Intranet**: Go to the Albert Heijn employee intranet.\n2. **Log In**: Use your employee credentials to log in.\n3. **Navigate to HR Section**: Look for the HR or Employee Services section on the intranet.\n4. **Access the HR System**: Click on the link to the HR management system from there.\n\nIf you encounter any issues, contact your IT support for assistance.'}</td>
+            <td><ul class='score-list'><li><strong>0.8</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided clear and relevant instructions for accessing the HR management system, which was directly related to the user's query.
+
+Full Chat Score:
+Throughout the conversation, the assistant gave complete and easy-to-follow guidance for both requesting time off and accessing the HR management system. All the responses were relevant, clear, and comprehensive, helping the user understand the process thoroughly. However, there was no mention of how to track the vacation days after submitting the request, which affects completeness slightly.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Sounds good. What if I have trouble logging in?</td>
+            <td>{'text_message': 'If you have trouble logging into the HR management system, try the following steps:\n\n1. **Check Credentials**: Ensure you are using the correct username and password.\n2. **Reset Password**: If you’ve forgotten your password, look for a "Forgot Password" option to reset it.\n3. **Clear Cache**: Clear your browser\'s cache and cookies, then try logging in again.\n4. **Try a Different Browser**: Sometimes, switching to another browser can resolve login issues.\n5. **Contact IT Support**: If the problem persists, reach out to your IT support team for further assistance.'}</td>
+            <td><ul class='score-list'><li><strong>1.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided a detailed and relevant response on what to do if the user has trouble logging into the HR management system, addressing the user's query comprehensively.
+
+Full Chat Score:
+The entire conversation is highly relevant and the assistant clearly explains the process for requesting and tracking vacation days. Each response builds on the previous one and offers practical steps for the user to follow. The instructions are detailed and complete, fulfilling the objective effectively.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details></div></body></html>

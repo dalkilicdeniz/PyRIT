@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Report</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa; /* Light gray background */
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+    details {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    details[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    summary {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #e3f2fd; /* Light blue */
+      color: #01579b;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      outline: none;
+      transition: background 0.3s ease;
+      border: none;
+    }
+    summary:hover {
+      background: #bbdefb;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    .metrics {
+      background-color: #f1f8e9; /* Light green */
+      padding: 12px 18px;
+      margin: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .objective-text {
+      color: #0277bd;
+      font-weight: bold;
+    }
+    .achieved-yes {
+      color: #1b5e20;
+      background-color: #c8e6c9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .achieved-no {
+      color: #b71c1c;
+      background-color: #ffcdd2;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    h3 {
+      padding: 10px 18px;
+      margin: 0;
+      background: #e3f2fd;
+      border-top: 1px solid #ddd;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #0277bd;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .metadata {
+      font-size: 0.85rem;
+      color: #666;
+      padding: 10px 18px;
+      border-top: 1px solid #ddd;
+    }
+    .score-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-list li {
+      margin-bottom: 4px;
+    }
+    .explanation-block {
+      display: inline-block;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .explanation-block summary {
+      background: #aed581;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+      outline: none;
+      border: none;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .explanation-block summary:hover {
+      background: #9ccc65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Multi-turn Chat Report</h1>
+<p class='overview'>Total Test Cases: 1 | Passed: 1 | Failed: 0</p>
+<p class='execution-time'>Test Execution Time: 5 minutes, 8 seconds</p>
+<p class='description'>This report provides an overview of multi-turn customer simulations, highlighting how the assistant engages in realistic, task-focused conversations. Each dialogue is evaluated for accuracy, helpfulness, and the ability to fulfill customer objectives across multiple turns. The report includes conversation transcripts, assistant responses, and corresponding scores reflecting the quality and relevance of the interaction.</p>
+
+    <details>
+      <summary>
+        Test Case 1: Objective: <span class='objective-text'>As a home cook, I want a quick and easy pasta recipe for a busy weeknight. I live gluten free and I have a nut allergy. I like meat</span> | Achieved: <span class="achieved-no">No</span> | Turns: 10 | Final Score: 0.4
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">As a home cook, I want a quick and easy pasta recipe for a busy weeknight. I live gluten free and I have a nut allergy. I like meat</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-no">No</span></p>
+        <p><strong>Total Turns:</strong> 10</p>
+        <p><strong>Final Score:</strong> 0.4</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Ik zoek een snel en makkelijk pasta recept voor een drukke doordeweekse avond. Wat raad je aan?</td>
+            <td>{'text_message': 'Het lijkt erop dat je een drukke avond voor de boeg hebt! Ik ga even zoeken naar een snel en makkelijk pasta recept voor je. Een momentje!Ik heb een selectie van heerlijke pastarecepten voor je gevonden. Pasta is veelzijdig en biedt een scala aan smaken en texturen die perfect passen bij elke gelegenheid. Geniet van de rijke en hartige combinaties die je smaakpapillen zullen verrassen. Veel plezier met deze recepten!', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":409684,"title":"Pasta\xa0aglio\xa0e olio","time":{"cook":15,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Pasta met pesto', 'Romige pasta met kip', 'Hoe kook je pasta perfect?', 'Verse pasta bewaren']}}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The last assistant response provides information and options for various pasta recipes but fails to fully address the user's dietary requirements and preferences clearly in the latest message.
+
+Full Chat Score:
+The assistant offered various pasta recipes but did not ensure the recipes were gluten-free and nut-free, which is crucial considering the user's requirements. Additionally, the assistant could have included meat options to better cater to the user's liking. Although it touched upon general pasta ideas, it did not fully meet the user's objective for a quick, easy, specific dietary-friendly pasta recipe. Hence, the clarity and completeness of the response were lacking to a significant extent, impacting the overall score.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Heb je glutenvrije en notenvrije recepten? Ik eet graag vlees.</td>
+            <td>{'text_message': 'Ik heb een aantal heerlijke recepten voor je gevonden met vlees. Van stoofschotels tot snelle bowls, er is voor ieder wat wils. Geniet ervan!Vanwege je voorkeur voor glutenvrije en notenvrije recepten, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":"Glutenvrije Vleesgerechten","items":[{"id":652112,"title":"Gestoofd vlees met rijst en wortel-rozijnensalade","time":{"cook":25,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije vleesgerechten', 'Notenvrije vleesrecepten', 'Hoe vlees veilig bereiden?', 'Glutenvrije producten']}}</td>
+            <td><ul class='score-list'><li><strong>0.6</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided relevant suggestions for gluten-free and nut-free recipes with meat, which directly addressed the user's dietary restrictions and preference for meat.
+
+Full Chat Score:
+The overall conversation indicated that the assistant understood the user's requirements for quick and easy pasta recipes for a busy weeknight, addressing both the need for dietary restrictions (gluten-free and nut-free) and preference for meat. However, the assistant responses lacked specific pasta recipes that meet these criteria and focused more on general suggestions and reminders. Additionally, the Italian pasta suggestions like 'Pasta aglio e olio' may not be suitable for someone with nut allergies or trying to live gluten-free without more specific guidance.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Kan je een specifiek glutenvrij pasta recept met vlees aanbevelen?</td>
+            <td>{'text_message': 'Het lijkt erop dat je op zoek bent naar een specifiek glutenvrij pasta recept met vlees. Ik ga even voor je zoeken! Een momentje.Ik heb een selectie van heerlijke glutenvrije pastarecepten voor je gevonden. Geniet van de rijke smaken en voedzame ingrediënten. Eetsmakelijk!Controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":1189006,"title":"Glutenvrije lasagne bolognese","time":{"cook":35,"oven":45,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije lasagne met gehakt', 'Kip Alfredo met glutenvrije pasta', 'Hoe glutenvrije pasta koken?', 'Glutenvrije pasta merken']}}</td>
+            <td><ul class='score-list'><li><strong>0.5</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided a specific recipe (Glutenvrije lasagne bolognese) that fits the user's request for a gluten-free pasta recipe with meat. However, it is not clear if this suggestion takes into account the user’s nut allergy.
+
+Full Chat Score:
+Throughout the conversation, the assistant offered several recipes and suggestions which cater to the user's dietary constraints and preferences (gluten-free, nut-free, meat). However, the assistant did not consistently emphasize checking for nut-containing ingredients which is critical due to the user's allergy. Clarity was maintained in the responses but completeness suffered slightly because of the overlooked allergy concern. While the assistant provided useful suggestions, the overall objective wasn't fully met due to a slight lack of specific allergy-focused advice.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Is de lasagne notenvrij en snel klaar? Ik wil iets voor doordeweeks.</td>
+            <td>{'text_message': 'Ik zoek even naar notenvrije lasagne recepten die snel klaar zijn voor doordeweeks. Een momentje!Ik heb verschillende lasagnerecepten voor je gevonden. Lasagne is een heerlijke Italiaanse klassieker die je smaakpapillen verwent met zijn rijke en hartige lagen. Geniet ervan!Kijk zelf of de recepten en ingrediënten voldoen aan je voorkeuren.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":1199418,"title":"AH verspakket lasagne","time":{"cook":30,"oven":30,"wait":0}', 'suggestion_pills': {'chips': ['Notenvrije lasagne recepten', 'Snel lasagne maken', 'Lasagne bewaren tips']}}</td>
+            <td><ul class='score-list'><li><strong>0.7</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+While the assistant suggested a lasagne recipe and acknowledged the need for a quick, nut-free dish, the response lacked specific confirmation on whether the recipe meets the user's nut-free requirement. The recommendation of the AH verspakket lasagne was provided without clearly stating suitability for the user's dietary restrictions (nut-free and gluten-free), which impacts relevance.
+
+Full Chat Score:
+Throughout the conversation, the assistant provided various pasta recipe suggestions and addressed the user's need for gluten-free and meat-inclusive dishes. However, the recommendations frequently lacked specifics or confirmation on whether they meet all dietary restrictions, thereby affecting completeness. Each response offered some level of helpfulness, contributing positively toward the user’s objective but occasionally missed critical details needed for fully clear and complete guidance.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Heb je een glutenvrij en notenvrij pasta recept met vlees dat snel klaar is?</td>
+            <td>{'text_message': 'Ik heb verschillende pastarecepten voor je gevonden. Pasta is veelzijdig en heerlijk, perfect voor elke gelegenheid. Geniet ervan!Vanwege je allergieën of intoleranties, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":646748,"title":"Pasta met gehakt","time":{"cook":25,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije pasta met kip', 'Snelle vleesgerechten', 'Hoe maak je glutenvrije pasta?', 'Vlees veilig bereiden tips']}}</td>
+            <td><ul class='score-list'><li><strong>0.6</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant response provides a pasta recipe with meat but fails to specifically confirm that it meets both the gluten-free and nut-free requirements as per the user's request. While the information is somewhat relevant, the user would need to verify the absence of gluten and nuts themselves, thus making the response incomplete and only moderately helpful.
+
+Full Chat Score:
+Throughout the conversation, the assistant displays a willingness to help with the user's dietary preferences, offering various recipes and suggesting that the user should verify them for allergies (gluten and nuts). However, the assistant does not consistently provide specific gluten-free and nut-free recipes, nor does it offer any clear verification on the allergy status of suggested dishes. Additionally, the assistant often fails to address the 'quick and easy' aspect of the user's objective explicitly. Thus, while the assistant's efforts are somewhat useful, they do not fully meet the user's requirement of quick, easy, gluten-free, nut-free pasta recipes with meat.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Kan je een glutenvrije, notenvrije pasta met vlees die snel klaar is, specifiek aanbevelen?</td>
+            <td>{'text_message': 'Ik heb verschillende pastarecepten voor je gevonden. Pasta is veelzijdig en heerlijk, perfect voor elke gelegenheid. Geniet ervan!Vanwege je allergieën, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":646748,"title":"Pasta met gehakt","time":{"cook":25,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije pasta met kip', 'Snelle vleesrecepten', 'Hoe glutenvrije pasta koken?']}}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score: The assistant provided a recipe that could potentially meet the requirements of the user but did not clearly specify whether the recipe was both gluten-free and nut-free. While it suggested the user take further steps to verify the ingredients, this does not ensure complete fulfillment of the user's needs.
+
+Full Chat Score: The overall conversation lacked specificity and did not directly address the user's requirement of a quick and easy pasta recipe that is gluten-free, nut-free, and contains meat. While the assistant presented several recipe options, it repeatedly suggested that the user verify ingredient suitability themselves, which is not as helpful as providing clear, confirmed options. Some responses were vague, and the chat does not conclusively help the user achieve their objective fully.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Specifieker graag: Glutenvrij, notenvrij, snel en met vlees?</td>
+            <td>{'text_message': 'Ik heb een aantal heerlijke recepten voor je gevonden met aardappelen. Deze veelzijdige knollen zijn perfect voor een voedzame maaltijd. Geniet ervan!Vanwege je allergie, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":1199948,"title":"Witlofschotel met ham, kaas en aardappelpuree","time":{"cook":20,"oven":35,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije vleesrecepten', 'Notenvrije vleesgerechten', 'Snel vleesgerecht bereiden', 'Hoe vlees veilig bereiden?']}}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant failed to provide a pasta recipe relevant to the user's request for a quick, gluten-free, nut-free, meat-containing meal. Instead, it suggested a recipe involving potatoes, which does not address the user's objective.
+
+Full Chat Score:
+Throughout the conversation, the assistant provided some relevant suggestions but failed to consistently meet the user's requirements. While it offered various pasta dishes and mentioned gluten-free and nut-free options, the assistant often strayed from specifics, repeating general advice without directly addressing the user's need for efficiency and allergy considerations. Clarity was often compromised, and completeness was inconsistent.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Sorry, ik zoek een snelle, glutenvrije, notenvrije pasta met vlees. Heb je zoiets?</td>
+            <td>{'text_message': 'Ik heb verschillende pastarecepten voor je gevonden. Pasta is veelzijdig en heerlijk, perfect voor elke gelegenheid. Geniet ervan!Vanwege je allergieën of intoleranties, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":646748,"title":"Pasta met gehakt","time":{"cook":25,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije pasta met kip', 'Snelle pastagerechten', 'Hoe glutenvrije pasta koken?']}}</td>
+            <td><ul class='score-list'><li><strong>0.3</strong> <details><summary>View Explanation</summary><div>Last Turn Score: The last assistant response does provide a pasta recipe with meat that is quick to prepare, but does not specifically address whether the recipe is nut-free, which was a crucial aspect of the user's inquiry. Therefore, it only partially meets the objective for the last user query.
+
+Full Chat Score: Throughout the conversation, the assistant provides various recipe suggestions, including pasta dishes with meat, but fails to consistently ensure that the recipes are both gluten-free and nut-free. The assistant also does not always provide clear confirmations regarding the recipe suitability outside of a general advisory. While the replies are somewhat relevant and aim to be helpful, there is a lack of detailed, specific recommendations that align perfectly with the user's requirements, which impacts completeness and clarity.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Is de pasta met gehakt glutenvrij en notenvrij?</td>
+            <td>{'text_message': 'Het spijt me, maar ik kan geen specifieke informatie geven over de ingrediënten van gerechten. Kan ik je helpen met het vinden van glutenvrije of notenvrije recepten?', 'suggestion_pills': {'chips': ['Glutenvrije pastasoorten', 'Notenvrije pastarecepten', 'Hoe maak je glutenvrije pasta?']}}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant's response to the user's specific query about whether the pasta with ground meat is both gluten-free and nut-free was insufficient. The response did not provide the needed clarification or assurance, which is crucial for someone with dietary restrictions. The suggestion pills were somewhat relevant but did not directly answer the user's question.  
+
+Full Chat Score:
+Throughout the conversation, the assistant provided recipes and suggestions that were generally related to pasta and meat dishes but often missed the mark on the user's requirement for gluten-free and nut-free options. The assistant repeatedly suggested checking the ingredients, which although cautious, did not directly satisfy the user's needs. There was some clarity and completeness in providing various recipes, but the assistant failed to consistently ensure the relevance and fulfillment of the user's specific dietary needs.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Heb je specifieke glutenvrije, notenvrije recepten met pasta en vlees die snel klaar zijn?</td>
+            <td>{'text_message': 'Ik heb verschillende pastarecepten voor je gevonden! Pasta is veelzijdig en heerlijk, perfect voor elke gelegenheid. Geniet ervan!Vanwege je allergie of intolerantie, controleer altijd zelf of de recepten en ingrediënten voor jou geschikt zijn.', 'data_message': '{"type":"RECIPE_LANE","data":{"title":null,"items":[{"id":646748,"title":"Pasta met gehakt","time":{"cook":25,"oven":0,"wait":0}', 'suggestion_pills': {'chips': ['Glutenvrije pasta met kip', 'Snelle vleesgerechten', 'Hoe kook je glutenvrije pasta?']}}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score: The assistant's last response acknowledges the user's request for a specific gluten-free, nut-free pasta recipe with meat that's quick to prepare. However, it fails to provide a new specific recipe and instead reiterates its suggestion for 'Pasta met gehakt' without confirming if it meets all the dietary requirements. This appears redundant and confusing to the user. 
+
+Full Chat Score: Throughout the conversation, the assistant provided several recipes and suggestions relevant to pasta dishes, and addressed the user's dietary restrictions intermittently. However, it often failed to give precise recipes that verified gluten-free and nut-free integrity while also being easy and quick to prepare for a busy weeknight, especially those containing meat. The assistant repeatedly suggested 'Pasta met gehakt', which might not meet the specificity required and didn't thoroughly address the user's paced queries on dietary compatibility. The responses could be clearer and more comprehensive in listing ingredients and preparation time. Thus, while the conversation was somewhat helpful, it did not effectively fulfill the user's objective comprehensively and clearly.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details></div></body></html>

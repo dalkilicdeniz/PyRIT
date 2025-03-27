@@ -92,7 +92,6 @@ class PromptNormalizer(abc.ABC):
 
         max_retries = 2
         retry_delay = 5  # seconds
-
         for attempt in range(max_retries + 1):
             try:
                 response = await target.send_prompt_async(prompt_request=request)
@@ -111,10 +110,11 @@ class PromptNormalizer(abc.ABC):
                 break  # Exit the loop if the operation is successful
             except Exception as ex:
                 # Ensure request to memory before processing exception
-                self._memory.add_request_response_to_memory(request=request)
+                #self._memory.add_request_response_to_memory(request=request)
 
                 if attempt < max_retries:
                     await asyncio.sleep(retry_delay)  # Wait before retrying
+                    print(f"Retrying prompt with conversation ID: {conversation_id} due to error: {ex}")
                 else:
                     error_response = construct_response_from_request(
                         request=request.request_pieces[0],

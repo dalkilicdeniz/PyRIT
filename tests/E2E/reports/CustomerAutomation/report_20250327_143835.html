@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Report</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa; /* Light gray background */
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+    details {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    details[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    summary {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #e3f2fd; /* Light blue */
+      color: #01579b;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      outline: none;
+      transition: background 0.3s ease;
+      border: none;
+    }
+    summary:hover {
+      background: #bbdefb;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    .metrics {
+      background-color: #f1f8e9; /* Light green */
+      padding: 12px 18px;
+      margin: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .objective-text {
+      color: #0277bd;
+      font-weight: bold;
+    }
+    .achieved-yes {
+      color: #1b5e20;
+      background-color: #c8e6c9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .achieved-no {
+      color: #b71c1c;
+      background-color: #ffcdd2;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    h3 {
+      padding: 10px 18px;
+      margin: 0;
+      background: #e3f2fd;
+      border-top: 1px solid #ddd;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #0277bd;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .metadata {
+      font-size: 0.85rem;
+      color: #666;
+      padding: 10px 18px;
+      border-top: 1px solid #ddd;
+    }
+    .score-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-list li {
+      margin-bottom: 4px;
+    }
+    .explanation-block {
+      display: inline-block;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .explanation-block summary {
+      background: #aed581;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+      outline: none;
+      border: none;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .explanation-block summary:hover {
+      background: #9ccc65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Multi-turn Chat Report</h1>
+<p class='overview'>Total Test Cases: 3 | Passed: 3 | Failed: 0</p>
+<p class='execution-time'>Test Execution Time: 59 seconds</p>
+<p class='description'>This report provides an overview of multi-turn customer simulations, highlighting how the assistant engages in realistic, task-focused conversations. Each dialogue is evaluated for accuracy, helpfulness, and ability to fulfill customer objectives.</p>
+
+    <details>
+      <summary>
+        Test Case 1: Objective: <span class='objective-text'>Find out how to register working hours correctly in the internal system.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 2 | Final Score: 1.0
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Find out how to register working hours correctly in the internal system.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 2</p>
+        <p><strong>Final Score:</strong> 1.0</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Hi! I just started working here—how does the onboarding process work?</td>
+            <td>{'text_message': "The onboarding process at Albert Heijn typically includes several key steps:\n\n1. **Orientation**: New employees usually attend an orientation session to learn about the company's values, culture, and policies.\n\n2. **Training**: You will receive training specific to your role, which may include shadowing experienced colleagues and learning about systems and procedures.\n\n3. **Documentation**: Complete any necessary paperwork, including tax forms and employment contracts.\n\n4. **Mentorship**: You may be assigned a mentor or buddy to help you navigate your new environment and answer any questions.\n\n5. **Feedback**: Regular check-ins with your supervisor to discuss your progress and any concerns.\n\nFor specific details, it’s best to consult your HR representative or the onboarding coordinator."}</td>
+            <td><ul class='score-list'><li><strong>0.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The last response from the assistant did not address the user's question about registering working hours correctly in the internal system. Instead, it provided a general overview of the onboarding process, which is not what the user inquired about.
+
+Full Chat Score:
+The conversation did not help the user achieve their objective of understanding how to register working hours. The assistant failed to provide any information or guidance related to the internal system for registering working hours, making the conversation irrelevant to the user's specific goal.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Thanks, that helps! Now, how do I register my working hours in the internal system?</td>
+            <td>{'text_message': 'To register your working hours in the internal system, follow these steps:\n\n1. **Log In**: Access the internal system using your employee credentials.\n\n2. **Navigate to Time Registration**: Find the section labeled "Time Registration" or "Working Hours."\n\n3. **Enter Hours**: Input your working hours for each day, ensuring you include start and end times.\n\n4. **Submit**: Review your entries for accuracy and submit them for approval.\n\n5. **Confirmation**: Check for a confirmation message or email to ensure your hours have been recorded successfully.\n\nIf you encounter any issues, contact your supervisor or the HR department for assistance.'}</td>
+            <td><ul class='score-list'><li><strong>1.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided a clear and thorough explanation on how to register working hours in the internal system, which directly addressed the user's request.
+
+Full Chat Score:
+Throughout the conversation, the assistant has responded promptly and accurately to the user's inquiries, including providing detailed steps for both the onboarding process and the time registration process. The instructions were clear and complete, effectively helping the user achieve their objective.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details>
+    <details>
+      <summary>
+        Test Case 2: Objective: <span class='objective-text'>Explore internal training opportunities for career development within AH.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 2 | Final Score: 0.9
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Explore internal training opportunities for career development within AH.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 2</p>
+        <p><strong>Final Score:</strong> 0.9</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>I’m looking to grow within Albert Heijn. Are there internal training opportunities available?</td>
+            <td>{'text_message': "Yes, Albert Heijn offers various internal training opportunities for employees looking to grow within the company. You can explore options such as leadership programs, skill development workshops, and online courses. It's best to check the internal employee portal or speak with your manager for specific programs available to you."}</td>
+            <td><ul class='score-list'><li><strong>0.8</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant's response is highly relevant to the user's request. The assistant clearly states that Albert Heijn offers various internal training opportunities and suggests checking the internal employee portal or speaking with the user's manager for specific programs. This response directly addresses the user's query effectively.
+
+Full Chat Score:
+Throughout the conversation, the assistant effectively supported the user's objective of exploring internal training opportunities for career development within AH. The information provided is complete, clear, and directly relevant to the user's goal. While the assistant could have provided more detailed or specific examples of available programs, the provided guidance is sufficient for the user to take the next steps in exploring these opportunities. Overall, the assistant helped the user satisfactorily in achieving their objective.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Hmm, can you give me examples of the specific programs available?</td>
+            <td>{'text_message': 'Specific programs may vary, but common examples include:\n\n1. **Leadership Development Program**: Aimed at employees aspiring to take on leadership roles.\n2. **Customer Service Training**: Focuses on enhancing customer interaction skills.\n3. **Product Knowledge Workshops**: Provides in-depth knowledge about various products.\n4. **Health and Safety Training**: Ensures compliance with safety regulations.\n5. **Diversity and Inclusion Training**: Promotes a more inclusive workplace.\n\nFor the most accurate and current offerings, please refer to the internal employee portal or consult with your HR department.'}</td>
+            <td><ul class='score-list'><li><strong>0.9</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided relevant and specific examples of internal training programs available, addressing the user's request accurately and effectively.
+
+Full Chat Score:
+Throughout the conversation, the assistant clearly and completely provided information about internal training opportunities available at Albert Heijn, including specific program examples and guidance on where the user can find more detailed information. The assistant's responses were highly relevant to the user's inquiries, helping them achieve their objective of exploring internal training opportunities for career development within Albert Heijn.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details>
+    <details>
+      <summary>
+        Test Case 3: Objective: <span class='objective-text'>Understand the process for requesting and tracking vacation days.</span> | Achieved: <span class="achieved-yes">Yes</span> | Turns: 2 | Final Score: 1.0
+      </summary>
+      <div class="metrics">
+        <p><strong>Objective:</strong> <span class="objective-text">Understand the process for requesting and tracking vacation days.</span></p>
+        <p><strong>Achieved Objective:</strong> <span class="achieved-yes">Yes</span></p>
+        <p><strong>Total Turns:</strong> 2</p>
+        <p><strong>Final Score:</strong> 1.0</p>
+
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assistant</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Hi there! Can you tell me a bit about how scheduling works here?</td>
+            <td>{'text_message': "Scheduling at Albert Heijn typically involves creating work schedules for employees based on operational needs, employee availability, and labor laws. Managers usually use scheduling software to assign shifts, manage time-off requests, and ensure adequate coverage during peak hours. Employees can often view their schedules online and may have the ability to swap shifts with colleagues, subject to approval. For specific details, it's best to consult your store manager or the HR department."}</td>
+            <td><ul class='score-list'><li><strong>0.4</strong> <details><summary>View Explanation</summary><div>Last Turn Score:
+The assistant provided a general explanation of how scheduling works at Albert Heijn, which is somewhat relevant to the user's request for information on scheduling processes.
+
+Full Chat Score:
+While the assistant's response was relevant, it did not specifically address the process for requesting and tracking vacation days, which is the user's objective throughout the chat.</div></details></li></ul></td>
+          </tr>
+
+          <tr>
+            <td>Got it. How do I request vacation days then?</td>
+            <td>{'text_message': "To request vacation days at Albert Heijn, you typically need to follow these steps:\n\n1. **Check the Policy**: Review the vacation policy in your employee handbook or on the internal portal.\n2. **Submit a Request**: Use the designated system or form to submit your vacation request, including the dates you wish to take off.\n3. **Notify Your Manager**: Inform your manager about your request, either in person or via email, to ensure they are aware.\n4. **Await Approval**: Your manager will review your request and confirm whether it can be accommodated based on staffing needs.\n\nFor specific procedures, consult your store's guidelines or speak with HR."}</td>
+            <td><ul class='score-list'><li><strong>1.0</strong> <details><summary>View Explanation</summary><div>Last Turn Score: 
+The assistant provided a detailed and relevant explanation to the user's query about requesting vacation days. The steps mentioned (checking policy, submitting request, notifying manager, and awaiting approval) are clear and cover the process comprehensively.
+
+Full Chat Score: 
+Throughout the conversation, the assistant was very informative and provided complete and relevant information. The user first asked about scheduling, and the assistant gave a thorough response. When the user asked specifically about vacation days, the assistant again provided a clear and detailed response. The entire conversation met the user's objective of understanding the process for requesting and tracking vacation days, and the assistant's responses were relevant, clear, and complete.</div></details></li></ul></td>
+          </tr>
+</tbody></table></details></div></body></html>

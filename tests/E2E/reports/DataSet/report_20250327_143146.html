@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Single-Turn Dataset Evaluation Report</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+    .description {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      color: #666;
+    }
+    details {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      overflow: hidden;
+    }
+    summary {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #e3f2fd;
+      color: #01579b;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      outline: none;
+      border: none;
+    }
+    summary:hover { background: #bbdefb; }
+    summary::-webkit-details-marker { display: none; }
+    .metrics {
+      background-color: #f1f8e9;
+      padding: 12px 18px;
+      margin: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      vertical-align: top;
+    }
+    th {
+      background-color: #0277bd;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .score-pass {
+      color: #1b5e20;
+      background-color: #c8e6c9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .score-fail {
+      color: #b71c1c;
+      background-color: #ffcdd2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .explanation-block summary {
+      background: #aed581;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+      outline: none;
+      display: inline-block;
+    }
+    .explanation-block summary:hover { background: #9ccc65; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Single-Turn Dataset Evaluation Report</h1>
+<p class='overview'>Total Test Cases: 5 | Passed: 3 | Failed: 2</p>
+<p class='execution-time'>Test Execution Time: 2 minutes, 21 seconds</p>
+<p class='description'>This report presents a comprehensive evaluation of the dataset by comparing each input with its corresponding actual and expected outputs, along with a score that quantifies the degree of alignment between the actual and expected responses.</p>
+
+    <details>
+      <summary>Test Case 1: <strong>User Prompt:</strong> "Ik heb zin in fruit..." | Score: 1.0 <span class='score-pass'>Passed</span></summary>
+      <div class="metrics">
+        <p><strong>User Prompt:</strong> Ik heb zin in fruit</p>
+        <p><strong>Threshold:</strong> 0.7</p>
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Prompt</th>
+            <th>Assistant Response</th>
+            <th>Expected Output</th>
+            <th>Score(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Ik heb zin in fruit</td>
+            <td>{'text_message': 'Het klinkt alsof je zin hebt in iets gezonds! Wat dacht je van een lekkere fruitsalade, smoothies of gewoon vers fruit als snack? Laat me weten als je specifieke recepten of ideeën wilt!', 'suggestion_pills': {'chips': ['Fruitige smoothies', 'Recepten met vers fruit', 'Hoe fruit bewaren?']}}</td>
+            <td>TEXT: Vraag om meer details</td>
+            <td>
+              <ul>
+                <li>
+                  <strong>1.0</strong>
+                  <span class='score-pass'>Pass</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>The assistant’s text message appropriately asks for more details by suggesting various fruit-related options and asking the user to specify their needs. This directly addresses the user’s question about wanting fruit and aligns well with the request for 'Vraag om meer details.' The suggestions provided are relevant and fit within the domain of food, recipes, or products.</div>
+                  </details>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </details>
+
+    <details>
+      <summary>Test Case 2: <strong>User Prompt:</strong> "Appel..." | Score: 0.8 <span class='score-pass'>Passed</span></summary>
+      <div class="metrics">
+        <p><strong>User Prompt:</strong> Appel</p>
+        <p><strong>Threshold:</strong> 0.7</p>
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Prompt</th>
+            <th>Assistant Response</th>
+            <th>Expected Output</th>
+            <th>Score(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Appel</td>
+            <td>{'text_message': 'Het lijkt erop dat je iets met appels wilt doen. Kun je me vertellen wat je precies zoekt? Bijvoorbeeld een recept, een product of iets anders?', 'suggestion_pills': {'chips': ['Appelmoes maken', 'Appeltaart recept', 'Hoe appels bewaren?', 'Appelsoorten ontdekken']}}</td>
+            <td>PRODUCT_LANE: [Apples]</td>
+            <td>
+              <ul>
+                <li>
+                  <strong>0.8</strong>
+                  <span class='score-pass'>Pass</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>The text message provided by the assistant closely aligns with the expected output, which is focused on apples. The assistant is asking for more specifics about what the user is looking for (e.g., a recipe or product), which is relevant to the domain of food, recipes, and products. However, the expected output directly suggests 'Apples' as a product lane, while the assistant’s message is prompting the user for more information. Given this slight deviation, the response is still highly relevant but not perfectly aligned.</div>
+                  </details>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </details>
+
+    <details>
+      <summary>Test Case 3: <strong>User Prompt:</strong> "Verkopen jullie gehakt?..." | Score: 0.8 <span class='score-pass'>Passed</span></summary>
+      <div class="metrics">
+        <p><strong>User Prompt:</strong> Verkopen jullie gehakt?</p>
+        <p><strong>Threshold:</strong> 0.7</p>
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Prompt</th>
+            <th>Assistant Response</th>
+            <th>Expected Output</th>
+            <th>Score(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Verkopen jullie gehakt?</td>
+            <td>{'text_message': 'Hier zijn enkele heerlijke gehaktproducten die je kunt overwegen. Gehakt is veelzijdig en perfect voor allerlei gerechten. Geniet ervan!', 'data_message': '{"type":"PRODUCT_LANE","data":{"title":null,"items":[{"id":4004,"title":"Rundergehakt","brand":"AH","salesUnitSize":"250 g","images":[]}', 'suggestion_pills': {'chips': ['Gehakt recepten', 'Hoe gehakt bewaren?', 'Alternatieven voor gehakt']}}</td>
+            <td>PRODUCT_LANE: [Gehakt]</td>
+            <td>
+              <ul>
+                <li>
+                  <strong>0.8</strong>
+                  <span class='score-pass'>Pass</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>The text message directly addresses the user's question about selling gehakt by mentioning some gehakt products and their versatility. The data message references Rundergehakt, which is relevant to the expected output. While the data message could include more variety, the overall response fulfills the user's request effectively within the correct domain.</div>
+                  </details>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </details>
+
+    <details>
+      <summary>Test Case 4: <strong>User Prompt:</strong> "Wat zijn vegetarische ontbijt producten..." | Score: 0.0 <span class='score-fail'>Failed</span></summary>
+      <div class="metrics">
+        <p><strong>User Prompt:</strong> Wat zijn vegetarische ontbijt producten</p>
+        <p><strong>Threshold:</strong> 0.7</p>
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Prompt</th>
+            <th>Assistant Response</th>
+            <th>Expected Output</th>
+            <th>Score(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Wat zijn vegetarische ontbijt producten</td>
+            <td>{'text_message': 'Hier zijn enkele producten die je misschien interesseren. Ontdek de veelzijdigheid van deze items en hoe ze in je dagelijkse routine passen. Veel plezier ermee!', 'data_message': '{"type":"PRODUCT_LANE","data":{"title":null,"items":[{"id":51254,"title":"Wake up drinkontbijt","brand":"Brinta","salesUnitSize":"120 g","images":[{"rendition":"LARGE","url":"https://static.ah.nl/dam/product/AHI_4354523130313037383732?revLabel=1&rendition=800x800_JPG_Q90&fileType=binary","width":800,"height":800}', 'suggestion_pills': {'chips': ['Vegetarische ontbijtgranen', 'Recepten met havermout', 'Hoe maak je tofu roerei?', 'Vegetarische spreads']}}</td>
+            <td>TEXT: Suggesties voor veganistische ontbijtproducten</td>
+            <td>
+              <ul>
+                <li>
+                  <strong>0.0</strong>
+                  <span class='score-fail'>Fail</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>The user's question asks for vegetarian breakfast products, and the expected output is indicative of suggestions for vegan breakfast products. However, the assistant’s Text Message is very general and does not provide specific information on vegetarian breakfast options. Furthermore, the Data Message only includes one product, 'Wake up drinkontbijt', which is not enough to form a comprehensive response. The overall relevance to the user’s question is very low, and there is a significant deviation from the expected informational content.</div>
+                  </details>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </details>
+
+    <details>
+      <summary>Test Case 5: <strong>User Prompt:</strong> "Wat kost een kilo kipfilet?..." | Score: 0.0 <span class='score-fail'>Failed</span></summary>
+      <div class="metrics">
+        <p><strong>User Prompt:</strong> Wat kost een kilo kipfilet?</p>
+        <p><strong>Threshold:</strong> 0.7</p>
+      </div>
+      <h3>Transcript</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Prompt</th>
+            <th>Assistant Response</th>
+            <th>Expected Output</th>
+            <th>Score(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Wat kost een kilo kipfilet?</td>
+            <td>{'text_message': 'Het spijt me, maar ik kan je daar niet mee helpen. Ik kan je wel helpen met het vinden van recepten en producten van Albert Heijn.', 'suggestion_pills': {'chips': ['Biologische kipfilet opties', 'Kipfilet recepten', 'Kipfilet veilig bereiden']}}</td>
+            <td>PRODUCT_LANE: [Kipfilet]</td>
+            <td>
+              <ul>
+                <li>
+                  <strong>0.0</strong>
+                  <span class='score-fail'>Fail</span>
+                  <details class='explanation-block'><summary>View Explanation</summary>
+                    <div>The assistant’s Text Message states that it cannot help with the user's query about the price of a kilo of chicken breast. Moreover, the suggested pills are not directly addressing the user's question, which is specific about the price. This response fails to provide relevant information or address the domain appropriately, thus scoring closer to 0.0.</div>
+                  </details>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </details>
+</div></body></html>
