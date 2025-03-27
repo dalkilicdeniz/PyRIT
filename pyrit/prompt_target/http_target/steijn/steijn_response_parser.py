@@ -1,7 +1,7 @@
 import re
 import json
 
-class AHAssistantResponseParser:
+class SteijnResponseParser:
     response_fields_regex_dict = [
         {"name": "text_message", "pattern": r"event:TEXT_MESSAGE\s+data:(.*?)(?:\n|$)"},
         {"name": "data_message", "pattern": r"event:DATA_MESSAGE\s+data:(\{.*?\})"},
@@ -14,7 +14,7 @@ class AHAssistantResponseParser:
         response_data = {}
         response_text = response.content.decode("utf-8")
 
-        for field in AHAssistantResponseParser.response_fields_regex_dict:
+        for field in SteijnResponseParser.response_fields_regex_dict:
             matches = re.findall(field["pattern"], response_text, re.DOTALL)
 
             if matches:
