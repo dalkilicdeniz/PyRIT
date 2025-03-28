@@ -520,6 +520,7 @@ def save_html_report(
         report_generator=None,
         is_chat_evaluation: bool = True,
         threshold: float = 0.7,
+        file_name: str = "report",
         description: str = "",
         execution_time: float = 0.0  # Test execution time provided as a parameter (in seconds)
 ) -> str:
@@ -632,7 +633,7 @@ def save_html_report(
 
     ### Save HTML file ###
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"report_{timestamp}.html"
+    file_name = f"{file_name}_{timestamp}.html"
     file_path = Path(directory) / file_name
 
     with open(file_path, "w", encoding="utf-8") as file:
