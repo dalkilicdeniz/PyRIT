@@ -639,7 +639,7 @@ def save_html_report(
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    print(f"✅ Report saved at: {file_path}")
+    print(f"\033[92m\n✅ Report saved at: {file_path}\033[0m")
     return str(file_path)
 
 
