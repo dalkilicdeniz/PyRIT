@@ -4,6 +4,7 @@
 import abc
 import asyncio
 import logging
+import traceback
 from typing import Any, List, Optional
 from uuid import uuid4
 
@@ -116,13 +117,14 @@ class PromptNormalizer(abc.ABC):
                     await asyncio.sleep(retry_delay)  # Wait before retrying
                     print("Retrying Prompt:" + str(request.request_pieces[0].original_value))
                 else:
-                    error_response = construct_response_from_request(
-                        request=request.request_pieces[0],
-                        response_text_pieces=[str(ex)],
-                        response_type="error",
-                        error="processing",
-                    )
 
+                    error_response = construct_response_from_request(
+                    request=request.request_pieces[0],
+                    response_text_pieces=[f"{ex}\n{repr(ex)}\n{traceback.format_exc()}"],
+                    response_type="error",
+                    error="processing",
+                    )
+                    
                     await self._calc_hash(request=error_response)
                     self._memory.add_request_response_to_memory(request=error_response)
                     cid = request.request_pieces[0].conversation_id if request and request.request_pieces else None
