@@ -10,7 +10,7 @@ from colorama import Fore, Style
 
 from pyrit.common.display_response import display_image_response
 from pyrit.common.utils import combine_dict
-from pyrit.models import PromptDataType, PromptRequestResponse
+from pyrit.models import PromptRequestResponse
 from pyrit.models.filter_criteria import PromptConverterState, PromptFilterCriteria
 from pyrit.orchestrator import Orchestrator
 from pyrit.prompt_converter import PromptConverter
@@ -129,7 +129,7 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
 
         return responses
 
-    async def send_qa_pairs_async(self, qa_pairs: List[Dict[str, Any]]) -> None:
+    async def send_qa_pairs_async(self, qa_pairs: List[Dict[str, Any]]) -> list[PromptRequestResponse]:
         """
         Sends a list of QA pairs to the prompt target.
         Supports both single-turn and multi-turn conversational test cases.
@@ -138,6 +138,7 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
         and then the target's HTTP request URL is updated accordingly.
         Single-turn cases are batched together.
         """
+        all_responses = []
         single_turn_requests: List[NormalizerRequest] = []
 
         for qa in qa_pairs:
@@ -149,7 +150,6 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
                     single_turn_requests = []
 
                 conversation_id = str(uuid.uuid4())
-                thread_id = None
                 for idx, turn in enumerate(qa["conversation"]):
                     prompt_text = turn["question"]
                     expected_output = turn["expected_outcome"]
@@ -162,8 +162,9 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
                         conversation_id=conversation_id,
                     )
 
-                    responses = await self.send_normalizer_requests_async(prompt_request_list=[request])
-                    flattened = PromptRequestResponse.flatten_to_prompt_request_pieces(responses)
+                    results = await self.send_normalizer_requests_async(prompt_request_list=[request])
+                    all_responses.extend(results)
+                    flattened = PromptRequestResponse.flatten_to_prompt_request_pieces(results)
                     if idx == 0:
                         thread_id = flattened[0].prompt_metadata.get("thread_id")
                         if thread_id:
@@ -196,7 +197,10 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
 
         # Flush any remaining single-turn requests in one batch.
         if single_turn_requests:
-            await self.send_normalizer_requests_async(prompt_request_list=single_turn_requests)
+            results = await self.send_normalizer_requests_async(prompt_request_list=single_turn_requests)
+            all_responses.extend(results)
+
+        return all_responses
 
     async def print_conversations_async(self):
         """Prints the conversation between the objective target and the red teaming bot."""

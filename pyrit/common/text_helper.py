@@ -4,14 +4,18 @@
 from typing import List, Dict, Union
 from pathlib import Path
 
+
 def read_txt(file) -> List[Dict[str, str]]:
     return [{"prompt": line.strip()} for line in file.readlines()]
+
 
 def write_txt(file, examples: List[Dict[str, str]]):
     file.write("\n".join([ex["prompt"] for ex in examples]))
 
+
 def sanitize(text: str) -> str:
     return str(text).replace("<", "&lt;").replace(">", "&gt;")
+
 
 def format_execution_time(seconds: float) -> str:
     seconds = int(round(seconds))
@@ -67,16 +71,18 @@ def _render_report_html(
 """
 
     for idx, result in enumerate(results, start=1):
-        transcript = []
-        turns = 1
-        final_score = 0.0
+        # ✅ Objective fallback for both types
+        if "objective" in result:
+            objective = result["objective"]
+        elif "prompt" in result:
+            objective = result["prompt"]
+        elif "conversation" in result:
+            first_user = next((msg for msg in result["conversation"] if msg.get("role") == "user"), {})
+            objective = first_user.get("message", "N/A")
+        else:
+            objective = "N/A"
 
-        # Use explicit objective, or fallback to prompt or first user message
-        objective = sanitize(result.get("objective", result.get("prompt", "N/A")))
-        if "conversation" in result and not result.get("objective"):
-            first_user_msg = next((m.get("message", "") for m in result["conversation"] if m.get("role") == "user"), "")
-            if first_user_msg:
-                objective = sanitize(first_user_msg)
+        objective = sanitize(objective)
 
         if is_chat_eval:
             transcript = result.get("transcript", [])
@@ -99,16 +105,31 @@ def _render_report_html(
                     transcript.append(turn)
 
             turns = result.get("aggregated_metrics", {}).get("total_turns", len(transcript))
-            final_score = result.get("aggregated_metrics", {}).get("final_score", 0.0)
+            raw_score = result.get("aggregated_metrics", {}).get("final_score", 0.0)
+
+            # Handle both boolean-like strings and numeric strings
+            if isinstance(raw_score, str):
+                if raw_score.lower() == "true":
+                    final_score = True
+                elif raw_score.lower() == "false":
+                    final_score = False
+                else:
+                    try:
+                        final_score = float(raw_score)
+                    except ValueError:
+                        final_score = 0.0
+            else:
+                final_score = raw_score
 
             score_values = []
             for turn in transcript:
                 for piece in turn["pieces"]:
                     for score in piece.get("scores", []):
+                        val = score.get("score", 0.0)
                         try:
-                            score_values.append(float(score.get("score", score.get("score_value", 0.0))))
+                            score_values.append(float(val))
                         except:
-                            continue
+                            score_values.append(1.0 if str(val).lower() == "true" else 0.0)
 
             if strict_step_failures:
                 passed = all(s >= threshold for s in score_values)
@@ -116,9 +137,10 @@ def _render_report_html(
                 try:
                     passed = float(final_score) >= threshold
                 except:
-                    passed = False
+                    passed = str(final_score).lower() == "true"
 
         else:
+            # dataset: single or multi-step
             if "conversation" in result:
                 conv = result["conversation"]
                 transcript = []
@@ -156,13 +178,21 @@ def _render_report_html(
             for turn in transcript:
                 for piece in turn["pieces"]:
                     for score in piece.get("scores", []):
+                        val = score.get("score_value", 0.0)
                         try:
-                            score_values.append(float(score.get("score", score.get("score_value", 0.0))))
+                            score_values.append(float(val))
                         except:
-                            continue
+                            score_values.append(1.0 if str(val).lower() == "true" else 0.0)
 
-            final_score = min(score_values, default=0.0)
-            passed = all(s >= threshold for s in score_values) if strict_step_failures else final_score >= threshold
+            if strict_step_failures:
+                passed = all(s >= threshold for s in score_values)
+            else:
+                passed = min(score_values, default=0.0) >= threshold
+
+            if turns == 1:
+                final_score = max(score_values, default=0.0)
+            else:
+                final_score = min(score_values, default=0.0)
 
         if passed:
             passed_cases += 1
@@ -170,16 +200,24 @@ def _render_report_html(
         badge = "pass" if passed else "fail"
         label = "Pass" if passed else "Fail"
 
+        summary_parts = [
+            f"Test Case {idx}: <strong>Objective:</strong> {objective}",
+            f"<strong>Achieved:</strong> <span class='badge {badge}'>{label}</span>",
+            f"<strong>Turns:</strong> {turns}"
+        ]
+
+        if not isinstance(final_score, bool):
+            final_score_display = f"{final_score:.2f}" if isinstance(final_score, (int, float)) else "N/A"
+            summary_parts.append(f"<strong>Final Score:</strong> {final_score_display}")
+
         html += f"""
-<details>
-  <summary>Test Case {idx}: <strong>Objective:</strong> {objective} |
-  <strong>Achieved:</strong> <span class='badge {badge}'>{label}</span> |
-  <strong>Turns:</strong> {turns} |
-  <strong>Final Score:</strong> {float(final_score):.2f}</summary>
-  <table>
-    <thead><tr><th>User</th><th>Assistant</th><th>Cumulative Score</th></tr></thead>
-    <tbody>
-"""
+        <details>
+          <summary>{' | '.join(summary_parts)}</summary>
+          <table>
+            <thead><tr><th>User</th><th>Assistant</th><th>Score</th></tr></thead>
+            <tbody>
+        """
+
 
         for turn in transcript:
             user_piece = next((p for p in turn["pieces"] if p["role"] == "user"), {"converted_value": ""})
@@ -190,14 +228,19 @@ def _render_report_html(
 
             scores_html = ""
             for score in assistant_piece.get("scores", []):
+                val = score.get("score", score.get("score_value", None))
+                rationale = sanitize(score.get("rationale", score.get("score_rationale", "")))
                 try:
-                    val = float(score.get("score", score.get("score_value", 0.0)))
-                    rationale = sanitize(score.get("rationale", score.get("score_rationale", "")))
-                    cls = "score-pass" if val >= threshold else "score-fail"
-                    scores_html += f"<div><strong class='{cls}'>{val:.2f}</strong><div class='explanation'>{rationale}</div></div>"
+                    val = float(val)
                 except:
-                    continue
+                    val = True if str(val).lower() == "true" else False
+                cls = "score-pass" if val >= threshold else "score-fail"
+                if isinstance(val, bool):
+                    val_display = "✔️ True" if val else "❌ False"
+                else:
+                    val_display = f"{val:.2f}"
 
+                scores_html += f"<div><strong class='{cls}'>{val_display}</strong><div class='explanation'>{rationale}</div></div>"
             html += f"<tr><td>{user_text}</td><td>{assistant_text}</td><td>{scores_html}</td></tr>"
 
         html += "</tbody></table></details>"
@@ -225,8 +268,10 @@ def generate_simulation_report(
         is_chat_eval=True,
         strict_step_failures=False
     )
+
     with open(save_path, "w", encoding="utf-8") as f:
         f.write(html)
+
     print(f"\n✅ Simulation report saved to: {save_path}")
 
 
@@ -247,6 +292,8 @@ def generate_dataset_report(
         is_chat_eval=False,
         strict_step_failures=True
     )
+
     with open(save_path, "w", encoding="utf-8") as f:
         f.write(html)
+
     print(f"\n✅ Dataset report saved to: {save_path}")
