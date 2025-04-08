@@ -31,12 +31,13 @@ evaluation_criteria: >
 
     ## Clarifications
     - The **expected output** is indicative and does not require an exact match.
-    - Focus on domain alignment for AH products, recipes, and cooking advice along with semantic similarity concerning cooking instructions, ingredient-specific recipes, dietary-specific recipes, or general culinary guidance.
+    - Focus on domain alignment for AH products, recipes, and cooking advice along with semantic similarity concerning cooking instructions, ingredient-specific recipes, dietary-specific recipes, general culinary guidance, or pricing details where applicable.
     - Minor variations in phrasing are acceptable if the overall meaning is preserved.
+    - For product inquiries that include a price-related aspect, ensure that pricing information is addressed appropriately in the response.
 
     ## General Query Requirements
     - The assistant must provide relevant responses when a user query clearly indicates a request for:
-        - Product recommendations (e.g., food or non-food products).
+        - Product recommendations (e.g., food or non-food products) that may also involve pricing details.
         - Recipe suggestions (including specific recipe lanes based on dietary or preparation criteria).
         - Cooking advice with practical and actionable instructions.
     - The assistant should distinguish between general questions (providing broad suggestions) and specific requests (addressed with targeted searches via tool calls).
@@ -46,10 +47,11 @@ evaluation_criteria: >
     ## Scoring Methodology
     - The total score for each exchange is calculated on a scale from 0.0 to 1.0.
     - Award a full score of 1.0 if the assistant’s response provides a fully correct and contextually relevant answer that includes the appropriate lane (product or recipe) or detailed cooking advice.
-    - In cases where the assistant provides a partial response—for example, a correct lane without fully addressing the query—award a base score of 0.5, with bonus points for precision and relevance.
-    - Deductions:
+    - In cases where the assistant provides a partial response—for example, a correct lane without fully addressing all aspects of the query—award a base score of 0.5, with bonus points for precision and relevance.
+    - Specific deductions:
         * Deduct 0.2 points if the assistant fails to provide actionable advice when the inquiry is valid.
         * Deduct 0.2 points if the assistant provides the correct lane or advice but includes incorrect or mismatched details.
+        * For inquiries that require pricing information, if the response does not explicitly include cost details, deduct 0.2 points from an otherwise acceptable response.
         * Assign a score of 0.0 if the response is completely off-target or if the inquiry is rejected without sufficient justification.
 
     ## Output
