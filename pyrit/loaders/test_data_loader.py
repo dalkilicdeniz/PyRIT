@@ -1,27 +1,34 @@
-# test_data_loader.py
 from pathlib import Path
-from typing import List, Tuple, Union
-from .single_turn_loader import extract_single_turn_tests
-from .conversational_loader import extract_conversational_tests
+from typing import Any, Dict, List, Union
+import yaml
 
-
-def load_test_data(
-    file_path: Union[str, Path]
-) -> Tuple[List[str], List[str]]:
+def load_test_data(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
     """
-    Auto-detects YAML format (single-turn or conversational) and returns prompt/expected pairs.
+    Loads test cases from a YAML file and returns a normalized list of QA dictionaries.
+    Supports both conversational and single-turn test cases.
+
+    For conversational tests, the YAML is assumed to have the key "conversation" with a list of turns.
+    For single-turn tests, expects keys "question" and "expected_outcomes" (note the plural)
+    and converts them to use "expected_outcome".
     """
     path = Path(file_path)
     with open(path, "r", encoding="utf-8") as f:
-        first_line = f.readline()
+        data = yaml.safe_load(f)
 
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
+    qa_pairs = []
+    for entry in data:
+        # Handle multi-turn conversational test cases.
+        if "conversation" in entry:
+            # Optionally, you could validate each turn inside the conversation.
+            qa_pairs.append(entry)
+        # Handle single-turn test cases.
+        elif "question" in entry and "expected_outcomes" in entry:
+            # Convert the key "expected_outcomes" to "expected_outcome"
+            qa_pairs.append({
+                "question": entry["question"],
+                "expected_outcome": entry["expected_outcomes"]
+            })
+        else:
+            raise ValueError(f"Unknown test case format in entry: {entry}")
 
-    # Use a basic heuristic to decide format
-    if "conversation:" in content:
-        return extract_conversational_tests(file_path)
-    elif "question:" in content and "expected_outcomes:" in content:
-        return extract_single_turn_tests(file_path)
-    else:
-        raise ValueError(f"Unknown test format in file: {file_path}")
+    return qa_pairs
