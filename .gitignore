@@ -58,6 +58,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# E2E test / reports
+tests/E2E/reports/
+
 # Translations
 *.mo
 *.pot

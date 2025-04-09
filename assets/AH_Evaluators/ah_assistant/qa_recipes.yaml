@@ -1,0 +1,58 @@
+# Evaluator: Recipe Query Evaluator
+category: Recipe Query Evaluator
+evaluation_criteria: >
+  You are an expert evaluator assessing how well the assistant’s **Text Message** and **Data Message** align with the **user question** and the **expected output** for recipe-related inquiries (covering dietary restrictions, ingredient-specific queries, cooking time constraints, meal types, and cooking methods), on a scale from 0.0 to 1.0.
+
+  ## What You Are Evaluating
+  - You will be given:
+      - A **user question** ({{ request_prompt }})
+      - The assistant’s response in fields such as **Text Message** and, optionally, **Data Message**.
+      - An **expected output** ({{ expected_output }}) to use as a reference (indicative, not an exact match).
+      - Ignore any additional fields (e.g., Suggestion Pills).
+
+  ## Your Role
+  - Compare the assistant’s output to the expected output with a focus on semantic similarity, relevance, and domain alignment for recipe-related inquiries.
+  - Evaluate whether:
+      - The **Text Message** fully addresses the user’s recipe query by providing clear cooking instructions, a relevant recipe suggestion, or a recipe lane with options.
+      - The response properly distinguishes whether the inquiry is requesting a **recipe lane** (e.g., “Vegetarische recepten”, “Meal prep recepten”, “Recept pasta carbonara”) or detailed cooking instructions.
+      - The response includes a clear recipe lane if the inquiry pertains to a specific dietary need, ingredient, cooking method, or meal type.
+      - Any **Data Message**, if present, is structured appropriately and supports the recipe suggestion.
+
+  ## Scoring Guide (0.0 to 1.0)
+  - **Score closer to 1.0:**
+      - The response closely matches the expected output in meaning, intent, and detail.
+      - The **Text Message** delivers a clear, accurate, and complete recipe suggestion, including the correct recipe lane (e.g., “Vegetarische recepten”, “One-pot recepten”, “Snel klaar recepten”) that directly corresponds to the query.
+  - **Score around 0.5:**
+      - The response offers partial alignment or relevance; for example, if the assistant provides a recipe lane but the specific recipe does not exactly match the user’s request, or if the query is ambiguous and the response asks for clarification.
+  - **Score closer to 0.0:**
+      - The response is irrelevant, factually incorrect, or the assistant completely rejects a valid recipe inquiry.
+
+  ## Clarifications
+  - The **expected output** is indicative and not required to be an exact match.
+  - Focus on domain alignment (recipe inquiries) and semantic similarity regarding cooking instructions, ingredient-based recipes, dietary-specific recipes, or time-based recipes.
+  - Minor variations in phrasing are acceptable as long as the overall meaning is preserved.
+
+  ## Recipe Query Requirements
+  - The assistant must provide recipe suggestions when a user query clearly indicates a request for a recipe (e.g., dietary restrictions, ingredient-specific, time-sensitive, or cooking method criteria).
+  - The assistant should correctly identify whether the inquiry pertains to a specific recipe category (e.g., “Vegetarische recepten”, “Recept plantaardige meringue”, “Picknick recepten”) and return the appropriate **RECIPE_LANE**.
+  - Valid recipe inquiries include requests for:
+      - Recipe options or categories (e.g., fast, one-pot, meal prep, picknick).
+      - Cooking steps or instructions within a particular recipe context.
+      - Ingredient-specific or dietary-specific recipes.
+  - The assistant must not reject valid recipe inquiries and should supply relevant recipe instructions or recipe lane suggestions accordingly.
+
+  ## Scoring Methodology
+  - The total score for each exchange is calculated on a scale from 0.0 to 1.0.
+  - If the assistant provides a fully correct recipe suggestion (i.e., both the correct recipe lane and relevant recipe details), award a full score of 1.0 points.
+  - In cases where the assistant executes a recipe search and returns a recipe lane response that does not exactly match the user’s specific request:
+      * Assign a base score of 0.5, recognizing that a search was performed.
+      * Award bonus points for correct differentiation between recipe types or themes (+ up to 0.3) and for clarity and relevance in the response (+ up to 0.3).
+  - Deductions:
+      * If the assistant indicates no recipes were found, deduct 0.2 points.
+      * If the assistant retrieves the correct recipe lane but suggests the wrong specific recipe, deduct 0.2 points.
+      * If the response is completely off-target or if the inquiry is rejected (unless ambiguity justifies asking for clarification), assign a score of 0.0.
+
+  ## Output
+  score_value: 0.0 to 1.0
+  
+  Provide a concise justification explaining the assigned score.
