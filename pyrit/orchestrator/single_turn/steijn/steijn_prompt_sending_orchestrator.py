@@ -141,7 +141,8 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
         all_responses = []
         single_turn_requests: List[NormalizerRequest] = []
 
-        for qa in qa_pairs:
+        for i, qa in enumerate(qa_pairs):
+            print("\nExecuting test case:", i+1)
             # Multi-turn test case.
             if "conversation" in qa:
                 # Flush any accumulated single-turn requests.
@@ -152,6 +153,7 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
                 conversation_id = str(uuid.uuid4())
                 for idx, turn in enumerate(qa["conversation"]):
                     prompt_text = turn["question"]
+                    print("Question:", prompt_text)
                     expected_output = turn["expected_outcome"]
                     request = self._create_normalizer_request(
                         prompt_text=prompt_text,
@@ -184,6 +186,7 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
             else:
                 # Single-turn test case: accumulate the request.
                 prompt_text = qa["question"]
+                print("Question:", prompt_text)
                 expected_output = qa["expected_outcome"]
                 request = self._create_normalizer_request(
                     prompt_text=prompt_text,
