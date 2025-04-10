@@ -1,35 +1,35 @@
 - question: "Wat maak ik voor vrienden die vegetarisch eten?"
-  expected_outcomes: "RECIPE_LANE: [Vegetarische recepten]"
+  expected_outcome: "RECIPE_LANE: [Vegetarische recepten]"
 
 - question: "Hoe maak je plantaardige meringue?"
-  expected_outcomes: "RECIPE_LANE: [Recept plantaardige meringue]"
+  expected_outcome: "RECIPE_LANE: [Recept plantaardige meringue]"
 
 - question: "Wat is een verrassend recept met pindakaas?"
-  expected_outcomes: "RECIPE_LANE: [Recepten met pindakaas]"
+  expected_outcome: "RECIPE_LANE: [Recepten met pindakaas]"
 
 - question: "Geef me een recept dat maximaal 15 minuten duurt."
-  expected_outcomes: "RECIPE_LANE: [Snel klaar recepten]"
+  expected_outcome: "RECIPE_LANE: [Snel klaar recepten]"
 
 - question: "Bedenk een gerecht waarbij ik maar één pan nodig heb."
-  expected_outcomes: "RECIPE_LANE: [One-pot recepten]"
+  expected_outcome: "RECIPE_LANE: [One-pot recepten]"
 
 - question: "Hoe maak je zelf suikervrije granola?"
-  expected_outcomes: "RECIPE_LANE: [Recept suikervrije granola]"
+  expected_outcome: "RECIPE_LANE: [Recept suikervrije granola]"
 
 - question: "Hoe maak je pasta carbonara?"
-  expected_outcomes: "RECIPE_LANE: [Recept pasta carbonara]"
+  expected_outcome: "RECIPE_LANE: [Recept pasta carbonara]"
 
 - question: "BBQ recepten zonder vlees"
-  expected_outcomes: "RECIPE_LANE: [Vegan BBQ recepten]"
+  expected_outcome: "RECIPE_LANE: [Vegan BBQ recepten]"
 
 - question: "Maak een recept dat goed werkt voor meal prepping."
-  expected_outcomes: "RECIPE_LANE: [Meal prep recepten]"
+  expected_outcome: "RECIPE_LANE: [Meal prep recepten]"
 
 - question: "Geef me een recept dat perfect is voor een picknick."
-  expected_outcomes: "RECIPE_LANE: [Picknick recepten]"
+  expected_outcome: "RECIPE_LANE: [Picknick recepten]"
 
 - question: "Wat is een gezond maar superlekker alternatief voor fastfood?"
-  expected_outcomes: "RECIPE_LANE: [Gezonde fastfood alternatieven]"
+  expected_outcome: "RECIPE_LANE: [Gezonde fastfood alternatieven]"
 
 - question: "Bedenk een gerecht dat er chique uitziet maar super simpel is."
-  expected_outcomes: "RECIPE_LANE: [Eenvoudige chique recepten]"
+  expected_outcome: "RECIPE_LANE: [Eenvoudige chique recepten]"

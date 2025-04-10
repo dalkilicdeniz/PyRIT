@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-from typing import Dict, List
-import datetime
+from typing import List, Dict, Union
 from pathlib import Path
+
 
 def read_txt(file) -> List[Dict[str, str]]:
     return [{"prompt": line.strip()} for line in file.readlines()]
@@ -12,636 +12,288 @@ def read_txt(file) -> List[Dict[str, str]]:
 def write_txt(file, examples: List[Dict[str, str]]):
     file.write("\n".join([ex["prompt"] for ex in examples]))
 
-def generate_multi_turn_html_report(
-        reports: list,
-        is_chat_evaluation: bool = True
+
+def sanitize(text: str) -> str:
+    return str(text).replace("<", "&lt;").replace(">", "&gt;")
+
+
+def format_execution_time(seconds: float) -> str:
+    seconds = int(round(seconds))
+    mins, secs = divmod(seconds, 60)
+    return f"{mins}m {secs}s" if mins else f"{secs}s"
+
+
+def _render_report_html(
+        title: str,
+        description: str,
+        results: list,
+        threshold: float,
+        execution_time: float,
+        is_chat_eval: bool,
+        strict_step_failures: bool
 ) -> str:
-    """
-    Generates an HTML report with a modern, accessible design.
+    passed_cases = 0
+    total_cases = len(results)
 
-    Features:
-    - Light color scheme for better readability
-    - Cumulative score labeling for chat evaluations
-    - Cleaner, minimalist approach without search/export features
-
-    Args:
-        reports (list): A list of report dictionaries (multi-turn or single-turn).
-        is_chat_evaluation (bool): If True, scores reflect the entire conversation (cumulative score).
-
-    Returns:
-        str: A complete HTML string.
-    """
-
-    # Set the score column label based on evaluation type
-    score_column_label = "Cumulative Score" if is_chat_evaluation else "Score"
-
-    html = """<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Report</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <meta charset='utf-8'>
+  <title>{title}</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f8f9fa; /* Light gray background */
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      color: #2c3e50;
-    }
-    details {
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #fcfcfc;
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    details[open] {
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    summary {
-      padding: 12px 18px;
-      cursor: pointer;
-      background: #e3f2fd; /* Light blue */
-      color: #01579b;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 6px;
-      outline: none;
-      transition: background 0.3s ease;
-      border: none;
-    }
-    summary:hover {
-      background: #bbdefb;
-    }
-    summary::-webkit-details-marker {
-      display: none;
-    }
-    .metrics {
-      background-color: #f1f8e9; /* Light green */
-      padding: 12px 18px;
-      margin: 0;
-      border-bottom: 1px solid #ddd;
-    }
-    .objective-text {
-      color: #0277bd;
-      font-weight: bold;
-    }
-    .achieved-yes {
-      color: #1b5e20;
-      background-color: #c8e6c9;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .achieved-no {
-      color: #b71c1c;
-      background-color: #ffcdd2;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    h3 {
-      padding: 10px 18px;
-      margin: 0;
-      background: #e3f2fd;
-      border-top: 1px solid #ddd;
-      font-size: 1rem;
-      font-weight: 500;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 15px 0;
-    }
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background-color: #0277bd;
-      color: #fff;
-      font-size: 0.9rem;
-    }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    .metadata {
-      font-size: 0.85rem;
-      color: #666;
-      padding: 10px 18px;
-      border-top: 1px solid #ddd;
-    }
-    .score-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    .score-list li {
-      margin-bottom: 4px;
-    }
-    .explanation-block {
-      display: inline-block;
-      border: none;
-      border-radius: 4px;
-      background: transparent;
-    }
-    .explanation-block summary {
-      background: #aed581;
-      color: #fff;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      border-radius: 4px;
-      outline: none;
-      border: none;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-    .explanation-block summary:hover {
-      background: #9ccc65;
-    }
+    body {{ font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }}
+    .container {{ background: #fff; padding: 30px; border-radius: 10px; max-width: 1100px; margin: auto; }}
+    h1 {{ text-align: center; color: #2c3e50; }}
+    .summary {{ font-size: 1rem; text-align: center; color: #444; margin-bottom: 30px; }}
+    details {{ border: 1px solid #ccc; border-radius: 6px; background: #eaf4fe; margin-bottom: 15px; }}
+    summary {{ padding: 12px; font-weight: bold; cursor: pointer; color: #01579b; }}
+    table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
+    th, td {{ padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }}
+    th {{ background: #0277bd; color: #fff; }}
+    .score-pass {{ color: green; font-weight: bold; }}
+    .score-fail {{ color: red; font-weight: bold; }}
+    .badge {{ display: inline-block; padding: 4px 10px; border-radius: 5px; font-weight: bold; }}
+    .badge.pass {{ background: #c8e6c9; color: #1b5e20; }}
+    .badge.fail {{ background: #ffcdd2; color: #b71c1c; }}
+    .explanation {{ font-size: 0.9rem; margin-top: 6px; color: #555; }}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Multi-turn Chat Report</h1>
+<div class='container'>
+  <h1>{title}</h1>
+  <p class='overview'>{description}</p>
+  <div class='summary'>
+    Total Test Cases: {total_cases} |
+    Passed: {{passed}} |
+    Failed: {{failed}} |
+    Execution Time: {format_execution_time(execution_time)}
+  </div>
 """
 
-    for index, report in enumerate(reports, start=1):
-        objective = report.get("objective", "N/A")
-        achieved = report.get("achieved_objective", False)
-        aggregated = report.get("aggregated_metrics", {})
-        total_turns = aggregated.get("total_turns", "N/A")
-        final_score = aggregated.get("final_score", "N/A")
-        final_score_rationale = aggregated.get("final_score_rationale", "")
+    for idx, result in enumerate(results, start=1):
+        # ✅ Objective fallback for both types
+        if "objective" in result:
+            objective = result["objective"]
+        elif "prompt" in result:
+            objective = result["prompt"]
+        elif "conversation" in result:
+            first_user = next((msg for msg in result["conversation"] if msg.get("role") == "user"), {})
+            objective = first_user.get("message", "N/A")
+        else:
+            objective = "N/A"
 
-        achieved_text = '<span class="achieved-yes">Yes</span>' if achieved else '<span class="achieved-no">No</span>'
-        conversation_id = report.get("additional_metadata", {}).get("conversation_id", "N/A")
+        objective = sanitize(objective)
 
-        summary_text = (
-            f"Test Case {index}: Objective: <span class='objective-text'>{objective}</span> "
-            f"| Achieved: {achieved_text} | Turns: {total_turns} | Final Score: {final_score}"
-        )
+        if is_chat_eval:
+            transcript = result.get("transcript", [])
+            if not transcript and "conversation" in result:
+                conv = result["conversation"]
+                for i in range(0, len(conv), 2):
+                    turn = {"turn_index": (i // 2) + 1, "pieces": []}
+                    if i < len(conv):
+                        turn["pieces"].append({
+                            "role": conv[i].get("role", ""),
+                            "converted_value": conv[i].get("message", ""),
+                            "scores": conv[i].get("scores", [])
+                        })
+                    if i + 1 < len(conv):
+                        turn["pieces"].append({
+                            "role": conv[i + 1].get("role", ""),
+                            "converted_value": conv[i + 1].get("message", ""),
+                            "scores": conv[i + 1].get("scores", [])
+                        })
+                    transcript.append(turn)
+
+            turns = result.get("aggregated_metrics", {}).get("total_turns", len(transcript))
+            raw_score = result.get("aggregated_metrics", {}).get("final_score", 0.0)
+
+            # Handle both boolean-like strings and numeric strings
+            if isinstance(raw_score, str):
+                if raw_score.lower() == "true":
+                    final_score = True
+                elif raw_score.lower() == "false":
+                    final_score = False
+                else:
+                    try:
+                        final_score = float(raw_score)
+                    except ValueError:
+                        final_score = 0.0
+            else:
+                final_score = raw_score
+
+            score_values = []
+            for turn in transcript:
+                for piece in turn["pieces"]:
+                    for score in piece.get("scores", []):
+                        val = score.get("score", 0.0)
+                        try:
+                            score_values.append(float(val))
+                        except:
+                            score_values.append(1.0 if str(val).lower() == "true" else 0.0)
+
+            if strict_step_failures:
+                passed = all(s >= threshold for s in score_values)
+            else:
+                try:
+                    passed = float(final_score) >= threshold
+                except:
+                    passed = str(final_score).lower() == "true"
+
+        else:
+            # dataset: single or multi-step
+            if "conversation" in result:
+                conv = result["conversation"]
+                transcript = []
+                for i in range(0, len(conv), 2):
+                    turn = {"turn_index": (i // 2) + 1, "pieces": []}
+                    if i < len(conv):
+                        turn["pieces"].append({
+                            "role": conv[i].get("role", ""),
+                            "converted_value": conv[i].get("message", ""),
+                            "scores": conv[i].get("scores", [])
+                        })
+                    if i + 1 < len(conv):
+                        turn["pieces"].append({
+                            "role": conv[i + 1].get("role", ""),
+                            "converted_value": conv[i + 1].get("message", ""),
+                            "scores": conv[i + 1].get("scores", [])
+                        })
+                    transcript.append(turn)
+                turns = len(transcript)
+            else:
+                transcript = [{
+                    "turn_index": 1,
+                    "pieces": [
+                        {"role": "user", "converted_value": result.get("prompt", "")},
+                        {
+                            "role": "assistant",
+                            "converted_value": result.get("assistant_response", ""),
+                            "scores": result.get("scores", [])
+                        }
+                    ]
+                }]
+                turns = 1
+
+            score_values = []
+            for turn in transcript:
+                for piece in turn["pieces"]:
+                    for score in piece.get("scores", []):
+                        val = score.get("score_value", 0.0)
+                        try:
+                            score_values.append(float(val))
+                        except:
+                            score_values.append(1.0 if str(val).lower() == "true" else 0.0)
+
+            if strict_step_failures:
+                passed = all(s >= threshold for s in score_values)
+            else:
+                passed = min(score_values, default=0.0) >= threshold
+
+            if turns == 1:
+                final_score = max(score_values, default=0.0)
+            else:
+                final_score = min(score_values, default=0.0)
+
+        if passed:
+            passed_cases += 1
+
+        badge = "pass" if passed else "fail"
+        label = "Pass" if passed else "Fail"
+
+        summary_parts = [
+            f"Test Case {idx}: <strong>Objective:</strong> {objective}",
+            f"<strong>Achieved:</strong> <span class='badge {badge}'>{label}</span>",
+            f"<strong>Turns:</strong> {turns}"
+        ]
+
+        if not isinstance(final_score, bool):
+            final_score_display = f"{final_score:.2f}" if isinstance(final_score, (int, float)) else "N/A"
+            summary_parts.append(f"<strong>Final Score:</strong> {final_score_display}")
 
         html += f"""
-    <details>
-      <summary>
-        {summary_text}
-      </summary>
-      <div class="metrics">
-        <p><strong>Objective:</strong> <span class="objective-text">{objective}</span></p>
-        <p><strong>Achieved Objective:</strong> {achieved_text}</p>
-        <p><strong>Total Turns:</strong> {total_turns}</p>
-        <p><strong>Final Score:</strong> {final_score}</p>
-"""
-        if final_score_rationale:
-            html += f"<p><strong>Final Score Rationale:</strong> {final_score_rationale}</p>"
+        <details>
+          <summary>{' | '.join(summary_parts)}</summary>
+          <table>
+            <thead><tr><th>User</th><th>Assistant</th><th>Score</th></tr></thead>
+            <tbody>
+        """
 
-        html += f"""
-      </div>
-      <h3>Transcript</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Assistant</th>
-            <th>{score_column_label}</th>
-          </tr>
-        </thead>
-        <tbody>
-"""
 
-        transcript = report.get("transcript", [])
         for turn in transcript:
-            user_text = "N/A"
-            assistant_text = "N/A"
-            score_html = "N/A"
+            user_piece = next((p for p in turn["pieces"] if p["role"] == "user"), {"converted_value": ""})
+            assistant_piece = next((p for p in turn["pieces"] if p["role"] == "assistant"), {"converted_value": "", "scores": []})
 
-            for piece in turn.get("pieces", []):
-                role = piece.get("role", "").lower()
-                converted_val = piece.get("converted_value", "")
-                scores = piece.get("scores", [])
+            user_text = sanitize(user_piece["converted_value"])
+            assistant_text = sanitize(assistant_piece["converted_value"])
 
-                if role == "user":
-                    user_text = converted_val
-                elif role == "assistant":
-                    assistant_text = converted_val
-                    if scores:
-                        bullet_points = "".join(
-                            f"<li><strong>{sc['score']}</strong> <details><summary>View Explanation</summary><div>{sc['rationale']}</div></details></li>"
-                            for sc in scores
-                        )
-                        score_html = f"<ul class='score-list'>{bullet_points}</ul>"
+            scores_html = ""
+            for score in assistant_piece.get("scores", []):
+                val = score.get("score", score.get("score_value", None))
+                rationale = sanitize(score.get("rationale", score.get("score_rationale", "")))
+                try:
+                    val = float(val)
+                except:
+                    val = True if str(val).lower() == "true" else False
+                cls = "score-pass" if val >= threshold else "score-fail"
+                if isinstance(val, bool):
+                    val_display = "✔️ True" if val else "❌ False"
+                else:
+                    val_display = f"{val:.2f}"
 
-            html += f"""
-          <tr>
-            <td>{user_text}</td>
-            <td>{assistant_text}</td>
-            <td>{score_html}</td>
-          </tr>
-"""
+                scores_html += f"<div><strong class='{cls}'>{val_display}</strong><div class='explanation'>{rationale}</div></div>"
+            html += f"<tr><td>{user_text}</td><td>{assistant_text}</td><td>{scores_html}</td></tr>"
 
         html += "</tbody></table></details>"
 
+    html = html.replace("{passed}", str(passed_cases))
+    html = html.replace("{failed}", str(total_cases - passed_cases))
     html += "</div></body></html>"
     return html
 
-def generate_single_turn_html_report(results: list, threshold: float = 0.7) -> str:
-    """
-    Generates an HTML report for single-turn dataset evaluations where expected_output is inside each score entry.
 
-    Args:
-        results (list): A list of dictionaries, each representing a single dataset item.
-                        Expected structure:
-                          {
-                            "conversation_id": str,
-                            "prompt": str,
-                            "assistant_response": str,
-                            "scores": [
-                                {
-                                  "score_value": str or float,
-                                  "score_rationale": str,
-                                  "expected_output": str
-                                },
-                                ...
-                            ]
-                          }
-        threshold (float): A numeric value used to determine pass/fail. Defaults to 0.7.
-
-    Returns:
-        str: A complete HTML string containing the report.
-    """
-
-    html = """<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Single-Turn Dataset Evaluation Report</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      color: #2c3e50;
-    }
-    .description {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1rem;
-      color: #666;
-    }
-    details {
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #fcfcfc;
-      overflow: hidden;
-    }
-    summary {
-      padding: 12px 18px;
-      cursor: pointer;
-      background: #e3f2fd;
-      color: #01579b;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 6px;
-      outline: none;
-      border: none;
-    }
-    summary:hover { background: #bbdefb; }
-    summary::-webkit-details-marker { display: none; }
-    .metrics {
-      background-color: #f1f8e9;
-      padding: 12px 18px;
-      margin: 0;
-      border-bottom: 1px solid #ddd;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 15px 0;
-    }
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-      vertical-align: top;
-    }
-    th {
-      background-color: #0277bd;
-      color: #fff;
-      font-size: 0.9rem;
-    }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    .score-pass {
-      color: #1b5e20;
-      background-color: #c8e6c9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .score-fail {
-      color: #b71c1c;
-      background-color: #ffcdd2;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .explanation-block summary {
-      background: #aed581;
-      color: #fff;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      border-radius: 4px;
-      outline: none;
-      display: inline-block;
-    }
-    .explanation-block summary:hover { background: #9ccc65; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Single-Turn Dataset Evaluation Report</h1>
-"""
-
-    for index, report in enumerate(results, start=1):
-        prompt = report.get("prompt", "N/A")
-        assistant_response = report.get("assistant_response", "N/A")
-        scores = report.get("scores", [])
-
-        numeric_scores = []
-        for s in scores:
-            raw_val = s.get("score_value", "0.0")
-            try:
-                numeric_scores.append(float(raw_val))
-            except ValueError:
-                numeric_scores.append(0.0)
-
-        main_score = max(numeric_scores) if numeric_scores else None
-
-        if main_score is not None:
-            pass_fail_label = "Passed" if main_score >= threshold else "Failed"
-            pass_fail_class = "score-pass" if main_score >= threshold else "score-fail"
-            summary_text = (
-                f"Test Case {index}: "
-                f"<strong>User Prompt:</strong> \"{prompt[:100]}...\" | "
-                f"Score: {main_score} <span class='{pass_fail_class}'>{pass_fail_label}</span>"
-            )
-        else:
-            summary_text = (
-                f"Test Case {index}: <strong>User Prompt:</strong> \"{prompt[:100]}...\""
-            )
-
-        html += f"""
-    <details>
-      <summary>{summary_text}</summary>
-      <div class="metrics">
-        <p><strong>User Prompt:</strong> {prompt}</p>
-        <p><strong>Threshold:</strong> {threshold}</p>
-      </div>
-      <h3>Transcript</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>User Prompt</th>
-            <th>Assistant Response</th>
-            <th>Expected Output</th>
-            <th>Score(s)</th>
-          </tr>
-        </thead>
-        <tbody>
-"""
-
-        if scores:
-            for s in scores:
-                raw_val = s.get("score_value", "0.0")
-                expected_output = s.get("expected_output", "N/A")
-                try:
-                    score_val = float(raw_val)
-                except ValueError:
-                    score_val = 0.0
-
-                pass_fail_span_class = "score-pass" if score_val >= threshold else "score-fail"
-                pass_fail_text = "Pass" if score_val >= threshold else "Fail"
-
-                rationale = s.get("score_rationale", "No rationale provided")
-
-                html += f"""
-          <tr>
-            <td>{prompt}</td>
-            <td>{assistant_response}</td>
-            <td>{expected_output}</td>
-            <td>
-              <ul>
-                <li>
-                  <strong>{score_val}</strong>
-                  <span class='{pass_fail_span_class}'>{pass_fail_text}</span>
-                  <details class='explanation-block'><summary>View Explanation</summary>
-                    <div>{rationale}</div>
-                  </details>
-                </li>
-              </ul>
-            </td>
-          </tr>
-"""
-
-        else:
-            html += f"""
-          <tr>
-            <td>{prompt}</td>
-            <td>{assistant_response}</td>
-            <td>N/A</td>
-            <td>N/A</td>
-          </tr>
-"""
-
-        html += """
-        </tbody>
-      </table>
-    </details>
-"""
-
-    html += "</div></body></html>"
-    return html
-
-def format_execution_time(seconds: float) -> str:
-    """
-    Convert a duration in seconds to a string formatted as hours, minutes, and seconds.
-    """
-    seconds = int(round(seconds))
-    hours = seconds // 3600
-    minutes = (seconds % 3600) // 60
-    secs = seconds % 60
-    if hours > 0:
-        return f"{hours} hours, {minutes} minutes, {secs} seconds"
-    elif minutes > 0:
-        return f"{minutes} minutes, {secs} seconds"
-    else:
-        return f"{secs} seconds"
-
-def save_html_report(
+def generate_simulation_report(
         results: list,
-        directory: str = ".",
-        report_generator=None,
-        is_chat_evaluation: bool = True,
-        threshold: float = 0.7,
-        file_name: str = "report",
+        threshold: float = 0.9,
+        title: str = "Comprehensive Simulation Report",
         description: str = "",
-        execution_time: float = 0.0  # Test execution time provided as a parameter (in seconds)
-) -> str:
-    """
-    Saves an HTML report generated by the specified report generator function.
-
-    Args:
-        results (list): A list of report dictionaries.
-        directory (str): Directory to save the report.
-        report_generator (callable): Function that generates the HTML report.
-        is_chat_evaluation (bool): Whether it's a multi-turn chat evaluation.
-        threshold (float): Score threshold to determine pass/fail.
-        description (str): Optional description to display in the report.
-        execution_time (float): Test execution time in seconds.
-
-    Returns:
-        str: Path to the saved HTML report.
-    """
-
-    # Generate the report content
-    if report_generator is None:
-        html_content = generate_multi_turn_html_report(results, is_chat_evaluation)
-    else:
-        if report_generator.__name__ == "generate_single_turn_html_report":
-            html_content = report_generator(results, threshold=threshold)
-        else:
-            html_content = report_generator(results, is_chat_evaluation)
-
-    # Insert description under the title if provided
-    if description:
-        html_content = html_content.replace(
-            "<h1>Single-Turn Dataset Evaluation Report</h1>",
-            f"<h1>Single-Turn Dataset Evaluation Report</h1>\n<p class='description'>{description}</p>"
-        )
-        html_content = html_content.replace(
-            "<h1>Multi-turn Chat Report</h1>",
-            f"<h1>Multi-turn Chat Report</h1>\n<p class='description'>{description}</p>"
-        )
-
-    ### Pass/Fail Distribution Calculation ###
-    total_cases = 0
-    passed_cases = 0
-
-    for report in results:
-        numeric_scores = []
-
-        if is_chat_evaluation:
-            # Multi-turn evaluation - loop through transcript & collect scores
-            transcript = report.get("transcript", [])
-            for turn in transcript:
-                pieces = turn.get("pieces", [])
-                for piece in pieces:
-                    scores = piece.get("scores", [])
-                    for s in scores:
-                        raw_val = s.get("score", "0.0")
-                        try:
-                            numeric_scores.append(float(raw_val))
-                        except ValueError:
-                            numeric_scores.append(0.0)
-        else:
-            # Single-turn evaluation - use top-level scores
-            scores = report.get("scores", [])
-            for s in scores:
-                raw_val = s.get("score_value", "0.0")
-                try:
-                    numeric_scores.append(float(raw_val))
-                except ValueError:
-                    numeric_scores.append(0.0)
-
-        # Pass/Fail logic
-        if numeric_scores:
-            main_score = max(numeric_scores)
-            total_cases += 1
-            if main_score >= threshold:
-                passed_cases += 1
-
-    failed_cases = total_cases - passed_cases
-
-    # Overview Text (insert into report)
-    overview_text = (
-        f"<p class='overview'>Total Test Cases: {total_cases} | "
-        f"Passed: {passed_cases} | Failed: {failed_cases}</p>"
+        execution_time: float = 0.0,
+        save_path: Union[str, Path] = "simulation_report.html"
+):
+    html = _render_report_html(
+        title=title,
+        description=description,
+        results=results,
+        threshold=threshold,
+        execution_time=execution_time,
+        is_chat_eval=True,
+        strict_step_failures=False
     )
 
-    ### Execution Time ###
-    def format_execution_time(seconds: float) -> str:
-        seconds = int(round(seconds))
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        secs = seconds % 60
-        if hours > 0:
-            return f"{hours} hours, {minutes} minutes, {secs} seconds"
-        elif minutes > 0:
-            return f"{minutes} minutes, {secs} seconds"
-        else:
-            return f"{secs} seconds"
+    with open(save_path, "w", encoding="utf-8") as f:
+        f.write(html)
 
-    formatted_execution_time = format_execution_time(execution_time)
-    execution_text = f"<p class='execution-time'>Test Execution Time: {formatted_execution_time}</p>"
-
-    # Insert Overview + Execution Time under the title
-    if is_chat_evaluation:
-        html_content = html_content.replace(
-            "</h1>", f"</h1>\n{overview_text}\n{execution_text}", 1
-        )
-    else:
-        html_content = html_content.replace(
-            "</h1>", f"</h1>\n{overview_text}\n{execution_text}", 1
-        )
-
-    ### Save HTML file ###
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"{file_name}_{timestamp}.html"
-    file_path = Path(directory) / file_name
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(html_content)
-
-    print(f"\033[92m\n✅ Report saved at: {file_path}\033[0m")
-    return str(file_path)
+    print(f"\n✅ Simulation report saved to: {save_path}")
 
 
+def generate_dataset_report(
+        results: list,
+        threshold: float = 0.7,
+        title: str = "Comprehensive Dataset Report",
+        description: str = "",
+        execution_time: float = 0.0,
+        save_path: Union[str, Path] = "dataset_report.html"
+):
+    html = _render_report_html(
+        title=title,
+        description=description,
+        results=results,
+        threshold=threshold,
+        execution_time=execution_time,
+        is_chat_eval=False,
+        strict_step_failures=True
+    )
 
+    with open(save_path, "w", encoding="utf-8") as f:
+        f.write(html)
 
+    print(f"\n✅ Dataset report saved to: {save_path}")

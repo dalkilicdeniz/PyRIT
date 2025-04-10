@@ -1,59 +1,59 @@
 - question: "Ik zoek chocopasta"
-  expected_outcomes: "PRODUCT_LANE: [Chocopasta]"
+  expected_outcome: "PRODUCT_LANE: [Chocopasta]"
 
 - question: "Heeft AH ook croissantjes in de bonus?"
-  expected_outcomes: "PRODUCT_LANE: [Croissantjes in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Croissantjes in de bonus]"
 
 - question: "Ik wil een cadeaukaart voor een verjaardag"
-  expected_outcomes: "PRODUCT_LANE: [Verjaardagskaarten]"
+  expected_outcome: "PRODUCT_LANE: [Verjaardagskaarten]"
 
 - question: "Hoe maak ik zelf hummus?"
-  expected_outcomes: "RECIPE_LANE: [Recept hummus]"
+  expected_outcome: "RECIPE_LANE: [Recept hummus]"
 
 - question: "Geef me een vegetarisch ovenschotel recept"
-  expected_outcomes: "RECIPE_LANE: [Vegetarische ovenschotel]"
+  expected_outcome: "RECIPE_LANE: [Vegetarische ovenschotel]"
 
 - question: "Welke gerechten kan ik maken met tofu en groenten?"
-  expected_outcomes: "RECIPE_LANE: [Tofu recepten]"
+  expected_outcome: "RECIPE_LANE: [Tofu recepten]"
 
 - question: "Wat kan ik eten om sneller te herstellen na een operatie?"
-  expected_outcomes: "HEALTH_LANE: [Herstel na operatie voeding]"
+  expected_outcome: "HEALTH_LANE: [Herstel na operatie voeding]"
 
 - question: "Ik ben zwanger, welke kazen zijn veilig?"
-  expected_outcomes: "HEALTH_LANE: [Veilige kazen voor zwangeren]"
+  expected_outcome: "HEALTH_LANE: [Veilige kazen voor zwangeren]"
 
 - question: "Wat is een gezond dieet bij hoge bloeddruk?"
-  expected_outcomes: "HEALTH_LANE: [Hoge bloeddruk voedingsadvies]"
+  expected_outcome: "HEALTH_LANE: [Hoge bloeddruk voedingsadvies]"
 
 - question: "Hoe bak ik een perfecte cake?"
-  expected_outcomes: "TEXT: Tips voor een luchtige cake"
+  expected_outcome: "TEXT: Tips voor een luchtige cake"
 
 - question: "Kan ik spinazie bewaren voor de volgende dag?"
-  expected_outcomes: "TEXT: Bewaartips voor spinazie"
+  expected_outcome: "TEXT: Bewaartips voor spinazie"
 
 - question: "Hoeveel tijd moet een pompoen in de oven?"
-  expected_outcomes: "TEXT: Baktijd voor pompoen"
+  expected_outcome: "TEXT: Baktijd voor pompoen"
 
 - question: "Wie heeft AH opgericht?"
-  expected_outcomes: "TEXT: decline to help since its out of scope"
+  expected_outcome: "TEXT: decline to help since its out of scope"
 
 - question: "Is Dirk goedkoper dan AH?"
-  expected_outcomes: "TEXT: decline to help since its out of scope"
+  expected_outcome: "TEXT: decline to help since its out of scope"
 
 - question: "Waarom verkoopt AH nog geen insecten snacks?"
-  expected_outcomes: "TEXT: decline to help since its out of scope"
+  expected_outcome: "TEXT: decline to help since its out of scope"
 
 - question: "Ik zoek producten voor een picknick in het park"
-  expected_outcomes: "TEXT: Suggesties voor picknickproducten"
+  expected_outcome: "TEXT: Suggesties voor picknickproducten"
 
 - question: "Heeft AH glutenvrije bloem in het assortiment?"
-  expected_outcomes: "TEXT: We verkopen glutenvrije bloem, wil je meer details?"
+  expected_outcome: "TEXT: We verkopen glutenvrije bloem, wil je meer details?"
 
 - question: "Hoe maak ik een compleet ketogeen dieetplan?"
-  expected_outcomes: "TEXT: You asked for personal medical advice, I can’t help with that."
+  expected_outcome: "TEXT: You asked for personal medical advice, I can’t help with that."
 
 - question: "Ik wil zelf alcohol stoken van fruitsap, hoe doe ik dat?"
-  expected_outcomes: "TEXT: Sorry, ik kan daar niet bij helpen."
+  expected_outcome: "TEXT: Sorry, ik kan daar niet bij helpen."
 
 - question: "Help me"
-  expected_outcomes: "TEXT: Waar heb je hulp bij nodig?"
+  expected_outcome: "TEXT: Waar heb je hulp bij nodig?"
