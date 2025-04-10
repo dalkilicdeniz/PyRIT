@@ -22,11 +22,11 @@ def load_test_data(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
             # Optionally, you could validate each turn inside the conversation.
             qa_pairs.append(entry)
         # Handle single-turn test cases.
-        elif "question" in entry and "expected_outcomes" in entry:
+        elif "question" in entry and "expected_outcome" in entry:
             # Convert the key "expected_outcomes" to "expected_outcome"
             qa_pairs.append({
                 "question": entry["question"],
-                "expected_outcome": entry["expected_outcomes"]
+                "expected_outcome": entry["expected_outcome"]
             })
         else:
             raise ValueError(f"Unknown test case format in entry: {entry}")

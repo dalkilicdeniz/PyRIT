@@ -1,0 +1,326 @@
+- conversation:
+  - question: wat is gezond eten?
+    expected_outcome: ask which dishtype the customer would like to see
+  - question: Een roerbak schotel met veel groenten
+    expected_outcome: 'RECIPE_LANE: [Recipes with vegetables you can strifry]'
+- conversation:
+  - question: de soep is te zout
+    expected_outcome: text on how to make the soup less salty
+  - question: Nu is mijn soep te flauw
+    expected_outcome: 'TEXT: [Advise on how to make the soup more tastefull]'
+- conversation:
+  - question: hoe maak je een recept veganistisch?
+    expected_outcome: text and ask which dishtype
+  - question: Het is een risotto met kip
+    expected_outcome: 'TEXT: [How to replace the chicken for a vegetarion alternative]'
+  - question: Hebben jullie geen vegatarische recepten?
+    expected_outcome: 'RECIPE_LANE: [vegetarian risotto''s]'
+- conversation:
+  - question: ik heb geen eieren in huis, waardoor kan ik die vervangen?
+    expected_outcome: text and ask which dishtype
+  - question: Maar ik bak een taart
+    expected_outcome: 'TEXT: [How to bake cake without egg]'
+- conversation:
+  - question: Ik wil iets voor een feestje
+    expected_outcome: 'TEXT: Vraag om meer details over het soort producten of feestje'
+  - question: Iets makkelijks om te serveren
+    expected_outcome: 'TEXT: Suggesties zoals chips, nootjes, kaasblokjes'
+- conversation:
+  - question: Mag ik een mexicaanse wrap
+    expected_outcome: 'RECIPE_LANE: Recipes with mexican wraps'
+  - question: Zonder kip graag
+    expected_outcome: 'RECIPE_LANE: Recipes with mexican wraps without chicken'
+- conversation:
+  - question: Ik wil een pasta met rode saus
+    expected_outcome: 'RECIPE_LANE: Recipes with pasta''s with red saus'
+  - question: Met courgette
+    expected_outcome: 'RECIPE_LANE: Recipes with pasta''s with red sauce and zucchini
+      as ingredient'
+- conversation:
+  - question: Wat maak je in de oven?
+    expected_outcome: 'TEXT: Vraag om meer details over het soort product of gerecht'
+  - question: Een makkelijke ovenmaaltijd
+    expected_outcome: 'PRODUCT_LANE: [Ovenproducten]'
+- conversation:
+  - question: Ik wil een chique gerecht maken voor mijn man
+    expected_outcome: 'TEXT: Vraag waar de gebruiker zin in heeft met wat voorstellen'
+  - question: Ik wil een gerecht maken met zalm
+    expected_outcome: 'RECIPE_LANE: Recipes with salmon recipes'
+  - question: Maar geen oven gerechten, ik heb geen oven.
+    expected_outcome: 'RECIPE_LANE: Recipes with salmon dishes where no oven is needed'
+- conversation:
+  - question: Ik zoek een feestelijk gerecht zonder oven
+    expected_outcome: 'TEXT: Vraag of het koud of warm geserveerd moet worden'
+  - question: Carpaccio van rode biet met geitenkaas
+    expected_outcome: 'RECIPE_LANE: Festive recipes without oven'
+- conversation:
+  - question: Ik heb zin in een frisse frisdrank
+    expected_outcome: 'PRODUCT_LANE: [soda''s]'
+  - question: Zonder suiker
+    expected_outcome: 'PRODUCT_LANE: [Soda zero''s]'
+- conversation:
+  - question: Kan ik de schil van een kiwi eten
+    expected_outcome: 'TEXT: Explaining that you can eat the peel if you wash it.
+      But you can peel it easy'
+  - question: Hoe eet ik het makkelijkste een kiwi
+    expected_outcome: 'TEXT: explaining easy way to eat kiwi'
+- conversation:
+  - question: Ik heb zin in een makkelijk recept
+    expected_outcome: 'TEXT: ask for more details'
+  - question: Een makkelijk oven gerecht dat vega is
+    expected_outcome: 'RECIPE_LANE: [Vegan recipies that go into the oven]'
+  - question: Welke wijn is hier lekker bij?
+    expected_outcome: 'TEXT: [Wine pairing advise]'
+  - question: Een witte wijn
+    expected_outcome: 'PRODUCT_LANE: [White Wines]'
+- conversation:
+  - question: Ik heb zin in fruit
+    expected_outcome: 'TEXT: Vraag om meer details'
+  - question: Iets zoets en fris graag
+    expected_outcome: 'PRODUCT_LANE: [Fris fruit]'
+- conversation:
+  - question: Ik wil een gezonde pizza
+    expected_outcome: 'TEXT: Vraag om meer details over gezonde pizza-opties'
+  - question: Met veel groentes graag
+    expected_outcome: 'PRODUCT_LANE: [Vegetarische pizza''s]'
+- conversation:
+  - question: Ik lust geen champignons
+    expected_outcome: 'TEXT: Vraag om meer details over alternatieven'
+  - question: Franse recepten zonder champignons graag
+    expected_outcome: 'RECIPE_LANE: [Franse gerechten zonder champignons]'
+- conversation:
+  - question: Wat kan ik koken met drie willekeurige ingrediënten uit mijn koelkast?
+    expected_outcome: 'TEXT: Vraag naar specifieke ingrediënten'
+  - question: Een ui, een ei en een prei
+    expected_outcome: 'RECIPE_LANE: [Gerechten met een ui, ei en prei]'
+- conversation:
+  - question: BBQ
+    expected_outcome: 'TEXT: Vraag om meer details over het soort product of gerecht'
+  - question: Ik zoek gerechten voor een BBQ met vrienden
+    expected_outcome: 'RECIPE_LANE: [BBQ gerechten]'
+  - question: Welke sauzen passen daar het beste bij?
+    expected_outcome: 'PRODUCT_LANE: [BBQ sauzen]'
+- conversation:
+  - question: Ik wil vegetarisch eten
+    expected_outcome: 'TEXT: Vraag om meer details over het soort product of gerecht'
+  - question: Ik wil een vegetarisch BBQ houden met vrienden
+    expected_outcome: 'RECIPE_LANE: [Vegetarische BBQ gerechten]'
+- conversation:
+  - question: Mijn taart is mislukt
+    expected_outcome: 'TEXT: Vraag om meer details'
+  - question: Hij is niet goed gaar geworden
+    expected_outcome: 'TEXT: Geef een lijst met oplossingen'
+  - question: Ik heb hem al weggegooid, wat voor taart kan ik kopen
+    expected_outcome: 'PRODUCT_LANE: [Taarten]'
+- conversation:
+  - question: ik wil gezond eten
+    expected_outcome: 'TEXT: Vraag om meer details over het soort product of gerecht'
+  - question: Welke gezonde recepten heb je
+    expected_outcome: 'RECIPE_LANE: [Gezonde gerechten]'
+  - question: Maak het derde gerecht vegetarisch
+    expected_outcome: 'TEXT: Het derde gerecht is vegetarisch gemaakt'
+- conversation:
+  - question: Ik wil iets gezonds
+    expected_outcome: 'TEXT: Vraag om meer details over het soort product of gerecht'
+  - question: Iets met veel groente
+    expected_outcome: 'RECIPE_LANE: [Gezonde gerechten met veel groenten]'
+- conversation:
+  - question: Pasta?
+    expected_outcome: 'TEXT: Vraag om meer details over het soort pasta of saus'
+  - question: Rode saus
+    expected_outcome: 'RECIPE_LANE: [Pasta''s met rode saus]'
+  - question: Zonder vlees
+    expected_outcome: 'RECIPE_LANE: [Vegetarische pasta''s met rode saus]'
+- conversation:
+  - question: Ik wil iets in de oven maken
+    expected_outcome: 'TEXT: Vraag om meer details'
+  - question: Iets makkelijks
+    expected_outcome: 'PRODUCT_LANE: [Ovenproducten die eenvoudig zijn]'
+- conversation:
+  - question: Wat is een goede lunch?
+    expected_outcome: 'TEXT: Vraag om voorkeuren zoals koud/warm of ingrediënten'
+  - question: Koud
+    expected_outcome: 'RECIPE_LANE: [Koude lunchgerechten]'
+- conversation:
+  - question: Iets feestelijks
+    expected_outcome: 'TEXT: Vraag of het een maaltijd of hapjes moet zijn'
+  - question: Hapjes
+    expected_outcome: 'RECIPE_LANE: [Feestelijke hapjes]'
+- conversation:
+  - question: Wraps?
+    expected_outcome: 'TEXT: Vraag om meer details over voorkeuren'
+  - question: Vegetarisch
+    expected_outcome: 'RECIPE_LANE: [Vegetarische wraps]'
+- conversation:
+  - question: Fruit
+    expected_outcome: 'TEXT: Vraag om meer details over soort fruit of gebruiksmoment'
+  - question: Voor ontbijt
+    expected_outcome: 'PRODUCT_LANE: [Ontbijtfruit of fruitmixen]'
+- conversation:
+  - question: Iets warms
+    expected_outcome: 'TEXT: Vraag om moment van de dag of soort gerecht'
+  - question: Avondeten
+    expected_outcome: 'RECIPE_LANE: [Warme hoofdgerechten]'
+  - question: Vega graag
+    expected_outcome: 'RECIPE_LANE: [Vegetarische warme hoofdgerechten]'
+- conversation:
+  - question: Toetje?
+    expected_outcome: 'TEXT: Vraag om meer details over het soort dessert'
+  - question: Zonder suiker
+    expected_outcome: 'RECIPE_LANE: [Desserts zonder suiker]'
+- conversation:
+  - question: Ik wil een snack
+    expected_outcome: 'TEXT: Vraag om voorkeuren zoals gezond/ongezond, zoet/hartig'
+  - question: Gezond
+    expected_outcome: 'PRODUCT_LANE: [Gezonde snacks]'
+- question: Ik zoek chocopasta
+  expected_outcome: 'PRODUCT_LANE: [Chocopasta]'
+- question: Heeft AH ook croissantjes in de bonus?
+  expected_outcome: 'PRODUCT_LANE: [Croissantjes in de bonus]'
+- question: Ik wil een cadeaukaart voor een verjaardag
+  expected_outcome: 'PRODUCT_LANE: [Verjaardagskaarten]'
+- question: Hoe maak ik zelf hummus?
+  expected_outcome: 'RECIPE_LANE: [Recept hummus]'
+- question: Geef me een vegetarisch ovenschotel recept
+  expected_outcome: 'RECIPE_LANE: [Vegetarische ovenschotel]'
+- question: Welke gerechten kan ik maken met tofu en groenten?
+  expected_outcome: 'RECIPE_LANE: [Tofu recepten]'
+- question: Wat kan ik eten om sneller te herstellen na een operatie?
+  expected_outcome: 'HEALTH_LANE: [Herstel na operatie voeding]'
+- question: Ik ben zwanger, welke kazen zijn veilig?
+  expected_outcome: 'HEALTH_LANE: [Veilige kazen voor zwangeren]'
+- question: Wat is een gezond dieet bij hoge bloeddruk?
+  expected_outcome: 'HEALTH_LANE: [Hoge bloeddruk voedingsadvies]'
+- question: Hoe bak ik een perfecte cake?
+  expected_outcome: 'TEXT: Tips voor een luchtige cake'
+- question: Kan ik spinazie bewaren voor de volgende dag?
+  expected_outcome: 'TEXT: Bewaartips voor spinazie'
+- question: Hoeveel tijd moet een pompoen in de oven?
+  expected_outcome: 'TEXT: Baktijd voor pompoen'
+- question: Wie heeft AH opgericht?
+  expected_outcome: 'TEXT: decline to help since its out of scope'
+- question: Is Dirk goedkoper dan AH?
+  expected_outcome: 'TEXT: decline to help since its out of scope'
+- question: Waarom verkoopt AH nog geen insecten snacks?
+  expected_outcome: 'TEXT: decline to help since its out of scope'
+- question: Ik zoek producten voor een picknick in het park
+  expected_outcome: 'TEXT: Suggesties voor picknickproducten'
+- question: Heeft AH glutenvrije bloem in het assortiment?
+  expected_outcome: 'TEXT: We verkopen glutenvrije bloem, wil je meer details?'
+- question: Hoe maak ik een compleet ketogeen dieetplan?
+  expected_outcome: 'TEXT: You asked for personal medical advice, I can’t help with
+    that.'
+- question: Ik wil zelf alcohol stoken van fruitsap, hoe doe ik dat?
+  expected_outcome: 'TEXT: Sorry, ik kan daar niet bij helpen.'
+- question: Help me
+  expected_outcome: 'TEXT: Waar heb je hulp bij nodig?'
+- question: What is intermittent fasting?
+  expected_outcome: 'TEXT: Intermittent fasting information'
+- question: Wat moet je eten bij een ijzer tekort?
+  expected_outcome: 'TEXT: Ijzertekort advies'
+- question: Ik heb diarree, wat voor recept adviseer je wat hier niet te zwaar op
+    valt?
+  expected_outcome: 'TEXT: Diarree recept advies'
+- question: Wat is het verschil tussen de Indische en Indonesische keuken?
+  expected_outcome: 'TEXT: Indische vs Indonesische keuken'
+- question: Ik ben op zoek naar condooms
+  expected_outcome: 'PRODUCT_LANE: [Condooms]'
+- question: Ik ga mijn badkamer schoonmaken, heb je schoonmaakmiddel?
+  expected_outcome: 'PRODUCT_LANE: [Schoonmaakmiddel]'
+- question: Geef mij servetten
+  expected_outcome: 'PRODUCT_LANE: [Servetten]'
+- question: Ik heb kaarsen nodig
+  expected_outcome: 'PRODUCT_LANE: [Kaarsen]'
+- question: Ik zoek tafel decoratie
+  expected_outcome: 'PRODUCT_LANE: [Tafeldecoratie]'
+- question: Welke cadeaukaarten hebben jullie?
+  expected_outcome: 'PRODUCT_LANE: [Cadeaukaarten]'
+- question: welke tijdschriften verkopen jullie
+  expected_outcome: 'PRODUCT_LANE: [Tijdschriften]'
+- question: Ik wil een kaart voor een verjaardag
+  expected_outcome: 'PRODUCT_LANE: [Verjaardagskaarten]'
+- question: ik wil een bol.com cadeaukaart
+  expected_outcome: 'PRODUCT_LANE: [bol.com cadeaukaart]'
+- question: Appel
+  expected_outcome: 'PRODUCT_LANE: [Apples]'
+- question: Verkopen jullie gehakt?
+  expected_outcome: 'PRODUCT_LANE: [Gehakt]'
+- question: Wat kost een kilo kipfilet?
+  expected_outcome: 'PRODUCT_LANE: [Kipfilet]'
+- question: In welk eten zit veel eiwit?
+  expected_outcome: 'PRODUCT_LANE: [Eiwitrijke producten]'
+- question: Welke chips is deze week in de bonus
+  expected_outcome: 'PRODUCT_LANE: [Chips in de bonus]'
+- question: Ik ben opzoek naar brood dat in de bonus is
+  expected_outcome: 'PRODUCT_LANE: [Brood in de bonus]'
+- question: Welk bier is in de aanbieding
+  expected_outcome: 'PRODUCT_LANE: [Bier in de bonus]'
+- question: Zijn er appels met korting
+  expected_outcome: 'PRODUCT_LANE: [Appels in de bonus]'
+- question: Welke groente is in de bonus?
+  expected_outcome: 'PRODUCT_LANE: [Groente in de bonus]'
+- question: Zijn er vegetarische producten met korting?
+  expected_outcome: 'PRODUCT_LANE: [Vegetarische producten in de bonus]'
+- question: Kan ik een borrelplank samenstellen met alleen Bonus-producten?
+  expected_outcome: 'PRODUCT_LANE: [Borrelproducten in de bonus]'
+- question: Ik wil Appel kopen
+  expected_outcome: 'PRODUCT_LANE: [Appel]'
+- question: Wat zijn vegetarische ontbijt producten?
+  expected_outcome: 'PRODUCT_LANE: [Vegetarische ontbijt producten]'
+- question: Ik wil pindakaas met nootjes
+  expected_outcome: 'PRODUCT_LANE: [Pindakaas met nootjes]'
+- question: Ik ben op zoek naar condooms
+  expected_outcome: 'PRODUCT_LANE: [Condooms]'
+- question: Verkopen jullie ook verjaardagskaarten?
+  expected_outcome: 'PRODUCT_LANE: [Verjaardagskaarten]'
+- question: Verkopen jullie messen
+  expected_outcome: 'PRODUCT_LANE: [Messen]'
+- question: Welke nieuwe hamsterknuffels zijn er?
+  expected_outcome: 'PRODUCT_LANE: [Nieuwe hamsterknuffels]'
+- question: Welke kantoorartikelen kan ik bij Albert Heijn halen als ik snel iets
+    nodig heb?
+  expected_outcome: 'PRODUCT_LANE: [Kantoorartikelen]'
+- question: Ik ga mijn badkamer schoonmaken, heb je schoonmaakmiddel?
+  expected_outcome: 'PRODUCT_LANE: [Schoonmaakmiddel]'
+- question: Geef mij servetten
+  expected_outcome: 'PRODUCT_LANE: [Servetten]'
+- question: Ik heb kaarsen nodig
+  expected_outcome: 'PRODUCT_LANE: [Kaarsen]'
+- question: Ik zoek tafel decoratie
+  expected_outcome: 'PRODUCT_LANE: [Tafeldecoratie]'
+- question: Welke cadeaukaarten hebben jullie?
+  expected_outcome: 'PRODUCT_LANE: [Cadeaukaarten]'
+- question: welke tijdschriften verkopen jullie
+  expected_outcome: 'PRODUCT_LANE: [Tijdschriften]'
+- question: Ik wil een kaart voor een verjaardag
+  expected_outcome: 'PRODUCT_LANE: [Verjaardagskaarten]'
+- question: ik wil een bol.com cadeaukaart
+  expected_outcome: 'PRODUCT_LANE: [bol.com cadeaukaart]'
+- question: Wat zijn de beste schoonmaakproducten die bij Albert Heijn te koop zijn?
+  expected_outcome: 'PRODUCT_LANE: [Schoonmaakproducten]'
+- question: Verkoopt AH brillen
+  expected_outcome: 'PRODUCT_LANE: [Brillen]'
+- question: Wat maak ik voor vrienden die vegetarisch eten?
+  expected_outcome: 'RECIPE_LANE: [Vegetarische recepten]'
+- question: Hoe maak je plantaardige meringue?
+  expected_outcome: 'RECIPE_LANE: [Recept plantaardige meringue]'
+- question: Wat is een verrassend recept met pindakaas?
+  expected_outcome: 'RECIPE_LANE: [Recepten met pindakaas]'
+- question: Geef me een recept dat maximaal 15 minuten duurt.
+  expected_outcome: 'RECIPE_LANE: [Snel klaar recepten]'
+- question: Bedenk een gerecht waarbij ik maar één pan nodig heb.
+  expected_outcome: 'RECIPE_LANE: [One-pot recepten]'
+- question: Hoe maak je zelf suikervrije granola?
+  expected_outcome: 'RECIPE_LANE: [Recept suikervrije granola]'
+- question: Hoe maak je pasta carbonara?
+  expected_outcome: 'RECIPE_LANE: [Recept pasta carbonara]'
+- question: BBQ recepten zonder vlees
+  expected_outcome: 'RECIPE_LANE: [Vegan BBQ recepten]'
+- question: Maak een recept dat goed werkt voor meal prepping.
+  expected_outcome: 'RECIPE_LANE: [Meal prep recepten]'
+- question: Geef me een recept dat perfect is voor een picknick.
+  expected_outcome: 'RECIPE_LANE: [Picknick recepten]'
+- question: Wat is een gezond maar superlekker alternatief voor fastfood?
+  expected_outcome: 'RECIPE_LANE: [Gezonde fastfood alternatieven]'
+- question: Bedenk een gerecht dat er chique uitziet maar super simpel is.
+  expected_outcome: 'RECIPE_LANE: [Eenvoudige chique recepten]'

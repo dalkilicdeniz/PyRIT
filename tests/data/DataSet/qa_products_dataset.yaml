@@ -1,86 +1,86 @@
 - question: "Appel"
-  expected_outcomes: "PRODUCT_LANE: [Apples]"
+  expected_outcome: "PRODUCT_LANE: [Apples]"
 
 - question: "Verkopen jullie gehakt?"
-  expected_outcomes: "PRODUCT_LANE: [Gehakt]"
+  expected_outcome: "PRODUCT_LANE: [Gehakt]"
 
 - question: "Wat kost een kilo kipfilet?"
-  expected_outcomes: "PRODUCT_LANE: [Kipfilet]"
+  expected_outcome: "PRODUCT_LANE: [Kipfilet]"
 
 - question: "In welk eten zit veel eiwit?"
-  expected_outcomes: "PRODUCT_LANE: [Eiwitrijke producten]"
+  expected_outcome: "PRODUCT_LANE: [Eiwitrijke producten]"
 
 - question: "Welke chips is deze week in de bonus"
-  expected_outcomes: "PRODUCT_LANE: [Chips in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Chips in de bonus]"
 
 - question: "Ik ben opzoek naar brood dat in de bonus is"
-  expected_outcomes: "PRODUCT_LANE: [Brood in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Brood in de bonus]"
 
 - question: "Welk bier is in de aanbieding"
-  expected_outcomes: "PRODUCT_LANE: [Bier in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Bier in de bonus]"
 
 - question: "Zijn er appels met korting"
-  expected_outcomes: "PRODUCT_LANE: [Appels in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Appels in de bonus]"
 
 - question: "Welke groente is in de bonus?"
-  expected_outcomes: "PRODUCT_LANE: [Groente in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Groente in de bonus]"
 
 - question: "Zijn er vegetarische producten met korting?"
-  expected_outcomes: "PRODUCT_LANE: [Vegetarische producten in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Vegetarische producten in de bonus]"
 
 - question: "Kan ik een borrelplank samenstellen met alleen Bonus-producten?"
-  expected_outcomes: "PRODUCT_LANE: [Borrelproducten in de bonus]"
+  expected_outcome: "PRODUCT_LANE: [Borrelproducten in de bonus]"
 
 - question: "Ik wil Appel kopen"
-  expected_outcomes: "PRODUCT_LANE: [Appel]"
+  expected_outcome: "PRODUCT_LANE: [Appel]"
 
 - question: "Wat zijn vegetarische ontbijt producten?"
-  expected_outcomes: "PRODUCT_LANE: [Vegetarische ontbijt producten]"
+  expected_outcome: "PRODUCT_LANE: [Vegetarische ontbijt producten]"
 
 - question: "Ik wil pindakaas met nootjes"
-  expected_outcomes: "PRODUCT_LANE: [Pindakaas met nootjes]"
+  expected_outcome: "PRODUCT_LANE: [Pindakaas met nootjes]"
 
 - question: "Ik ben op zoek naar condooms"
-  expected_outcomes: "PRODUCT_LANE: [Condooms]"
+  expected_outcome: "PRODUCT_LANE: [Condooms]"
 
 - question: "Verkopen jullie ook verjaardagskaarten?"
-  expected_outcomes: "PRODUCT_LANE: [Verjaardagskaarten]"
+  expected_outcome: "PRODUCT_LANE: [Verjaardagskaarten]"
 
 - question: "Verkopen jullie messen"
-  expected_outcomes: "PRODUCT_LANE: [Messen]"
+  expected_outcome: "PRODUCT_LANE: [Messen]"
 
 - question: "Welke nieuwe hamsterknuffels zijn er?"
-  expected_outcomes: "PRODUCT_LANE: [Nieuwe hamsterknuffels]"
+  expected_outcome: "PRODUCT_LANE: [Nieuwe hamsterknuffels]"
 
 - question: "Welke kantoorartikelen kan ik bij Albert Heijn halen als ik snel iets nodig heb?"
-  expected_outcomes: "PRODUCT_LANE: [Kantoorartikelen]"
+  expected_outcome: "PRODUCT_LANE: [Kantoorartikelen]"
 
 - question: "Ik ga mijn badkamer schoonmaken, heb je schoonmaakmiddel?"
-  expected_outcomes: "PRODUCT_LANE: [Schoonmaakmiddel]"
+  expected_outcome: "PRODUCT_LANE: [Schoonmaakmiddel]"
 
 - question: "Geef mij servetten"
-  expected_outcomes: "PRODUCT_LANE: [Servetten]"
+  expected_outcome: "PRODUCT_LANE: [Servetten]"
 
 - question: "Ik heb kaarsen nodig"
-  expected_outcomes: "PRODUCT_LANE: [Kaarsen]"
+  expected_outcome: "PRODUCT_LANE: [Kaarsen]"
 
 - question: "Ik zoek tafel decoratie"
-  expected_outcomes: "PRODUCT_LANE: [Tafeldecoratie]"
+  expected_outcome: "PRODUCT_LANE: [Tafeldecoratie]"
 
 - question: "Welke cadeaukaarten hebben jullie?"
-  expected_outcomes: "PRODUCT_LANE: [Cadeaukaarten]"
+  expected_outcome: "PRODUCT_LANE: [Cadeaukaarten]"
 
 - question: "welke tijdschriften verkopen jullie"
-  expected_outcomes: "PRODUCT_LANE: [Tijdschriften]"
+  expected_outcome: "PRODUCT_LANE: [Tijdschriften]"
 
 - question: "Ik wil een kaart voor een verjaardag"
-  expected_outcomes: "PRODUCT_LANE: [Verjaardagskaarten]"
+  expected_outcome: "PRODUCT_LANE: [Verjaardagskaarten]"
 
 - question: "ik wil een bol.com cadeaukaart"
-  expected_outcomes: "PRODUCT_LANE: [bol.com cadeaukaart]"
+  expected_outcome: "PRODUCT_LANE: [bol.com cadeaukaart]"
 
 - question: "Wat zijn de beste schoonmaakproducten die bij Albert Heijn te koop zijn?"
-  expected_outcomes: "PRODUCT_LANE: [Schoonmaakproducten]"
+  expected_outcome: "PRODUCT_LANE: [Schoonmaakproducten]"
 
 - question: "Verkoopt AH brillen"
-  expected_outcomes: "PRODUCT_LANE: [Brillen]"
+  expected_outcome: "PRODUCT_LANE: [Brillen]"

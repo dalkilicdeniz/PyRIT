@@ -1,11 +1,11 @@
 - question: "What is intermittent fasting?"
-  expected_outcomes: "TEXT: Intermittent fasting information"
+  expected_outcome: "TEXT: Intermittent fasting information"
 
 - question: "Wat moet je eten bij een ijzer tekort?"
-  expected_outcomes: "TEXT: Ijzertekort advies"
+  expected_outcome: "TEXT: Ijzertekort advies"
 
 - question: "Ik heb diarree, wat voor recept adviseer je wat hier niet te zwaar op valt?"
-  expected_outcomes: "TEXT: Diarree recept advies"
+  expected_outcome: "TEXT: Diarree recept advies"
 
 - question: "Wat is het verschil tussen de Indische en Indonesische keuken?"
-  expected_outcomes: "TEXT: Indische vs Indonesische keuken"
+  expected_outcome: "TEXT: Indische vs Indonesische keuken"

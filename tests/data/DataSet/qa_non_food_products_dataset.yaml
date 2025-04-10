@@ -1,26 +1,26 @@
 - question: "Ik ben op zoek naar condooms"
-  expected_outcomes: "PRODUCT_LANE: [Condooms]"
+  expected_outcome: "PRODUCT_LANE: [Condooms]"
 
 - question: "Ik ga mijn badkamer schoonmaken, heb je schoonmaakmiddel?"
-  expected_outcomes: "PRODUCT_LANE: [Schoonmaakmiddel]"
+  expected_outcome: "PRODUCT_LANE: [Schoonmaakmiddel]"
 
 - question: "Geef mij servetten"
-  expected_outcomes: "PRODUCT_LANE: [Servetten]"
+  expected_outcome: "PRODUCT_LANE: [Servetten]"
 
 - question: "Ik heb kaarsen nodig"
-  expected_outcomes: "PRODUCT_LANE: [Kaarsen]"
+  expected_outcome: "PRODUCT_LANE: [Kaarsen]"
 
 - question: "Ik zoek tafel decoratie"
-  expected_outcomes: "PRODUCT_LANE: [Tafeldecoratie]"
+  expected_outcome: "PRODUCT_LANE: [Tafeldecoratie]"
 
 - question: "Welke cadeaukaarten hebben jullie?"
-  expected_outcomes: "PRODUCT_LANE: [Cadeaukaarten]"
+  expected_outcome: "PRODUCT_LANE: [Cadeaukaarten]"
 
 - question: "welke tijdschriften verkopen jullie"
-  expected_outcomes: "PRODUCT_LANE: [Tijdschriften]"
+  expected_outcome: "PRODUCT_LANE: [Tijdschriften]"
 
 - question: "Ik wil een kaart voor een verjaardag"
-  expected_outcomes: "PRODUCT_LANE: [Verjaardagskaarten]"
+  expected_outcome: "PRODUCT_LANE: [Verjaardagskaarten]"
 
 - question: "ik wil een bol.com cadeaukaart"
-  expected_outcomes: "PRODUCT_LANE: [bol.com cadeaukaart]"
+  expected_outcome: "PRODUCT_LANE: [bol.com cadeaukaart]"
