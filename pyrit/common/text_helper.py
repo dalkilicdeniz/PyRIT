@@ -140,7 +140,7 @@ def _render_report_html(
                     passed = str(final_score).lower() == "true"
 
         else:
-            # dataset: single or multi-step
+            # Dataset report: single or multi-step
             if "conversation" in result:
                 conv = result["conversation"]
                 transcript = []
@@ -214,10 +214,13 @@ def _render_report_html(
         <details>
           <summary>{' | '.join(summary_parts)}</summary>
           <table>
-            <thead><tr><th>User</th><th>Assistant</th><th>Score</th></tr></thead>
-            <tbody>
         """
-
+        # Update table header and row ordering for dataset report: input, assistant response, expected output, score.
+        if not is_chat_eval:
+            html += "<thead><tr><th>User</th><th>Assistant</th><th>Expected Output</th><th>Score</th></tr></thead>"
+        else:
+            html += "<thead><tr><th>User</th><th>Assistant</th><th>Score</th></tr></thead>"
+        html += "<tbody>"
 
         for turn in transcript:
             user_piece = next((p for p in turn["pieces"] if p["role"] == "user"), {"converted_value": ""})
@@ -239,9 +242,18 @@ def _render_report_html(
                     val_display = "✔️ True" if val else "❌ False"
                 else:
                     val_display = f"{val:.2f}"
-
                 scores_html += f"<div><strong class='{cls}'>{val_display}</strong><div class='explanation'>{rationale}</div></div>"
-            html += f"<tr><td>{user_text}</td><td>{assistant_text}</td><td>{scores_html}</td></tr>"
+
+            if not is_chat_eval:
+                # Retrieve expected output from the first score object.
+                if assistant_piece.get("scores") and len(assistant_piece["scores"]) > 0:
+                    assistant_expected = sanitize(assistant_piece["scores"][0].get("expected_output", "N/A"))
+                else:
+                    assistant_expected = "N/A"
+                # New order: User, Assistant, Expected Output, Score.
+                html += f"<tr><td>{user_text}</td><td>{assistant_text}</td><td>{assistant_expected}</td><td>{scores_html}</td></tr>"
+            else:
+                html += f"<tr><td>{user_text}</td><td>{assistant_text}</td><td>{scores_html}</td></tr>"
 
         html += "</tbody></table></details>"
 
@@ -249,7 +261,6 @@ def _render_report_html(
     html = html.replace("{failed}", str(total_cases - passed_cases))
     html += "</div></body></html>"
     return html
-
 
 def generate_simulation_report(
         results: list,
