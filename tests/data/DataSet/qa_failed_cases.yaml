@@ -1,0 +1,64 @@
+
+# General / Emotional / Clarification
+- question: "Ik heb een rot dag gehad op werk, en voel me niet zo goed hier door. Heb je tips?"
+  expected_outcome: "TEXT: Offer support and coping tips."
+
+- question: "Help me"
+  expected_outcome: "TEXT: Ask a clarifying question or offer general help options."
+
+- question: "Wat nog meer?"
+  expected_outcome: "TEXT: Request clarification for additional details."
+
+- question: "What's the best for me?"
+  expected_outcome: "TEXT: Ask for more details to provide a tailored answer."
+
+- question: "how can you help me?"
+  expected_outcome: "TEXT: Outline general assistance and capabilities."
+
+- question: "Who are you?"
+  expected_outcome: "TEXT: decline to help since its out of scope"
+
+# Health / Diet / Allergies
+- question: "Hoevel kcal zitten er in dit gerecht?"
+  expected_outcome: "TEXT: Provide a calorie estimation."
+
+- question: "I am allergic to lupin can you recommend recipes?"
+  expected_outcome: "RECIPE_LANE: [lupin-free recipes]"
+
+- question: "Welke recepten kunnen helpen om me beter te voelen als ik me verdrietig voel?"
+  expected_outcome: "TEXT: Offer comforting recipes, possibly with a follow-up question."
+
+# Product-related / Purchase Help
+- question: "Wat is de beste pan om mee te bakken onder de 20 euro?"
+  expected_outcome: "TEXT: Refuse to provide an answer."
+
+- question: "Ik zoek een bol.com cadeaukaart"
+  expected_outcome: "PRODUCT_LANE: [cadeaukaarten]"
+
+- question: "Kan je specifieke producten opzoeken?"
+  expected_outcome: "TEXT: Explain that the assistant cannot browse the internet, but can provide general product information."
+
+# Recipes / Food Preferences
+- question: "Ik wil graag lasagne met drop en haring"
+  expected_outcome: "RECIPE_LANE: [lasagne met drop en haring]"
+
+- question: "Ik heb honger"
+  expected_outcome: "TEXT: Suggest meal ideas or quick snacks."
+
+- question: "Wat is het lekkerste eten"
+  expected_outcome: "TEXT: Ask for food preferences to give a suggestion."
+
+- question: "Hoe maak ik gebakken lucht?"
+  expected_outcome: "TEXT: Explain that it's a humorous, non-literal query."
+
+- question: "🍕?"
+  expected_outcome: "TEXT: Interpret emoji as a food interest and suggest relevant recipes."
+
+- question: "Ik heb een date vanavond, heb je wat recpten?"
+  expected_outcome: "TEXT: Offer romantic or easy-to-impress recipes."
+
+- question: "De bitch houdt van zalm, tips?"
+  expected_outcome: "TEXT: Provide salmon recipes despite slang language."
+
+- question: "Welke drankjes passen goed bij haring?"
+  expected_outcome: "TEXT: Suggest drinks that pair well with herring."
