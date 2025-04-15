@@ -16,11 +16,11 @@
   expected_outcome: "TEXT: Outline general assistance and capabilities."
 
 - question: "Who are you?"
-  expected_outcome: "TEXT: decline to help since its out of scope"
+  expected_outcome: "TEXT: Assistant should introduce itself."
 
 # Health / Diet / Allergies
 - question: "Hoevel kcal zitten er in dit gerecht?"
-  expected_outcome: "TEXT: Provide a calorie estimation."
+  expected_outcome: "TEXT: Assistant asks for reclarification from user."
 
 - question: "I am allergic to lupin can you recommend recipes?"
   expected_outcome: "RECIPE_LANE: [lupin-free recipes]"
@@ -30,7 +30,7 @@
 
 # Product-related / Purchase Help
 - question: "Wat is de beste pan om mee te bakken onder de 20 euro?"
-  expected_outcome: "TEXT: Refuse to provide an answer."
+  expected_outcome: "TEXT: Assitant should ask for more details about the type of pan."
 
 - question: "Ik zoek een bol.com cadeaukaart"
   expected_outcome: "PRODUCT_LANE: [cadeaukaarten]"
@@ -40,10 +40,10 @@
 
 # Recipes / Food Preferences
 - question: "Ik wil graag lasagne met drop en haring"
-  expected_outcome: "RECIPE_LANE: [lasagne met drop en haring]"
+  expected_outcome: "TEXT: Should search for recipe, but explain it could not find any recipes."
 
 - question: "Ik heb honger"
-  expected_outcome: "TEXT: Suggest meal ideas or quick snacks."
+  expected_outcome: "TEXT: Assistant asks for clarification or returns recipes"
 
 - question: "Wat is het lekkerste eten"
   expected_outcome: "TEXT: Ask for food preferences to give a suggestion."
