@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 class RTOSystemPromptPaths(enum.Enum):
     AH_ASSISTANT_CUSTOMER = Path(AH_PERSONAS, "customer.yaml").resolve()
+    AH_ASSISTANT_CUSTOMER_SHORT_PHRASE = Path(AH_PERSONAS, "steijn_customer_v1_short_phrases.yaml").resolve()
 
 class SteijnOrchestrator(MultiTurnOrchestrator):
     """
