@@ -8,12 +8,8 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Optional, Sequence, Union
 
-from colorama import Fore, Style
-
-from pyrit.common.display_response import display_image_response
-from pyrit.memory import CentralMemory
 from pyrit.models import PromptRequestPiece, PromptRequestResponse, Score, SeedPrompt
-from pyrit.orchestrator import Orchestrator
+from pyrit.orchestrator import Orchestrator, OrchestratorResult
 from pyrit.prompt_converter import PromptConverter
 from pyrit.prompt_normalizer import PromptNormalizer
 from pyrit.prompt_target import PromptChatTarget, PromptTarget
@@ -248,7 +244,6 @@ class MultiTurnOrchestrator(Orchestrator):
         super().__init__(prompt_converters=prompt_converters, verbose=verbose)
 
         self._objective_target = objective_target
-        self._achieved_objective = False
 
         self._adversarial_chat_system_seed_prompt = SeedPrompt.from_yaml_file(adversarial_chat_system_prompt_path)
 
@@ -283,7 +278,7 @@ class MultiTurnOrchestrator(Orchestrator):
     @abstractmethod
     async def run_attack_async(
         self, *, objective: str, memory_labels: Optional[dict[str, str]] = None
-    ) -> MultiTurnAttackResult:
+    ) -> OrchestratorResult:
         """
         Applies the attack strategy until the conversation is complete or the maximum number of turns is reached.
 
@@ -295,15 +290,17 @@ class MultiTurnOrchestrator(Orchestrator):
                 the passed-in labels take precedence. Defaults to None.
 
         Returns:
-            MultiTurnAttackResult: Contains the outcome of the attack, including:
-                - conversation_id (UUID): The ID associated with the final conversation state.
-                - achieved_objective (bool): Indicates whether the orchestrator successfully met the objective.
+            OrchestratorResult: Contains the outcome of the attack, including:
+                - conversation_id (str): The ID associated with the final conversation state.
                 - objective (str): The intended goal of the attack.
+                - status (OrchestratorResultStatus): The status of the attack ("success", "failure", "pruned", etc.)
+                - score (Score): The score evaluating the attack outcome.
+                - confidence (float): The confidence level of the result.
         """
 
     async def run_attacks_async(
         self, *, objectives: list[str], memory_labels: Optional[dict[str, str]] = None, batch_size=5
-    ) -> list[MultiTurnAttackResult]:
+    ) -> list[OrchestratorResult]:
         """Applies the attack strategy for each objective in the list of objectives.
 
         Args:
@@ -315,7 +312,12 @@ class MultiTurnOrchestrator(Orchestrator):
             batch_size (int): The number of objectives to process in parallel. The default value is 5.
 
         Returns:
-            list[MultiTurnAttackResult]: The list of MultiTurnAttackResults for each objective.
+            list[OrchestratorResult]: The list of OrchestratorResults for each objective, each containing:
+                - conversation_id (str): The ID associated with the final conversation state.
+                - objective (str): The intended goal of the attack.
+                - status (OrchestratorResultStatus): The status of the attack ("success", "failure", "pruned", etc.)
+                - score (Score): The score evaluating the attack outcome.
+                - confidence (float): The confidence level of the result.
         """
         semaphore = asyncio.Semaphore(batch_size)
 
