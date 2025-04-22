@@ -12,7 +12,7 @@ from uuid import uuid4
 from pyrit.common.path import RED_TEAM_ORCHESTRATOR_PATH, AH_PERSONAS
 from pyrit.common.utils import combine_dict
 from pyrit.models import PromptRequestPiece, Score, SeedPrompt, SeedPromptGroup
-from pyrit.orchestrator import MultiTurnAttackResult, MultiTurnOrchestrator
+from pyrit.orchestrator import OrchestratorResult, MultiTurnOrchestrator
 from pyrit.prompt_converter import PromptConverter
 from pyrit.prompt_normalizer import PromptNormalizer
 from pyrit.prompt_normalizer.prompt_converter_configuration import (
@@ -114,7 +114,7 @@ class SteijnRedTeamOrchestrator(MultiTurnOrchestrator):
 
     async def run_attack_async(
             self, *, objective: str, memory_labels: Optional[dict[str, str]] = None
-    ) -> MultiTurnAttackResult:
+    ) -> OrchestratorResult:
         """
         Executes a multi-turn red teaming attack asynchronously.
 
@@ -131,7 +131,7 @@ class SteijnRedTeamOrchestrator(MultiTurnOrchestrator):
                 the passed-in labels take precedence. Defaults to None.
 
         Returns:
-            MultiTurnAttackResult: Contains the outcome of the attack, including:
+            OrchestratorResult: Contains the outcome of the attack, including:
                 - conversation_id (UUID): The ID associated with the final conversation state.
                 - achieved_objective (bool): Indicates whether the orchestrator successfully met the objective.
                 - objective (str): The intended goal of the attack.
@@ -226,10 +226,12 @@ class SteijnRedTeamOrchestrator(MultiTurnOrchestrator):
                 f"number of turns ({self._max_turns}).",
             )
 
-        return MultiTurnAttackResult(
+        return OrchestratorResult(
             conversation_id=objective_target_conversation_id,
-            achieved_objective=achieved_objective,
             objective=objective,
+            status="success" if achieved_objective else "failure",
+            score=score,
+            confidence=1.0 if achieved_objective else 0.0,
         )
 
     async def _retrieve_and_send_prompt_async(
