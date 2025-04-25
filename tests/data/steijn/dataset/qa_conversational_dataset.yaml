@@ -10,3 +10,194 @@
   - question: "Nu is mijn soep te flauw"
     expected_outcome: "TEXT: [Advise on how to make the soup more tastefull]"
 
+- conversation:
+  - question: "hoe maak je een recept veganistisch?"
+    expected_outcome: "text and ask which dishtype"
+  - question: "Het is een risotto met kip"
+    expected_outcome: "TEXT: [How to replace the chicken for a vegetarion alternative]"
+  - question: "Hebben jullie geen vegatarische recepten?"
+    expected_outcome: "RECIPE_LANE: [vegetarian risotto's]"
+
+- conversation:
+  - question: "ik heb geen eieren in huis, waardoor kan ik die vervangen?"
+    expected_outcome: "text and ask which dishtype"
+  - question: "Maar ik bak een taart"
+    expected_outcome: "TEXT: [How to bake cake without egg]"
+
+- conversation:
+  - question: "Ik wil iets voor een feestje"
+    expected_outcome: "TEXT: Vraag om meer details over het soort producten of feestje"
+  - question: "Iets makkelijks om te serveren"
+    expected_outcome: "TEXT: Suggesties zoals chips, nootjes, kaasblokjes"
+
+- conversation:
+  - question: "Mag ik een mexicaanse wrap"
+    expected_outcome: "RECIPE_LANE: Recipes with mexican wraps"
+  - question: "Zonder kip graag"
+    expected_outcome: "RECIPE_LANE: Recipes with mexican wraps without chicken"
+
+- conversation:
+  - question: "Ik wil een pasta met rode saus"
+    expected_outcome: "RECIPE_LANE: Recipes with pasta's with red saus"
+  - question: "Met courgette"
+    expected_outcome: "RECIPE_LANE: Recipes with pasta's with red sauce and zucchini as ingredient"
+
+- conversation:
+  - question: "Wat maak je in de oven?"
+    expected_outcome: "TEXT: Vraag om meer details over het soort product of gerecht"
+  - question: "Een makkelijke ovenmaaltijd"
+    expected_outcome: "PRODUCT_LANE: [Ovenproducten]"
+
+- conversation:
+  - question: "Ik wil een chique gerecht maken voor mijn man"
+    expected_outcome: "TEXT: Vraag waar de gebruiker zin in heeft met wat voorstellen"
+  - question: "Ik wil een gerecht maken met zalm"
+    expected_outcome: "RECIPE_LANE: Recipes with salmon recipes"
+  - question: "Maar geen oven gerechten, ik heb geen oven."
+    expected_outcome: "RECIPE_LANE: Recipes with salmon dishes where no oven is needed"
+
+- conversation:
+  - question: "Ik zoek een feestelijk gerecht zonder oven"
+    expected_outcome: "TEXT: Vraag of het koud of warm geserveerd moet worden"
+  - question: "Carpaccio van rode biet met geitenkaas"
+    expected_outcome: "RECIPE_LANE: Festive recipes without oven"
+
+- conversation:
+  - question: "Ik heb zin in een frisse frisdrank"
+    expected_outcome: "PRODUCT_LANE: [soda's]"
+  - question: "Zonder suiker"
+    expected_outcome: "PRODUCT_LANE: [Soda zero's]"
+
+- conversation:
+  - question: "Kan ik de schil van een kiwi eten"
+    expected_outcome: "TEXT: Explaining that you can eat the peel if you wash it. But you can peel it easy"
+  - question: "Hoe eet ik het makkelijkste een kiwi"
+    expected_outcome: "TEXT: explaining easy way to eat kiwi"
+
+- conversation:
+  - question: "Ik heb zin in een makkelijk recept"
+    expected_outcome: "TEXT: ask for more details"
+  - question: "Een makkelijk oven gerecht dat vega is"
+    expected_outcome: "RECIPE_LANE: [Vegan recipies that go into the oven]"
+  - question: "Welke wijn is hier lekker bij?"
+    expected_outcome: "TEXT: [Wine pairing advise]"
+  - question: "Een witte wijn"
+    expected_outcome: "PRODUCT_LANE: [White Wines]"
+
+- conversation:
+  - question: "Ik heb zin in fruit"
+    expected_outcome: "TEXT: Vraag om meer details"
+  - question: "Iets zoets en fris graag"
+    expected_outcome: "PRODUCT_LANE: [Fris fruit]"
+
+- conversation:
+  - question: "Ik wil een gezonde pizza"
+    expected_outcome: "TEXT: Vraag om meer details over gezonde pizza-opties"
+  - question: "Met veel groentes graag"
+    expected_outcome: "PRODUCT_LANE: [Vegetarische pizza's]"
+
+- conversation:
+  - question: "Ik lust geen champignons"
+    expected_outcome: "TEXT: Vraag om meer details over alternatieven"
+  - question: "Franse recepten zonder champignons graag"
+    expected_outcome: "RECIPE_LANE: [Franse gerechten zonder champignons]"
+
+- conversation:
+  - question: "Wat kan ik koken met drie willekeurige ingrediënten uit mijn koelkast?"
+    expected_outcome: "TEXT: Vraag naar specifieke ingrediënten"
+  - question: "Een ui, een ei en een prei"
+    expected_outcome: "RECIPE_LANE: [Gerechten met een ui, ei en prei]"
+
+- conversation:
+  - question: "BBQ"
+    expected_outcome: "TEXT: Vraag om meer details over het soort product of gerecht"
+  - question: "Ik zoek gerechten voor een BBQ met vrienden"
+    expected_outcome: "RECIPE_LANE: [BBQ gerechten]"
+  - question: "Welke sauzen passen daar het beste bij?"
+    expected_outcome: "PRODUCT_LANE: [BBQ sauzen]"
+
+- conversation:
+  - question: "Ik wil vegetarisch eten"
+    expected_outcome: "TEXT: Vraag om meer details over het soort product of gerecht"
+  - question: "Ik wil een vegetarisch BBQ houden met vrienden"
+    expected_outcome: "RECIPE_LANE: [Vegetarische BBQ gerechten]"
+
+- conversation:
+  - question: "Mijn taart is mislukt"
+    expected_outcome: "TEXT: Vraag om meer details"
+  - question: "Hij is niet goed gaar geworden"
+    expected_outcome: "TEXT: Geef een lijst met oplossingen"
+  - question: "Ik heb hem al weggegooid, wat voor taart kan ik kopen"
+    expected_outcome: "PRODUCT_LANE: [Taarten]"
+
+- conversation:
+  - question: "ik wil gezond eten"
+    expected_outcome: "TEXT: Vraag om meer details over het soort product of gerecht"
+  - question: "Welke gezonde recepten heb je"
+    expected_outcome: "RECIPE_LANE: [Gezonde gerechten]"
+  - question: "Maak het derde gerecht vegetarisch"
+    expected_outcome: "TEXT: Het derde gerecht is vegetarisch gemaakt"
+
+- conversation:
+  - question: "Ik wil iets gezonds"
+    expected_outcome: "TEXT: Vraag om meer details over het soort product of gerecht"
+  - question: "Iets met veel groente"
+    expected_outcome: "RECIPE_LANE: [Gezonde gerechten met veel groenten]"
+
+- conversation:
+  - question: "Pasta?"
+    expected_outcome: "TEXT: Vraag om meer details over het soort pasta of saus"
+  - question: "Rode saus"
+    expected_outcome: "RECIPE_LANE: [Pasta's met rode saus]"
+  - question: "Zonder vlees"
+    expected_outcome: "RECIPE_LANE: [Vegetarische pasta's met rode saus]"
+
+- conversation:
+  - question: "Ik wil iets in de oven maken"
+    expected_outcome: "TEXT: Vraag om meer details"
+  - question: "Iets makkelijks"
+    expected_outcome: "PRODUCT_LANE: [Ovenproducten die eenvoudig zijn]"
+
+- conversation:
+  - question: "Wat is een goede lunch?"
+    expected_outcome: "TEXT: Vraag om voorkeuren zoals koud/warm of ingrediënten"
+  - question: "Koud"
+    expected_outcome: "RECIPE_LANE: [Koude lunchgerechten]"
+
+- conversation:
+  - question: "Iets feestelijks"
+    expected_outcome: "TEXT: Vraag of het een maaltijd of hapjes moet zijn"
+  - question: "Hapjes"
+    expected_outcome: "RECIPE_LANE: [Feestelijke hapjes]"
+
+- conversation:
+  - question: "Wraps?"
+    expected_outcome: "TEXT: Vraag om meer details over voorkeuren"
+  - question: "Vegetarisch"
+    expected_outcome: "RECIPE_LANE: [Vegetarische wraps]"
+
+- conversation:
+  - question: "Fruit"
+    expected_outcome: "TEXT: Vraag om meer details over soort fruit of gebruiksmoment"
+  - question: "Voor ontbijt"
+    expected_outcome: "PRODUCT_LANE: [Ontbijtfruit of fruitmixen]"
+
+- conversation:
+  - question: "Iets warms"
+    expected_outcome: "TEXT: Vraag om moment van de dag of soort gerecht"
+  - question: "Avondeten"
+    expected_outcome: "RECIPE_LANE: [Warme hoofdgerechten]"
+  - question: "Vega graag"
+    expected_outcome: "RECIPE_LANE: [Vegetarische warme hoofdgerechten]"
+
+- conversation:
+  - question: "Toetje?"
+    expected_outcome: "TEXT: Vraag om meer details over het soort dessert"
+  - question: "Zonder suiker"
+    expected_outcome: "RECIPE_LANE: [Desserts zonder suiker]"
+
+- conversation:
+  - question: "Ik wil een snack"
+    expected_outcome: "TEXT: Vraag om voorkeuren zoals gezond/ongezond, zoet/hartig"
+  - question: "Gezond"
+    expected_outcome: "PRODUCT_LANE: [Gezonde snacks]"
