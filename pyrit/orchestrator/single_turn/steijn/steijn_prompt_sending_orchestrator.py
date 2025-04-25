@@ -140,9 +140,12 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
         """
         all_responses = []
         single_turn_requests: List[NormalizerRequest] = []
+        start_request_copy = self._objective_target.http_request
 
         for i, qa in enumerate(qa_pairs):
             print("\nExecuting test case:", i+1)
+            self._objective_target.http_request = start_request_copy # Reset to the original request for each test case.
+
             # Multi-turn test case.
             if "conversation" in qa:
                 # Flush any accumulated single-turn requests.
@@ -151,6 +154,7 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
                     single_turn_requests = []
 
                 conversation_id = str(uuid.uuid4())
+                is_thread_id_set = False
                 for idx, turn in enumerate(qa["conversation"]):
                     prompt_text = turn["question"]
                     print("Question:", prompt_text)
@@ -169,14 +173,15 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
                     flattened = PromptRequestResponse.flatten_to_prompt_request_pieces(results)
                     if idx == 0:
                         thread_id = flattened[0].prompt_metadata.get("thread_id")
-                        if thread_id:
+                        if thread_id and not is_thread_id_set:
                             # Update the target's HTTP URL to include the threadId.
-                            if re.search(r"threadId=\d+", self._objective_target.http_request):
-                                self._objective_target.http_request = re.sub(
-                                    r"threadId=\d+", f"threadId={thread_id}", self._objective_target.http_request
+                            match = re.search(r"(https?://[^\s/$.?#].[^\s]*)", self._objective_target.http_request)
+                            if match:
+                                url = match.group(1)
+                                self._objective_target.http_request = self._objective_target.http_request.replace(
+                                    url, f"{url}?threadId={thread_id}"
                                 )
-                            else:
-                                self._objective_target.http_request += f"&threadId={thread_id}"
+                                is_thread_id_set = True
                         else:
                             print("Thread ID not found in the first turn's response. Aborting this conversation.")
                             break
@@ -204,28 +209,6 @@ class SteijnPromptSendingOrchestrator(Orchestrator):
             all_responses.extend(results)
 
         return all_responses
-
-    async def print_conversations_async(self):
-        """Prints the conversation between the objective target and the red teaming bot."""
-        messages = self.get_memory()
-        last_conversation_id = None
-
-        for message in messages:
-            if message.conversation_id != last_conversation_id:
-                print(f"{Style.NORMAL}{Fore.RESET}Conversation ID: {message.conversation_id}")
-                last_conversation_id = message.conversation_id
-
-            if message.role == "user" or message.role == "system":
-                print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
-            else:
-                print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
-                await display_image_response(message)
-
-            for score in message.scores:
-                if float(score.score_value) > 0.7:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
-                else:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
 
     def validate_normalizer_requests(self, *, prompt_request_list: List[NormalizerRequest]):
         """

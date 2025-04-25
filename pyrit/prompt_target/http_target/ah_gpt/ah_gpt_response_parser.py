@@ -4,28 +4,17 @@ class AHGPTResponseParser:
     @staticmethod
     def parse_response(response):
         try:
-            lines = response.text.splitlines()
-            tokens = []
+            # Parse the JSON string directly
+            data = json.loads(response.text)
+            messages = data.get("messages", [])
 
-            for line in lines:
-                # We only care about lines starting with `data:` — `event:` lines can be skipped
-                if line.startswith("data:"):
-                    data_part = line.split("data:", 1)[1].strip()
-                    if not data_part:
-                        continue  # skip empty lines
+            # Find the last assistant message
+            for message in reversed(messages):
+                if message.get("role") == "assistant":
+                    return {"text_message": message.get("content", "").strip()}
 
-                    try:
-                        data = json.loads(data_part)
-                        token = data.get("token", "")
-                        if token:
-                            tokens.append(token)
-                    except json.JSONDecodeError as e:
-                        print("JSON parse error:", e)
-                        continue
-
-            message = "".join(tokens).strip()
-            return {"text_message": message}
+            return {"text_message": ""}  # Fallback if no assistant message is found
 
         except Exception as e:
             print("Failed to parse AI message response:", e)
-            return {"text": ""}
+            return {"text_message": ""}

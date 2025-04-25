@@ -2,8 +2,9 @@
 # Licensed under the MIT license.
 import asyncio
 import logging
+import re
 import uuid
-from typing import Optional, Union
+from typing import Optional, Union, List, Dict, Any
 
 from colorama import Fore, Style
 from langsmith import expect
@@ -28,12 +29,12 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
     """
 
     def __init__(
-        self,
-        objective_target: PromptTarget,
-        prompt_converters: Optional[list[PromptConverter]] = None,
-        scorers: Optional[list[Scorer]] = None,
-        batch_size: int = 1,
-        verbose: bool = False,
+            self,
+            objective_target: PromptTarget,
+            prompt_converters: Optional[list[PromptConverter]] = None,
+            scorers: Optional[list[Scorer]] = None,
+            batch_size: int = 1,
+            verbose: bool = False,
     ) -> None:
         """
         Args:
@@ -71,7 +72,7 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
         self._prepended_conversation = prepended_conversation
 
     async def get_prepended_conversation_async(
-        self, *, normalizer_request: NormalizerRequest
+            self, *, normalizer_request: NormalizerRequest
     ) -> Optional[list[PromptRequestResponse]]:
         """
         Returns the prepended conversation for the normalizer request.
@@ -84,7 +85,7 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
         return None
 
     def set_skip_criteria(
-        self, *, skip_criteria: PromptFilterCriteria, skip_value_type: PromptConverterState = "original"
+            self, *, skip_criteria: PromptFilterCriteria, skip_value_type: PromptConverterState = "original"
     ):
         """
         Sets the skip criteria for the orchestrator.
@@ -94,10 +95,10 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
         self._prompt_normalizer.set_skip_criteria(skip_criteria=skip_criteria, skip_value_type=skip_value_type)
 
     async def send_normalizer_requests_async(
-        self,
-        *,
-        prompt_request_list: list[NormalizerRequest],
-        memory_labels: Optional[dict[str, str]] = None,
+            self,
+            *,
+            prompt_request_list: list[NormalizerRequest],
+            memory_labels: Optional[dict[str, str]] = None,
     ) -> list[PromptRequestResponse]:
         """
         Sends the normalized prompts to the prompt target.
@@ -138,86 +139,102 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
                     piece.prompt_metadata["reference_prompt"] = request_prompts[i]
 
         for scorer in self._scorers:
-                await scorer.score_responses_inferring_tasks_batch_async(
-                    request_responses=response_pieces, batch_size=5
-                )
+            await scorer.score_responses_inferring_tasks_batch_async(
+                request_responses=response_pieces, batch_size=5
+            )
 
         return responses
 
-    async def send_prompts_async(
-        self,
-        *,
-        prompt_list: list[str],
-        expected_output_list: list[str] = None,
-        prompt_type: PromptDataType = "text",
-        memory_labels: Optional[dict[str, str]] = None,
-        metadata: Optional[dict[str, Union[str, int]]] = None,
-        thread_ids: Optional[list[str]] = None,
-    ) -> list[PromptRequestResponse]:
+    async def send_qa_pairs_async(self, qa_pairs: List[Dict[str, Any]]) -> list[PromptRequestResponse]:
         """
-        Sends the prompts to the prompt target.
-
-        Args:
-            prompt_list (list[str]): The list of prompts to be sent.
-            prompt_type (PromptDataType): The type of prompt data. Defaults to "text".
-            memory_labels (dict[str, str], Optional): A free-form dictionary of additional labels to apply to the
-                prompts. Any labels passed in will be combined with self._global_memory_labels (from the
-                GLOBAL_MEMORY_LABELS environment variable) into one dictionary. In the case of collisions,
-                the passed-in labels take precedence. Defaults to None.
-            metadata (Optional(dict[str, str | int]): Any additional information to be added to the memory entry
-                corresponding to the prompts sent.
-
-        Returns:
-            list[PromptRequestResponse]: The responses from sending the prompts.
+        Sends a list of QA pairs to the prompt target.
+        Supports both single-turn and multi-turn conversational test cases.
+        For multi-turn cases, all turns in a conversation share the same conversation ID.
+        For multi-turn conversations, the first turn's response is awaited so that its thread ID can be extracted
+        and then the target's HTTP request URL is updated accordingly.
+        Single-turn cases are batched together.
         """
-        if isinstance(prompt_list, str):
-            prompt_list = [prompt_list]
+        all_responses = []
+        single_turn_requests: List[NormalizerRequest] = []
+        start_request_copy = self._objective_target.http_request
 
-        requests: list[NormalizerRequest] = []
+        for i, qa in enumerate(qa_pairs):
+            print("\nExecuting test case:", i+1)
+            self._objective_target.http_request = start_request_copy # Reset to the original request for each test case.
 
-        i= 0
-        for prompt in prompt_list:
-            expected_output = expected_output_list[i] if expected_output_list else None
-            metadata = {"chatId": thread_ids[i]} if thread_ids else metadata
-            requests.append(
-                    self._create_normalizer_request(
-                        prompt_text=prompt,
+            # Multi-turn test case.
+            if "conversation" in qa:
+                # Flush any accumulated single-turn requests.
+                if single_turn_requests:
+                    await self.send_normalizer_requests_async(prompt_request_list=single_turn_requests)
+                    single_turn_requests = []
+
+                conversation_id = str(uuid.uuid4())
+                is_thread_id_set = False
+                for idx, turn in enumerate(qa["conversation"]):
+                    prompt_text = turn["question"]
+                    print("Question:", prompt_text)
+                    expected_output = turn["expected_outcome"]
+                    request = self._create_normalizer_request(
+                        prompt_text=prompt_text,
                         expected_output=expected_output,
-                        prompt_type=prompt_type,
+                        prompt_type="text",
                         converters=self._prompt_converters,
-                        metadata=metadata,
-                        conversation_id=str(uuid.uuid4()),
+                        metadata=None,
+                        conversation_id=conversation_id,
                     )
-                )
-            i+=1
 
-        return await self.send_normalizer_requests_async(
-            prompt_request_list=requests,
-            memory_labels=memory_labels,
-        )
+                    results = await self.send_normalizer_requests_async(prompt_request_list=[request])
+                    all_responses.extend(results)
+                    flattened = PromptRequestResponse.flatten_to_prompt_request_pieces(results)
+                    if idx == 0:
+                        thread_id = flattened[0].prompt_metadata.get("chatId")
+                        if thread_id and not is_thread_id_set:
+                            # Update the target's HTTP URL to include the threadId.
+                            if re.search(r"(test+)", self._objective_target.http_request):
+                                self._objective_target.http_request = re.sub(
+                                    r"test+", f"{thread_id}/messages", self._objective_target.http_request
+                                )
 
-    async def print_conversations_async(self):
-        """Prints the conversation between the objective target and the red teaming bot."""
-        messages = self.get_memory()
+                                follow_up_request_body = """{
+                                    "message": "{{PROMPT}}"
+                                }"""
 
-        last_conversation_id = None
+                                self._objective_target.http_request = re.sub(
+                                    r'\n\n.*',  # Match from the double newline to the end
+                                    f'\n\n{follow_up_request_body}',
+                                    self._objective_target.http_request,
+                                    flags=re.DOTALL
+                                )
 
-        for message in messages:
-            if message.conversation_id != last_conversation_id:
-                print(f"{Style.NORMAL}{Fore.RESET}Conversation ID: {message.conversation_id}")
-                last_conversation_id = message.conversation_id
+                                is_thread_id_set = True
+                        else:
+                            print("Thread ID not found in the first turn's response. Aborting this conversation.")
+                            break
 
-            if message.role == "user" or message.role == "system":
-                print(f"\n{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
+                    # Optionally, wait a bit between turns.
+                    await asyncio.sleep(1)
             else:
-                print(f"{Style.BRIGHT}{Fore.LIGHTBLACK_EX}{message.role.capitalize()}: {Style.NORMAL}{message.converted_value}")
-                await display_image_response(message)
+                # Single-turn test case: accumulate the request.
+                prompt_text = qa["question"]
+                print("Question:", prompt_text)
+                expected_output = qa["expected_outcome"]
+                request = self._create_normalizer_request(
+                    prompt_text=prompt_text,
+                    expected_output=expected_output,
+                    prompt_type="text",
+                    converters=self._prompt_converters,
+                    metadata=None,
+                    conversation_id=str(uuid.uuid4()),
+                )
+                single_turn_requests.append(request)
 
-            for score in message.scores:
-                if float(score.score_value) > 0.7:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
-                else:
-                    print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+        # Flush any remaining single-turn requests in one batch.
+        if single_turn_requests:
+            results = await self.send_normalizer_requests_async(prompt_request_list=single_turn_requests)
+            all_responses.extend(results)
+
+        return all_responses
 
     def validate_normalizer_requests(self, *, prompt_request_list: list[NormalizerRequest]):
         """
@@ -231,7 +248,7 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
         """
         Adds the conversation to memory if there is a prepended conversation, and return the conversation ID.
         """
-        conversation_id = str(uuid.uuid4())
+        conversation_id = normalizer_request.conversation_id or str(uuid.uuid4())
 
         prepended_conversation = await self.get_prepended_conversation_async(normalizer_request=normalizer_request)
         if prepended_conversation:
@@ -247,64 +264,57 @@ class AHGPTPromptSendingOrchestrator(Orchestrator):
                 self._memory.add_request_response_to_memory(request=request)
         return conversation_id
 
-    def get_chat_results(self) -> list[dict]:
+    def get_all_chat_results(self) -> List[dict]:
         """
-        Retrieves single-turn results from the orchestrator's memory, pairing each user
-        message with the next assistant message in the same conversation. Each result
-        entry includes:
-          {
-            "conversation_id": str,
-            "prompt": str,
-            "assistant_response": str,
-            "scores": [
-                {
-                    "score_value": float,
-                    "score_rationale": str
-                },
-                ...
-            ]
-          }
+        Retrieves all chat results from the orchestrator's memory by grouping messages by conversation ID.
+
+        For each conversation:
+          - If the conversation contains exactly one user message followed by one assistant message,
+            it returns a simplified dictionary with keys "prompt", "assistant_response", and "scores".
+          - Otherwise, it returns the full transcript under the key "conversation".
 
         Returns:
-            list[dict]: A list of single-turn results, ready to be used in a single-turn HTML report.
+            List[dict]: A list of conversation results.
         """
         messages = self.get_memory()
-        results = []
+        conv_dict: Dict[str, List[Dict[str, Any]]] = {}
 
-        user_prompt = None
-        conversation_id = None
-
-        # Iterate through all messages in memory
+        # Group messages by conversation_id.
         for msg in messages:
-
-            if msg.role == "user":
-                # Record user prompt and conversation ID
-                user_prompt = msg.converted_value
-                conversation_id = msg.conversation_id
-
-            elif msg.role == "assistant" and user_prompt is not None:
-                # We have found an assistant response that pairs with the last user prompt
-                assistant_response = msg.converted_value
-
-                # Convert the message scores to a list of dicts
-                single_turn_scores = []
-                for s in msg.scores:
-                    single_turn_scores.append({
+            conv_id = msg.conversation_id
+            if conv_id not in conv_dict:
+                conv_dict[conv_id] = []
+            entry = {
+                "role": msg.role,
+                "message": msg.converted_value
+            }
+            if msg.scores:
+                entry["scores"] = [
+                    {
                         "score_value": s.score_value,
                         "score_rationale": s.score_rationale,
                         "expected_output": s.expected_output
-                    })
+                    }
+                    for s in msg.scores
+                ]
+            conv_dict[conv_id].append(entry)
 
-                # Build the single-turn result
+        results = []
+        for conv_id, conversation in conv_dict.items():
+            # If conversation has exactly one user and one assistant message, return a pair structure.
+            if (len(conversation) == 2 and
+                    conversation[0]["role"].lower() == "user" and
+                    conversation[1]["role"].lower() == "assistant"):
                 results.append({
-                    "conversation_id": conversation_id,
-                    "prompt": user_prompt,
-                    "assistant_response": assistant_response,
-                    "scores": single_turn_scores
+                    "conversation_id": conv_id,
+                    "prompt": conversation[0]["message"],
+                    "assistant_response": conversation[1]["message"],
+                    "scores": conversation[1].get("scores", [])
                 })
-
-                # Reset for the next user->assistant pair
-                user_prompt = None
-                conversation_id = None
-
+            else:
+                # Otherwise, return the entire conversation transcript.
+                results.append({
+                    "conversation_id": conv_id,
+                    "conversation": conversation
+                })
         return results

@@ -191,8 +191,6 @@ class SteijnRedTeamOrchestrator(MultiTurnOrchestrator):
                         self._objective_target.http_request = self._objective_target.http_request.replace(
                             url, f"{url}?threadId={thread_id}"
                         )
-                    else:
-                        self._objective_target.http_request += f"threadId={thread_id}"
                 else:
                     print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}\nThread ID not found. Restarting chat...")
                     retry_count += 1
