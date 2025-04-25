@@ -85,7 +85,6 @@ class SteijnHTTPTarget(PromptTarget):
             http2_version = True
 
         # to avoid rate limiting, we wait for 10 seconds between turns
-        print("Raw HTTP request: ", http_request_w_prompt)
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
             match http_body:
                 case dict():
