@@ -1,0 +1,25 @@
+- conversation:
+  - question: "wat is gezond eten?"
+    expected_outcome: "ask which dishtype the customer would like to see"
+  - question: "Een roerbak schotel met veel groenten"
+    expected_outcome: "RECIPE_LANE: [Recipes with vegetables you can strifry]"
+
+- conversation:
+  - question: "de soep is te zout"
+    expected_outcome: "text on how to make the soup less salty"
+  - question: "Nu is mijn soep te flauw"
+    expected_outcome: "TEXT: [Advise on how to make the soup more tastefull]"
+
+- conversation:
+  - question: "hoe maak je een recept veganistisch?"
+    expected_outcome: "text and ask which dishtype"
+  - question: "Het is een risotto met kip"
+    expected_outcome: "TEXT: [How to replace the chicken for a vegetarion alternative]"
+  - question: "Hebben jullie geen vegatarische recepten?"
+    expected_outcome: "RECIPE_LANE: [vegetarian risotto's]"
+
+- conversation:
+  - question: "ik heb geen eieren in huis, waardoor kan ik die vervangen?"
+    expected_outcome: "text and ask which dishtype"
+  - question: "Maar ik bak een taart"
+    expected_outcome: "TEXT: [How to bake cake without egg]"

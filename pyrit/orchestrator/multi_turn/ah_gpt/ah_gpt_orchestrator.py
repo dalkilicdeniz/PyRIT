@@ -143,44 +143,6 @@ class AHGPTOrchestrator(MultiTurnOrchestrator):
             ValueError: If the scoring feedback is not of the required type (true/false) for binary completion.
         """
 
-        # AH-GPT do not take the initial user message into account when we start the chat. It only uses it for generating a title. Therefore, we have to initialize chat separately.
-        # Send request to new chat endpoint and get the thread ID to use in actual chat
-        empty_seed = SeedPromptGroup(
-            prompts=[SeedPrompt(value="", data_type="text")],
-        )
-
-        response_piece = (
-            await self._prompt_normalizer.send_prompt_async(
-                target=self._objective_target,
-                seed_prompt_group=empty_seed,
-            )
-        ).request_pieces[0]
-
-        thread_id = response_piece.prompt_metadata.get("chatId")
-        print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}\nCreated new chat with thread_id: " + thread_id + f"{Style.NORMAL}")
-
-        # prepare chat request template
-        url = f"https://ahgpt-service.kaas.nonprd.k8s.ah.technology/v1/chats/{thread_id}/messages/stream"
-
-        # Replace the request body for follow-up messages
-        follow_up_request_body = """{
-              "message": "{{PROMPT}}"
-            }"""
-
-        # Update the HTTP request with the new body
-        self._objective_target.http_request = re.sub(
-            r'POST\s+https://ahgpt-service\.kaas\.nonprd\.k8s\.ah\.technology/v1/chats',
-            f'POST {url}',
-            self._objective_target.http_request
-        )
-
-        self._objective_target.http_request = re.sub(
-            r'\n\n.*',  # Match from the double newline to the end
-            f'\n\n{follow_up_request_body}',
-            self._objective_target.http_request,
-            flags=re.DOTALL
-        )
-
         # Set conversation IDs for objective target and adversarial chat at the beginning of the conversation.
         objective_target_conversation_id = str(uuid4())
         adversarial_chat_conversation_id = str(uuid4())
@@ -216,6 +178,34 @@ class AHGPTOrchestrator(MultiTurnOrchestrator):
                 custom_prompt=custom_prompt,
                 memory_labels=updated_memory_labels,
             )
+
+            # Extract the thread ID from the response to send follow-up messages
+            if turn == 1:
+                thread_id = response.prompt_metadata.get("chatId")
+                print(f"Extracted Thread ID: ", thread_id)
+
+                # Replace the request body for follow-up messages
+                follow_up_request_body = """{
+                    "message": "{{PROMPT}}"
+                }"""
+
+                if thread_id:
+                    match = re.search(r"(test+)", self._objective_target.http_request)
+                    if match:
+                        test_id_str = match.group(1)
+                        self._objective_target.http_request = self._objective_target.http_request.replace(
+                            test_id_str, f"{thread_id}/messages"
+                        )
+
+                        self._objective_target.http_request = re.sub(
+                            r'\n\n.*',  # Match from the double newline to the end
+                            f'\n\n{follow_up_request_body}',
+                            self._objective_target.http_request,
+                            flags=re.DOTALL
+                        )
+                else:
+                    print("Thread ID not found. Restarting chat...")
+                    continue
 
             # Reset custom prompt for future turns
             custom_prompt = None

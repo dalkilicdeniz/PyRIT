@@ -185,15 +185,12 @@ class SteijnOrchestrator(MultiTurnOrchestrator):
                 thread_id = response.prompt_metadata.get("thread_id")
                 print(f"Extracted Thread ID: ", thread_id)
                 if thread_id:
-                    match = re.search(r"(memberId=\d+)", self._objective_target.http_request)
+                    match = re.search(r"(https?://[^\s/$.?#].[^\s]*)", self._objective_target.http_request)
                     if match:
-                        member_id_str = match.group(1)
+                        url = match.group(1)
                         self._objective_target.http_request = self._objective_target.http_request.replace(
-                            member_id_str, f"{member_id_str}&threadId={thread_id}"
+                            url, f"{url}?threadId={thread_id}"
                         )
-                    else:
-                        self._objective_target.http_request += f"&threadId={thread_id}"
-
                 else:
                     print("Thread ID not found. Restarting chat...")
                     continue

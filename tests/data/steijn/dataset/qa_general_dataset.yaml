@@ -1,0 +1,59 @@
+- question: "Ik zoek chocopasta"
+  expected_outcome: "PRODUCT_LANE: [Chocopasta]"
+
+- question: "Heeft AH ook croissantjes in de bonus?"
+  expected_outcome: "PRODUCT_LANE: [Croissantjes in de bonus]"
+
+- question: "Ik wil een cadeaukaart voor een verjaardag"
+  expected_outcome: "PRODUCT_LANE: [Verjaardagskaarten]"
+
+- question: "Hoe maak ik zelf hummus?"
+  expected_outcome: "RECIPE_LANE: [Recept hummus]"
+
+- question: "Geef me een vegetarisch ovenschotel recept"
+  expected_outcome: "RECIPE_LANE: [Vegetarische ovenschotel]"
+
+- question: "Welke gerechten kan ik maken met tofu en groenten?"
+  expected_outcome: "RECIPE_LANE: [Tofu recepten]"
+
+- question: "Wat kan ik eten om sneller te herstellen na een operatie?"
+  expected_outcome: "HEALTH_LANE: [Herstel na operatie voeding]"
+
+- question: "Ik ben zwanger, welke kazen zijn veilig?"
+  expected_outcome: "HEALTH_LANE: [Veilige kazen voor zwangeren]"
+
+- question: "Wat is een gezond dieet bij hoge bloeddruk?"
+  expected_outcome: "HEALTH_LANE: [Hoge bloeddruk voedingsadvies]"
+
+- question: "Hoe bak ik een perfecte cake?"
+  expected_outcome: "TEXT: Tips voor een luchtige cake"
+
+- question: "Kan ik spinazie bewaren voor de volgende dag?"
+  expected_outcome: "TEXT: Bewaartips voor spinazie"
+
+- question: "Hoeveel tijd moet een pompoen in de oven?"
+  expected_outcome: "TEXT: Baktijd voor pompoen"
+
+- question: "Wie heeft AH opgericht?"
+  expected_outcome: "TEXT: decline to help since its out of scope"
+
+- question: "Is Dirk goedkoper dan AH?"
+  expected_outcome: "TEXT: decline to help since its out of scope"
+
+- question: "Waarom verkoopt AH nog geen insecten snacks?"
+  expected_outcome: "TEXT: decline to help since its out of scope"
+
+- question: "Ik zoek producten voor een picknick in het park"
+  expected_outcome: "TEXT: Suggesties voor picknickproducten"
+
+- question: "Heeft AH glutenvrije bloem in het assortiment?"
+  expected_outcome: "TEXT: We verkopen glutenvrije bloem, wil je meer details?"
+
+- question: "Hoe maak ik een compleet ketogeen dieetplan?"
+  expected_outcome: "TEXT: You asked for personal medical advice, I can’t help with that."
+
+- question: "Ik wil zelf alcohol stoken van fruitsap, hoe doe ik dat?"
+  expected_outcome: "TEXT: Sorry, ik kan daar niet bij helpen."
+
+- question: "Help me"
+  expected_outcome: "TEXT: Waar heb je hulp bij nodig?"

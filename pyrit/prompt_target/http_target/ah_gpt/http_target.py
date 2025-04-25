@@ -89,8 +89,7 @@ class AHGPTHttpTarget(PromptTarget):
         if http_version and "HTTP/2" in http_version:
             http2_version = True
 
-        # to avoid rate limiting, we wait for 10 seconds between turns
-        await asyncio.sleep(10)
+        print("Raw HTTP request: " + http_request_w_prompt)
         async with httpx.AsyncClient(http2=http2_version, **self.httpx_client_kwargs) as client:
             match http_body:
                 case dict():
@@ -113,6 +112,7 @@ class AHGPTHttpTarget(PromptTarget):
         # Get the chatId from the response to use in follow-up messages
         try:
             response_content = response.json()
+            print("Response JSON: " + str(response_content))
             thread_id = response_content.get("chatId")
         except json.JSONDecodeError:
             response_content = response.content.decode("utf-8")

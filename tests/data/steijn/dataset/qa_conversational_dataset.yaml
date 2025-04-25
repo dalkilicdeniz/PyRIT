@@ -1,0 +1,12 @@
+- conversation:
+  - question: "wat is gezond eten?"
+    expected_outcome: "ask which dishtype the customer would like to see"
+  - question: "Een roerbak schotel met veel groenten"
+    expected_outcome: "RECIPE_LANE: [Recipes with vegetables you can strifry]"
+
+- conversation:
+  - question: "de soep is te zout"
+    expected_outcome: "text on how to make the soup less salty"
+  - question: "Nu is mijn soep te flauw"
+    expected_outcome: "TEXT: [Advise on how to make the soup more tastefull]"
+
