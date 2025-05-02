@@ -17,6 +17,7 @@ from pyrit.score import Scorer
 
 logger = logging.getLogger(__name__)
 
+
 class MultiTurnOrchestrator(Orchestrator):
     """
     The `MultiTurnOrchestrator` is an interface that coordinates attacks and conversations between
