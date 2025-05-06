@@ -253,6 +253,7 @@ API Reference
     OrchestratorResult
     PAIROrchestrator
     PromptSendingOrchestrator
+    QuestionAnsweringBenchmarkOrchestrator
     RedTeamingOrchestrator
     ScoringOrchestrator
     SkeletonKeyOrchestrator
@@ -315,6 +316,7 @@ API Reference
     UnicodeSubstitutionConverter
     UrlConverter
     VariationConverter
+    ZalgoConverter
     ZeroWidthConverter
 
 .. automodule:: pyrit.prompt_converter.fuzzer_converter
@@ -388,6 +390,7 @@ API Reference
     MarkdownInjectionScorer
     PromptShieldScorer
     Scorer
+    QuestionAnswerScorer
     SelfAskCategoryScorer
     SelfAskLikertScorer
     SelfAskRefusalScorer
