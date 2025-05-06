@@ -68,13 +68,9 @@ class OrchestratorResult:
 
                 await display_image_response(piece)
 
-                scores = self._memory.get_scores_by_prompt_ids(prompt_request_response_ids=[str(piece.id)])
-                if scores and len(scores) > 0:
-                    for score in scores:
-                        if score.score_value == "True":
-                            print(f"{Style.BRIGHT}{Fore.LIGHTGREEN_EX}Score: {Fore.LIGHTGREEN_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
-                        else:
-                            print(f"{Style.BRIGHT}{Fore.LIGHTRED_EX}Score: {Fore.LIGHTRED_EX}{score.score_value} : {Style.NORMAL}{score.score_rationale}")
+                if self.score:
+                    print(f"{Style.RESET_ALL}score: {self.score} : {self.score.score_rationale}")
+
 
     async def get_conversation_report_async(self) -> dict:
         """
@@ -207,3 +203,4 @@ class OrchestratorResult:
 
             pieces_data.append(piece_data)
         return pieces_data
+
