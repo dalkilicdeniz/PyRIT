@@ -33,7 +33,5 @@ class SteijnResponseParser:
                             pass  # Keep as a string if JSON parsing fails
 
                 response_data[field["name"]] = content
-            else:
-                response_data[field["name"]] = "ERROR, NO RESPONSE"
 
         return response_data
