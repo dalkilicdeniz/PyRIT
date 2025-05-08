@@ -58,7 +58,7 @@ class AHGPTOrchestrator(MultiTurnOrchestrator):
         objective_target: PromptTarget,
         adversarial_chat: PromptChatTarget,
         adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.AH_ASSISTANT_CUSTOMER.value,
-        adversarial_chat_seed_prompt: Optional[str] = "How can I help you?",
+        adversarial_chat_seed_prompt: Optional[str] = "",
         prompt_converters: Optional[list[PromptConverter]] = None,
         max_turns: int = 5,
         objective_scorer: Scorer,
@@ -160,7 +160,6 @@ class AHGPTOrchestrator(MultiTurnOrchestrator):
         achieved_objective = False
         while turn <= self._max_turns:
             # to avoid rate limiting, we wait for 10 seconds between turns
-            await asyncio.sleep(10)
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 

@@ -3,9 +3,9 @@ import json
 
 class SteijnResponseParser:
     response_fields_regex_dict = [
-        {"name": "text_message", "pattern": r"event:TEXT_MESSAGE\s+data:(.*?)(?:\n|$)"},
-        {"name": "data_message", "pattern": r"event:DATA_MESSAGE\s+data:(\{.*?\})"},
-        {"name": "suggestion_pills", "pattern": r"event:SUGGESTION_CHIPS\s+data:(\{.*?\})"}
+        {"name": "Text message", "pattern": r"event:TEXT_MESSAGE\s+data:(.*?)(?:\n|$)"},
+        {"name": "Data message", "pattern": r"event:DATA_MESSAGE\s+data:(\{.*?\})"},
+        {"name": "Suggestion pills", "pattern": r"event:SUGGESTION_CHIPS\s+data:(\{.*?\})"}
     ]
 
     @staticmethod
@@ -18,9 +18,10 @@ class SteijnResponseParser:
             matches = re.findall(field["pattern"], response_text, re.DOTALL)
 
             if matches:
-                if field["name"] == "text_message":
+                if field["name"] == "Text message":
                     # Combine all text messages, clean up whitespace
                     content = "".join(matches)
+
                 else:
                     content = matches[-1].strip()  # Get the latest non-empty match
 
@@ -32,5 +33,7 @@ class SteijnResponseParser:
                             pass  # Keep as a string if JSON parsing fails
 
                 response_data[field["name"]] = content
+            else:
+                response_data[field["name"]] = "ERROR, NO RESPONSE"
 
         return response_data

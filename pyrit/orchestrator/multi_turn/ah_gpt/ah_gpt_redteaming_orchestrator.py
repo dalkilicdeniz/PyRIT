@@ -59,7 +59,7 @@ class AHGPTRedTeamingOrchestrator(MultiTurnOrchestrator):
         objective_target: PromptTarget,
         adversarial_chat: PromptChatTarget,
         adversarial_chat_system_prompt_path: Path = RTOSystemPromptPaths.TEXT_GENERATION.value,
-        adversarial_chat_seed_prompt: Optional[str] = "How can I help you?",
+        adversarial_chat_seed_prompt: Optional[str] = "",
         prompt_converters: Optional[list[PromptConverter]] = None,
         max_turns: int = 5,
         objective_scorer: Scorer,
@@ -160,8 +160,6 @@ class AHGPTRedTeamingOrchestrator(MultiTurnOrchestrator):
         retry_count = 0
         achieved_objective = False
         while turn <= self._max_turns and retry_count < max_retries:
-            # to avoid rate limiting, we wait for 10 seconds between turns
-            await asyncio.sleep(10)
 
             logger.info(f"Applying the attack strategy for turn {turn}.")
 
@@ -415,6 +413,7 @@ class AHGPTRedTeamingOrchestrator(MultiTurnOrchestrator):
             # If there is no response from the attack target (i.e., this is the first turn),
             # we use the initial red teaming prompt
             logger.info(f"Using the specified initial adversarial prompt: {self._adversarial_chat_seed_prompt}")
+
             return self._adversarial_chat_seed_prompt.value
 
         if last_response_from_objective_target.converted_value_data_type in ["text", "error"]:

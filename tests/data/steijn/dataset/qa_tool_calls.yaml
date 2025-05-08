@@ -6,7 +6,7 @@
     - question: "Actually, let's skip gluten too."
       expected_outcome: "Confirm dietary preference, ask for dish type"
     - question: "A stir-fry sounds good."
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
 
 - conversation:
     - question: "I'm cooking for friends tomorrow."
@@ -16,7 +16,7 @@
     - question: "No dairy, though."
       expected_outcome: "Confirm dietary need and ask for ingredients or style"
     - question: "Actually — can you give me a taco recipe without cheese or sour cream?"
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
 
 - conversation:
     - question: "Looking for something light."
@@ -26,15 +26,15 @@
     - question: "No leafy greens though."
       expected_outcome: "Acknowledge and suggest alternatives (grain, bean salads)"
     - question: "Can you give me one with chickpeas and lemon?"
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
 
 - conversation:
     - question: "I want to use up leftovers."
       expected_outcome: "Ask what ingredients they have"
     - question: "I have rice, spinach, and feta."
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
     - question: "Actually, no feta — can you show me a different one?"
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
 
 - conversation:
     - question: "Any good winter meals?"
@@ -44,66 +44,66 @@
     - question: "Vegetarian and not too heavy."
       expected_outcome: "Suggest options that match, ask for confirmation"
     - question: "Can you give me one with pumpkin?"
-      expected_outcome: "RECIPE_LANE"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE"
 
 - question: "Can you give me a healthy breakfast, lunch, and dinner recipe?"
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
 
 - question: "I need ideas for meals tomorrow — something easy for breakfast and a vegetarian dinner."
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
 
 - conversation:
     - question: "Can you help me plan meals for the day?"
       expected_outcome: "Ask for the number of meals or dietary needs"
     - question: "Yes, a keto breakfast and high-protein dinner please."
-      expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
 
 - conversation:
     - question: "I want to prep lunch and dinner ahead for tomorrow."
       expected_outcome: "Ask for dietary restrictions or ingredients"
     - question: "Lunch should be light, dinner vegetarian."
-      expected_outcome: "RECIPE_LANE for lunch, RECIPE_LANE for dinner"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for lunch, RECIPE_LANE for dinner"
 
 - question: "What are three budget-friendly meals I can make today?"
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
 
 - conversation:
     - question: "Can I get a gluten-free breakfast and a low-carb lunch?"
-      expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch"
 
 - question: "Give me three meals using only pantry staples — one for each mealtime."
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
 
 - conversation:
     - question: "I want something sweet for breakfast and something spicy for dinner."
-      expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for dinner"
 
 - conversation:
     - question: "What should I eat today?"
       expected_outcome: "Ask for meal types or preferences"
     - question: "Surprise me — one idea for each meal!"
-      expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner"
 
 - question: "Suggest meals for a picnic: light lunch and a no-bake dessert."
-  expected_outcome: "RECIPE_LANE for lunch, RECIPE_LANE for dessert"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for lunch, RECIPE_LANE for dessert"
 
 - question: "Can you suggest a breakfast, lunch, dinner, and snack idea for tomorrow?"
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for snack"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for snack"
 
 - question: "Give me 4 vegan meals: breakfast, lunch, dinner and dessert."
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert"
 
 - question: "I'd like kid-friendly meals for the whole day — breakfast, lunch, dinner, and something sweet."
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert"
 
 - question: "I’m planning a party — I need a starter, a main course, a dessert, and a drink."
-  expected_outcome: "RECIPE_LANE for appetizer, RECIPE_LANE for main, RECIPE_LANE for dessert, RECIPE_LANE for drink"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for appetizer, RECIPE_LANE for main, RECIPE_LANE for dessert, RECIPE_LANE for drink"
 
 - question: "What are 5 Mediterranean-style dishes I can make: breakfast, lunch, dinner, dessert, and a snack?"
-  expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert, RECIPE_LANE for snack"
+  expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for dessert, RECIPE_LANE for snack"
 
 - conversation:
     - question: "Can you plan an entire meal day for someone eating low-carb?"
       expected_outcome: "Ask for number of meals or dish types"
     - question: "Yes — breakfast, lunch, dinner, snack, and dessert please."
-      expected_outcome: "RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for snack, RECIPE_LANE for dessert"
+      expected_outcome: "DATA_MESSAGE: RECIPE_LANE for breakfast, RECIPE_LANE for lunch, RECIPE_LANE for dinner, RECIPE_LANE for snack, RECIPE_LANE for dessert"
